@@ -112,6 +112,8 @@ button{cursor:pointer}
 #stage.disc #bub{top:11%;max-height:27%}
 #airLight{position:absolute;top:2%;left:3%;font-size:12px;font-weight:800;letter-spacing:2px;color:#fff;background:#C0352B;padding:4px 10px;border-radius:6px;box-shadow:0 0 10px rgba(255,80,60,.75);z-index:3;display:none}
 #stage.onair #airLight{display:block}
+#cueChip{position:absolute;top:calc(2% + 30px);left:3%;border:none;background:rgba(20,14,12,.82);color:#fff;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;z-index:3}
+body.clean #cueChip{display:none}
 #stage.onair #discBar{left:auto;right:3%;transform:none;max-width:68%}
 body.clean #stage.onair.nolight #airLight{display:none}
 #airBtn{border:1px solid var(--line);background:var(--ui2);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
@@ -197,6 +199,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
 </g></g></svg></div>
   <div id="airLight">ON AIR</div>
+  <button id="cueChip" hidden></button>
   <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
   <div id="heard"></div>
   <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
@@ -227,6 +230,9 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="seg" id="aSeg"><button data-p="kyi" class="on">Chat Kyi</button><button data-p="paw">Thamein Paw Taw</button></div>
   <div class="f"><label for="aTitle">Episode topic (optional)</label><input type="text" id="aTitle" placeholder="e.g. Moving out of your parents' house"></div>
   <div class="f"><label for="aUrl">Or a link for him to read first (optional)</label><input type="text" id="aUrl" placeholder="https://…" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+  <div class="f"><label for="aScript">Script (optional)</label><textarea id="aScript" rows="6" placeholder="Paste your episode script. Mark his spots:
+[KYI] = he reacts in his own words
+KYI: line = he says that line word for word"></textarea><p class="hint">Use [KYI] or KYI: for Chat Kyi, [PAW] or PAW: for Thamein Paw Taw ([CO] or CO: works for either). He follows along as you read and comes in at each mark. Tapping him on screen fires the next cue if he misses one.</p></div>
   <div class="f"><label for="aMode">He jumps in</label><select id="aMode"><option value="called">When I say his name</option><option value="every">After every line I say</option></select></div>
   <label class="tog">Show the ON AIR light in recordings <input type="checkbox" id="aLight" checked></label>
   <button class="btn primary" id="aGo" style="width:100%">Go On Air</button>
@@ -356,6 +362,7 @@ let awaitUntil=0;
 async function route(t){
   const w=findWake(t);
   if(air){
+    if(air.cues&&air.ci<air.cues.length){heardBuf.push(...wordsOf(t));if(heardBuf.length>80)heardBuf=heardBuf.slice(-80);if(cueReached()){fireCue();return}}
     const mine=w&&w.p===air.persona,rest=mine?w.rest:"";
     if(air.mode==="every"){send(mine&&rest.replace(/[^\p{L}\p{N}]/gu,"").length>1?rest:t,{label:t});return}
     if(mine){if(rest.replace(/[^\p{L}\p{N}]/gu,"").length>1){send(rest,{label:t});return}awaitUntil=Date.now()+9000;say(air.persona==="kyi"?"Yes? Go on.":"The king is listening!");return}
@@ -549,14 +556,19 @@ $("#aGo").onclick=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl")
   if(busy){toast("Busy talking. Try in a second.");return}
   if(disc)await endDiscussion(true);
   closeDrawers();micHold=false;await switchTo(aPick);
-  air={persona:aPick,title,brief:"",mode:$("#aMode").value,light:$("#aLight").checked,startedAt:Date.now()};
+  const scriptRaw=$("#aScript").value.trim(),cues=scriptRaw?parseScript(scriptRaw):[];
+  if(scriptRaw&&!cues.length){toast("No [KYI] or KYI: marks found in the script, so he'll only answer when called.")}
+  air={persona:aPick,title,brief:"",mode:cues.length?"called":$("#aMode").value,light:$("#aLight").checked,startedAt:Date.now(),cues,ci:0};heardBuf=[];updCue();
   const n=S.name||"Jamie",who=aPick==="paw"?"Thamein Paw Taw (silly self-declared king)":"Chat Kyi (condescending robot uncle)";
   if(url||title){busy=true;setState("think");sfx.puff();
     try{const o=await readSource(url?{url,text:""}:{url:"",text:title},`Return ONLY JSON: {"title":"short episode title","brief":"about 120 words of key facts for the episode","opener":"one short line ${who} says to open the show as co-host, in character, introducing the topic to listeners"}. If the page can't be read, return {"error":"short reason"}.`,1200);
       air.title=String(o.title||title||"").slice(0,70);air.brief=String(o.brief||"").slice(0,1200);saveAir();showDisc();busy=false;
-      $("#aTitle").value="";$("#aUrl").value="";await say(o.opener||"And we are live. Try not to embarrass yourself.");return}
+      $("#aTitle").value="";$("#aUrl").value="";$("#aScript").value="";
+      if(cues.length){setState("idle");toast("On Air. Start reading your script.");if(!cues[0].anchor.length)fireCue();return}
+      await say(o.opener||"And we are live. Try not to embarrass yourself.");return}
     catch(e){busy=false;toast(errText(e)+" Going on air without notes.")}}
-  saveAir();showDisc();setState("idle");
+  saveAir();showDisc();setState("idle");$("#aScript").value="";
+  if(cues.length){toast("On Air. Start reading your script.");if(!cues[0].anchor.length)fireCue();else if(handsFree())setTimeout(listen,400);return}
   await say(aPick==="kyi"?"Okay. We are live. Try not to embarrass yourself, Boba Boy.":"Hear ye! The royal show begins! Bow to your listeners, Royal Peasant.");
 };
 async function summarizeSession(title,startedAt,kindLabel,closerHint){
@@ -567,13 +579,47 @@ async function summarizeSession(title,startedAt,kindLabel,closerHint){
   return o;
 }
 async function endAir(){
-  if(!air)return;const a=air;air=null;saveAir();showDisc();micHold=true;if(rec&&listening){try{rec.abort()}catch(e){}}listening=false;$("#mic").classList.remove("on");
+  if(!air)return;const a=air;air=null;saveAir();showDisc();updCue();micHold=true;if(rec&&listening){try{rec.abort()}catch(e){}}listening=false;$("#mic").classList.remove("on");
   busy=true;setState("think");sfx.puff();
   try{const o=await summarizeSession(a.title,a.startedAt,"Episode","one short sign-off line the co-host says to end the show, in character");busy=false;
     await say((o&&o.closer)||(a.persona==="kyi"?"That's the show. I was brilliant, as usual.":"The royal broadcast has ended! You may go."))}
   catch(e){busy=false;setState("idle");toast("Off Air. Couldn't save the episode memory.")}
   micHold=false;
 }
+
+/* ----- script mode ----- */
+const STOP=new Set("the a an and or but to of in on at for with is are was were be been it its this that these those i you he she we they my your our me him them so just very really do does did not no yes".split(" "));
+const TAG="(?:KYI|PAW|CO|CO-?HOST|CHAT\\s*KYI|THAMEIN(?:\\s*PAW\\s*TAW)?)";
+function wordsOf(t){return norm(t).trim().split(" ").filter(Boolean)}
+function parseScript(raw){
+  const cues=[];let host="";const lineRe=new RegExp("^\\s*"+TAG+"\\s*:\\s*(.+)$","i"),inl=new RegExp("\\["+TAG+"\\]","i");
+  for(const line of String(raw).split(/\r?\n/)){
+    const m=line.match(lineRe);if(m){cues.push({type:"line",text:m[1].trim(),host:host.trim()});host="";continue}
+    const parts=line.split(inl);parts.forEach((pt,i)=>{host+=pt+" ";if(i<parts.length-1){cues.push({type:"improv",host:host.trim()});host=""}});host+="\n";
+  }
+  cues.forEach(c=>{const w=wordsOf(c.host).filter(x=>!STOP.has(x)&&x.length>1);c.anchor=w.slice(-6)});
+  return cues;
+}
+function lev(a,b){if(Math.abs(a.length-b.length)>1)return 2;let d=0,i=0,j=0;while(i<a.length&&j<b.length){if(a[i]===b[j]){i++;j++;continue}if(++d>1)return 2;if(a.length>b.length)i++;else if(b.length>a.length)j++;else{i++;j++}}return d+(a.length-i)+(b.length-j)}
+function wEq(a,b){return a===b||(a.length>=4&&b.length>=4&&(a.startsWith(b)||b.startsWith(a)))||(a.length>=5&&lev(a,b)<=1)}
+let heardBuf=[],cueFiring=false;
+function cueReached(){const c=air&&air.cues&&air.cues[air.ci];if(!c)return false;const an=c.anchor;if(!an.length)return true;
+  const recent=heardBuf.slice(-30);const hit=an.filter(a=>recent.some(r=>wEq(r,a))).length;
+  const tail=an.slice(-2).some(a=>recent.slice(-10).some(r=>wEq(r,a)));
+  return hit>=Math.max(1,Math.ceil(an.length*0.6))&&tail}
+function updCue(){const c=$("#cueChip");const on=!!(air&&air.cues&&air.cues.length);c.hidden=!on;if(!on)return;
+  c.textContent=air.ci<air.cues.length?`Cue ${air.ci+1}/${air.cues.length} ▸`:"Script done"}
+async function fireCue(){
+  if(!air||!air.cues||air.ci>=air.cues.length||cueFiring)return;cueFiring=true;const c=air.cues[air.ci];
+  air.ci++;heardBuf=[];saveAir();updCue();
+  try{
+    if(c.type==="line"){log.push({user:"(script line)",p:air.persona,mood,english:c.text,at:Date.now()});saveLog();await say(c.text)}
+    else{await send(`[SCRIPT CUE] ${S.name||"Jamie"} just read this part of the episode script: "${c.host.slice(-700)}". React as co-host, in character, 1-2 sentences, then hand it back.`,{label:"(script cue)"})}
+  }finally{cueFiring=false}
+  const n=air&&air.cues&&air.cues[air.ci];if(n&&!n.anchor.length)setTimeout(fireCue,250);
+}
+$("#cueChip").onclick=()=>{unlock();if(busy||cueFiring||pst==="talk")return;fireCue()};
+$("#kw").addEventListener("click",()=>{if(!air||!air.cues||!air.cues.length||busy||cueFiring||pst==="talk")return;unlock();fireCue()});
 
 /* ----- backup ----- */
 $("#xExport").onclick=async()=>{
@@ -645,7 +691,7 @@ function applyBg(){document.body.style.setProperty("--bgc",S.bg)}
 
 /* ----- start ----- */
 if(air&&S.persona!==air.persona){S.persona=air.persona;mood=air.persona==="paw"?"silly":"smirk";saveS()}
-applyBg();paint();updConv();showDisc();
+applyBg();paint();updConv();showDisc();updCue();
 if(!KEY)$("#setup").classList.add("show");
 else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
 </script>
