@@ -112,6 +112,8 @@ button{cursor:pointer}
 #stage.disc #bub{top:11%;max-height:27%}
 #airLight{position:absolute;top:2%;left:3%;font-size:12px;font-weight:800;letter-spacing:2px;color:#fff;background:#C0352B;padding:4px 10px;border-radius:6px;box-shadow:0 0 10px rgba(255,80,60,.75);z-index:3;display:none}
 #stage.onair #airLight{display:block}
+.idea{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--ui2);border-radius:12px;padding:10px 12px;margin:8px 0 0}
+.idea b{display:block;font-size:15px}.idea span{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
 #cueChip{position:absolute;top:calc(2% + 30px);left:3%;border:none;background:rgba(20,14,12,.82);color:#fff;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;z-index:3}
 body.clean #cueChip{display:none}
 #stage.onair #discBar{left:auto;right:3%;transform:none;max-width:68%}
@@ -158,7 +160,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <body>
 <div id="top">
   <button id="who" aria-label="Switch persona"><span id="whoName">Chat Kyi</span><span class="sw">switch</span></button>
-  <button id="airBtn">On Air</button><span id="spacer"></span><div id="timers"></div>
+  <span id="spacer"></span><div id="timers"></div>
   <button class="tb" data-d="log">Log</button>
   <button class="tb" data-d="teach">Topics</button>
   <button class="tb" data-d="settings">⚙︎</button>
@@ -198,8 +200,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <g class="m m-silly" stroke="none"><circle cx="136" cy="171" r="13" fill="#7fe3c4"/><circle cx="141" cy="176" r="4.5" fill="#1f2a36"/><circle cx="177" cy="168" r="7" fill="#7fe3c4"/><circle cx="174" cy="165" r="2.5" fill="#1f2a36"/><g class="mouth"><path d="M132 189 Q155 205 180 187" stroke="#7fe3c4" stroke-width="3" fill="none"/><ellipse cx="164" cy="199" rx="6" ry="5" fill="#f28b9b"/></g></g>
 <g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
 </g></g></svg></div>
-  <div id="airLight">ON AIR</div>
-  <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
+    <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
   <div id="heard"></div>
   <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
 </div>
@@ -217,23 +218,14 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <aside class="drawer" id="d-log"><div class="dh"><h2>Chat log</h2><button class="btn" data-close>Done</button></div><div class="db" id="logList"></div></aside>
 <aside class="drawer" id="d-teach"><div class="dh"><h2>Topics</h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="tUrl">Paste a link</label><input type="text" id="tUrl" placeholder="https://…" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+  <div class="f"><label for="tKw">Find topics from keywords</label><div class="row" style="flex-wrap:nowrap"><input type="text" id="tKw" placeholder="e.g. boba, rent, Thingyan" style="flex:1;min-width:0"><button class="btn" id="tFind">Find</button></div><div id="tIdeas"></div></div>
+  <label class="tog">Search the web for current info on typed topics <input type="checkbox" id="tWeb" checked></label>
   <div class="f"><label for="tText">Or paste article text, or just type a topic</label><textarea id="tText" rows="4" placeholder="e.g. Is boba overrated?"></textarea></div>
   <div class="row"><button class="btn primary" id="dStart">Start discussion</button><button class="btn" id="tGo">Just learn it</button></div>
   <p class="err" id="tErr"></p>
   <p class="hint">Start discussion: they read it and talk it through with you. When you tap End discussion, they remember what you said and may tease you about it later.</p>
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
-</div></aside>
-<aside class="drawer" id="d-air"><div class="dh"><h2>Go On Air</h2><button class="btn" data-close>Cancel</button></div><div class="db">
-  <span class="lbl">Co-host for this episode</span>
-  <div class="seg" id="aSeg"><button data-p="kyi" class="on">Chat Kyi</button><button data-p="paw">Thamein Paw Taw</button></div>
-  <div class="f"><label for="aTitle">Episode topic (optional)</label><input type="text" id="aTitle" placeholder="e.g. Moving out of your parents' house"></div>
-  <div class="f"><label for="aUrl">Or a link for him to read first (optional)</label><input type="text" id="aUrl" placeholder="https://…" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
-  <div class="f"><label for="aMode">He jumps in</label><select id="aMode"><option value="called">When I say his name</option><option value="every">After every line I say</option></select></div>
-  <label class="tog">Show the ON AIR light in recordings <input type="checkbox" id="aLight" checked></label>
-  <button class="btn primary" id="aGo" style="width:100%">Go On Air</button>
-  <p class="err" id="aErr"></p>
-  <p class="hint">The co-host is locked for the whole episode. Talk naturally: he answers when you say his name, or after every line if you chose that. The mic stays on between replies; tap the mic to pause it. Tap Off Air to end, and he'll remember the episode.</p>
 </div></aside>
 <aside class="drawer" id="d-settings"><div class="dh"><h2>Settings</h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
@@ -286,6 +278,7 @@ let S=Object.assign({name:"Jamie",model:"claude-haiku-4-5-20251001",micLang:"en-
   vo:{kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}},burmese:false,
   speakLang:"en",bg:"#00B140",sfx:true,glitch:true,shouted:false,conv:false},st.get("settings",{}));
 if(!S.v13){S.v13=true;S.model="claude-haiku-4-5-20251001";S.burmese=false;S.vo={kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
+if(!S.v14){S.v14=true;S.conv=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 let KEY=st.get("key","");let log=st.get("log",[]);let shelf=st.get("shelf",[]);
 const saveS=()=>st.set("settings",S),saveLog=()=>st.set("log",log.slice(-60)),saveShelf=()=>st.set("shelf",shelf);
 const NAMES={kyi:"Chat Kyi",paw:"သမိန်ပေါတော"};
@@ -418,7 +411,7 @@ async function claudeStream(sys,messages,max,onText){
   return full;
 }
 function pj(t){const s=String(t).replace(/```json|```/g,"").trim();return JSON.parse(s.slice(s.indexOf("{"),s.lastIndexOf("}")+1))}
-function errText(e){switch(e&&e.code){case"no_key":return"No brain yet. Add your API key.";case"bad_key":return"That API key didn't work. Check it in Settings.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Switch it in Settings.";case"overloaded":return"The brain is busy right now. Try again in a minute.";case"network":return"No internet connection.";case"fetch":return(e.message||"Couldn't open that link.")+" Paste the article text instead.";default:return"He mumbled something nobody understood. Try again."}}
+function errText(e){switch(e&&e.code){case"no_key":return"No brain yet. Add your API key.";case"bad_key":return"That API key didn't work. Check it in Settings.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Switch it in Settings.";case"overloaded":return"The brain is busy right now. Try again in a minute.";case"network":return"No internet connection.";case"api_error":return/search|tool/i.test(e.message||"")?"Web search isn't available on your API account. Turn off web search in Topics, or enable it in console.anthropic.com.":"He mumbled something nobody understood. Try again.";case"fetch":return(e.message||"Couldn't open that link.")+" Paste the article text instead.";default:return"He mumbled something nobody understood. Try again."}}
 
 /* streaming speaker: queues sentences as they arrive */
 function makeSpeaker(){
@@ -494,25 +487,47 @@ function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.in
 let disc=st.get("disc",null);
 function showDisc(){const on=!!air||!!disc;$("#discBar").hidden=!on||(!!air&&!air.title);$("#discTitle").textContent=air?(air.title||""):disc?"Discussing: "+disc.title:"";$("#dEnd").textContent="End discussion";$("#dEnd").hidden=!!air;
   $("#stage").classList.toggle("disc",on);$("#stage").classList.toggle("onair",!!air);$("#stage").classList.toggle("nolight",!!air&&!air.light);
-  const ab=$("#airBtn");ab.classList.toggle("live",!!air);ab.textContent=air?"Off Air":"On Air";$("#who .sw").textContent=air?"locked":"switch"}
+  $("#who .sw").textContent=air?"locked":"switch"}
 function srcErr(t){$("#tErr").textContent=t}
 function getSource(needLong){
   const url=$("#tUrl").value.trim(),text=$("#tText").value.trim();srcErr("");
   if(!url&&!text){srcErr("Paste a link, some text, or type a topic first.");return null}
   if(url&&!/^https?:\/\/\S+$/i.test(url)){srcErr("Links need to start with http:// or https://");return null}
-  if(!url&&needLong&&text.length<80){srcErr("Paste a bit more text, or use Start discussion for a quick topic.");return null}
+  if(!url&&needLong&&text.length<80&&!useWeb()){srcErr("Paste a bit more text, or turn on web search for short topics.");return null}
   return {url,text};
 }
 async function readSource(src,instr,max){
   const content=src.url?`Use the web_fetch tool to read this page: ${src.url}\n\n${instr}`
     :src.text.length>=80?`Source:\n\n${src.text.slice(0,24000)}\n\n${instr}`
+    :useWeb()?`Topic: ${src.text}\nUse web_search (2-3 searches) to find current, reliable facts, related angles and recent developments on this topic, then answer.\n\n${instr}`
     :`Topic: ${src.text}\n(No article was given. Use well-established general knowledge only, and leave out anything you're unsure of.)\n\n${instr}`;
-  const out=await claude("You prepare material for Chat Kyi and Thamein Paw Taw, comedy robot co-hosts. Be accurate to the source; do not invent facts.",[{role:"user",content}],max,src.url?[{type:"web_fetch_20250910",name:"web_fetch",max_uses:2}]:undefined);
+  const tools=src.url?[{type:"web_fetch_20250910",name:"web_fetch",max_uses:2}]:(src.text.length<80&&useWeb())?[{type:"web_search_20250305",name:"web_search",max_uses:3}]:undefined;
+  const out=await claude("You prepare material for Chat Kyi and Thamein Paw Taw, comedy robot co-hosts. Be accurate to the source; do not invent facts.",[{role:"user",content}],tools?Math.max(max,2000):max,tools);
   const m=out.match(/\{\s*"(?:title|error)"[\s\S]*\}/);if(!m)throw{code:"bad"};
   let o;try{o=JSON.parse(m[0])}catch(e){o=pj(m[0])}
   if(o.error){const e=new Error(String(o.error).slice(0,120));e.code="fetch";throw e}
   return o;
 }
+function useWeb(){const c=$("#tWeb");return !c||c.checked}
+async function findIdeas(){
+  const kw=$("#tKw").value.trim();srcErr("");if(!kw){srcErr("Type a few keywords first.");return}
+  const b=$("#tFind"),box=$("#tIdeas");b.disabled=true;b.textContent="Searching…";box.innerHTML='<p class="hint">Looking for good topics…</p>';
+  try{
+    const out=await claude("You find conversation topics for a comedy podcast co-hosted by a human and a sarcastic robot uncle. Prefer current, specific, discussable angles. Be accurate; don't invent facts.",
+      [{role:"user",content:`Keywords: ${kw}\n${useWeb()?"Use web_search to find current, relevant stories or debates connected to these keywords.":"Use well-established general knowledge."} Suggest 5 specific discussion topics that connect these keywords. Return ONLY JSON: {"ideas":[{"title":"short topic title","angle":"one sentence on why it's interesting or the debate","source":"source site name or empty"}]}`}],
+      2000,useWeb()?[{type:"web_search_20250305",name:"web_search",max_uses:3}]:undefined);
+    const m=out.match(/\{\s*"ideas"[\s\S]*\}/);if(!m)throw{code:"bad"};
+    let o;try{o=JSON.parse(m[0])}catch(e){o=pj(m[0])}
+    const ideas=(o.ideas||[]).slice(0,6);box.innerHTML="";
+    if(!ideas.length){box.innerHTML='<p class="hint">Nothing good came up. Try other keywords.</p>';return}
+    ideas.forEach(it=>{const btn=document.createElement("button");btn.className="idea";const t=document.createElement("b");t.textContent=String(it.title||"");const a=document.createElement("span");a.textContent=String(it.angle||"")+(it.source?" · "+it.source:"");btn.append(t,a);
+      btn.onclick=()=>{$("#tUrl").value="";$("#tText").value=String(it.title||"")+(it.angle?": "+it.angle:"");try{$("#tText").scrollIntoView({block:"center"})}catch(e){}toast("Tap Start discussion or Just learn it")};box.appendChild(btn)});
+    const h=document.createElement("p");h.className="hint";h.textContent="Tap one to load it, then Start discussion.";box.appendChild(h);
+  }catch(e){box.innerHTML="";toast(errText(e))}
+  finally{b.disabled=false;b.textContent="Find"}
+}
+$("#tFind").onclick=()=>{unlock();findIdeas()};
+$("#tKw").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();findIdeas()}});
 $("#tGo").onclick=async()=>{const src=getSource(true);if(!src)return;if(busy){toast("Busy talking. Try in a second.");return}
   busy=true;const b=$("#tGo");b.textContent="Reading…";closeDrawers();setState("think");sfx.puff();
   try{const o=await readSource(src,`Return ONLY JSON: {"title":"short topic title","summary":"2-3 sentence factual summary","hooks":["up to 3 short joke angles"],"reaction":"one short line the current speaker says after reading, in character"}. If the page can't be read, return {"error":"short reason"}.`,1200);
@@ -543,12 +558,12 @@ $("#dEnd").onclick=()=>{unlock();if(busy){toast("Let them finish talking first."
 ["#tUrl","#tText"].forEach(x=>$(x).addEventListener("input",()=>srcErr("")));
 
 /* ----- On Air ----- */
-let air=st.get("air",null),aPick="kyi";
+let air=null,aPick="kyi";st.set("air",null);
 function saveAir(){st.set("air",air)}
-document.querySelectorAll("#aSeg button").forEach(b=>b.onclick=()=>{aPick=b.dataset.p;document.querySelectorAll("#aSeg button").forEach(x=>x.classList.toggle("on",x===b))});
-$("#airBtn").onclick=()=>{unlock();if(air){if(busy){toast("Let him finish talking first.");return}endAir();return}
+[].forEach(b=>b.onclick=()=>{aPick=b.dataset.p;document.querySelectorAll("#aSeg button").forEach(x=>x.classList.toggle("on",x===b))});
+const _noAir=()=>{unlock();if(air){if(busy){toast("Let him finish talking first.");return}endAir();return}
   aPick=S.persona;document.querySelectorAll("#aSeg button").forEach(x=>x.classList.toggle("on",x.dataset.p===aPick));$("#aErr").textContent="";openDrawer("air")};
-$("#aGo").onclick=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl").value.trim();$("#aErr").textContent="";
+const _noGo=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl").value.trim();$("#aErr").textContent="";
   if(url&&!/^https?:\/\/\S+$/i.test(url)){$("#aErr").textContent="Links need to start with http:// or https://";return}
   if(busy){toast("Busy talking. Try in a second.");return}
   if(disc)await endDiscussion(true);
