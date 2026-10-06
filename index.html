@@ -111,7 +111,7 @@ button{cursor:pointer}
 #discBar{position:absolute;top:2%;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(20,14,12,.82);color:#fff;border-radius:999px;padding:5px 6px 5px 12px;font-size:13px;max-width:92%;z-index:2}
 #discBar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #discBar button{border:none;background:#C0352B;color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap}
-#stage.disc #bub{top:11%;max-height:27%}
+#stage.disc #bub{top:calc(2% + 52px);max-height:30%}
 #airLight{position:absolute;top:2%;left:3%;font-size:12px;font-weight:800;letter-spacing:2px;color:#fff;background:#C0352B;padding:4px 10px;border-radius:6px;box-shadow:0 0 10px rgba(255,80,60,.75);z-index:3;display:none}
 #stage.onair #airLight{display:block}
 .idea{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--ui2);border-radius:12px;padding:10px 12px;margin:8px 0 0}
@@ -122,7 +122,7 @@ body.clean #cueChip{display:none}
 body.clean #stage.onair.nolight #airLight{display:none}
 #airBtn{border:1px solid var(--line);background:var(--ui2);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
 #airBtn::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
-#airBtn.live{background:#C0352B;border-color:#C0352B;color:#fff}#airBtn.live::before{background:#fff}#stage.disc #cloud{top:12%}
+#airBtn.live{background:#C0352B;border-color:#C0352B;color:#fff}#airBtn.live::before{background:#fff}#stage.disc #cloud{top:calc(2% + 56px)}
 body.clean #discBar{display:none}
 body.clean #top,body.clean #bottom{display:none}
 body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
@@ -229,7 +229,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.6</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.7</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option><option value="my-MM">Burmese (most iPhones can't)</option></select></div>
   <div class="f"><label for="sWkyi">Chat Kyi wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
@@ -465,10 +465,16 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:S.burmese?650:(disc||air?300:230),onText);
+    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:S.burmese?2000:(disc||air?300:230),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
-    const blines=Array.isArray(o.burmese_lines)?o.burmese_lines.map(String):[];if(blines.length)pairBubble(enFinal,blines,glitch);
+    let blines=Array.isArray(o.burmese_lines)?o.burmese_lines.map(String):[];
+    if(!blines.length&&S.burmese){const bm=full.match(/"burmese_lines"\s*:\s*\[([\s\S]*)/);if(bm){const re=/"((?:[^"\\]|\\.)*)"/g;let x;while((x=re.exec(bm[1]))){try{blines.push(JSON.parse('"'+x[1]+'"'))}catch(e){}}}}
+    if(S.burmese&&blines.length<splitSent(enFinal).length){const sents=splitSent(enFinal);const at=Date.now();
+      claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script). Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(sents)}],2500)
+        .then(t=>{const m=t.match(/\[[\s\S]*\]/);if(!m)return;const arr=JSON.parse(m[0]).map(String);const last=log[log.length-1];if(last&&last.english===enFinal){last.burmese=arr.join("\n");saveLog()}
+          if($("#bub").classList.contains("show")&&Date.now()-at<60000)pairBubble(enFinal,arr,glitch)}).catch(()=>{})}
+    if(blines.length)pairBubble(enFinal,blines,glitch);
     log.push({user:label||text,p,mood,english:enFinal,burmese:blines.length?blines.join("\n"):(o.burmese?String(o.burmese):""),at:Date.now()});saveLog();
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
     await sp.finish();
