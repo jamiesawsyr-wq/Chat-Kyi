@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Chat Kyi</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chat Kyi">
+<meta name="theme-color" content="#7A1F1A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;800&family=Noto+Sans+Myanmar:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ui:#FFFFFF;--ui2:#F4F1EE;--ink:#1E1714;--muted:#6B5F59;--line:rgba(30,23,20,.14);--lac:#A8322A;--gold:#B8862B;--danger:#C0352B;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ui:#241A17;--ui2:#1D1513;--ink:#F3EAE4;--muted:#B3A49C;--line:rgba(243,234,228,.14);--lac:#D2493D;--gold:#E0B04F;--danger:#FF6B5E;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:Nunito,-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--bgc,#00B140);display:flex;flex-direction:column;overflow:hidden;overscroll-behavior:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.my{font-family:"Noto Sans Myanmar","Myanmar Sangam MN","Myanmar Text",sans-serif!important;line-height:1.9!important}
+
+#top{flex:none;display:flex;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px 8px;background:var(--ui);border-bottom:1px solid var(--line)}
+#who{font-family:Bangers,Impact,sans-serif;font-size:24px;letter-spacing:1px;border:none;background:none;padding:0 6px 0 0;display:flex;align-items:center;gap:4px;min-width:0}
+#who.paw{font-family:"Noto Sans Myanmar",sans-serif;font-size:17px;font-weight:600;color:var(--gold)}
+#who .sw{font-family:Nunito,sans-serif;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 6px;letter-spacing:0}
+#spacer{flex:1}
+.tb{border:1px solid var(--line);background:var(--ui2);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:600;white-space:nowrap}
+#timers{display:flex;gap:4px}
+.timer{font-size:11px;font-weight:800;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:3px 8px;background:var(--ui2)}
+
+#stage{flex:1;position:relative;overflow:hidden;min-height:0}
+#kw{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);height:62%;aspect-ratio:230/410}
+#kw.swap{animation:flip .5s ease-in-out}
+@keyframes flip{0%{transform:translateX(-50%) scaleX(1)}50%{transform:translateX(-50%) scaleX(0)}100%{transform:translateX(-50%) scaleX(1)}}
+#kw svg{width:100%;height:100%;display:block}
+#bub{position:absolute;left:4%;top:4%;max-width:74%;background:#fff;color:#111;border:3px solid #111;border-radius:18px;padding:10px 14px;font-weight:800;font-size:clamp(16px,4.6vw,24px);line-height:1.35;opacity:0;transform:scale(.94);transform-origin:bottom right;transition:opacity .18s,transform .18s;max-height:44%;overflow:hidden}
+#bub.show{opacity:1;transform:none}
+#bub.paw{background:#FFF2BF}
+#bub.glitch{background:#C0352B;color:#fff}
+#bub.my{font-weight:600}
+#cloud{position:absolute;right:4%;top:5%;width:28%;opacity:0;transition:opacity .2s}
+#cloud.show{opacity:1}
+#heard{position:absolute;left:4%;right:4%;bottom:2%;background:rgba(0,0,0,.6);color:#fff;font-size:14px;padding:6px 12px;border-radius:999px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .2s}
+#heard.show{opacity:1}
+#shout{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0}
+#shout.show{opacity:1}
+#shout div{font-family:Bangers,Impact,sans-serif;color:#fff;background:#C0352B;font-size:44px;line-height:1;padding:14px 18px;border:5px solid #111;border-radius:8px;text-align:center;transform:rotate(-4deg)}
+#shout.show div{animation:shake .1s 10 alternate}
+@keyframes shake{from{transform:rotate(-4deg) translateX(-7px)}to{transform:rotate(-2deg) translateX(7px)}}
+
+#bottom{flex:none;background:var(--ui);border-top:1px solid var(--line);padding:10px 12px calc(env(safe-area-inset-bottom,0px) + 10px)}
+#row1{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
+#mic{width:72px;height:72px;border-radius:50%;border:none;background:var(--lac);color:#fff;display:grid;place-items:center;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+#mic svg{width:32px;height:32px}
+#mic.on{background:var(--danger);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(192,53,43,.25)}}
+.side{width:64px;font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--ui2);border-radius:14px;padding:8px 4px;text-align:center}
+.side.on{border-color:var(--gold);color:var(--gold)}
+#row2{display:flex;gap:8px}
+#input{flex:1;min-width:0;border:1px solid var(--line);background:var(--ui2);border-radius:999px;padding:10px 14px;font-size:16px;font-family:Nunito,"Noto Sans Myanmar",sans-serif}
+#send{border:none;background:var(--lac);color:#fff;border-radius:999px;padding:0 16px;font-weight:700}
+
+.drawer{position:fixed;left:0;right:0;bottom:0;max-height:86%;background:var(--ui);border-radius:18px 18px 0 0;border-top:1px solid var(--line);z-index:10;transform:translateY(105%);transition:transform .22s;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer.open{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dh h2{margin:0;font-size:18px}
+.db{flex:1;overflow-y:auto;padding:14px 16px;-webkit-overflow-scrolling:touch}
+.f{margin:0 0 14px}
+.f label,.lbl{display:block;font-size:13px;color:var(--muted);margin:0 0 5px}
+.f input[type=text],.f input[type=password],.f select,.f textarea{width:100%;border:1px solid var(--line);background:var(--ui2);border-radius:10px;padding:9px 10px;font-size:16px}
+.f input[type=range]{width:100%;accent-color:var(--lac)}
+.tog{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px;font-size:15px}
+.tog input{width:22px;height:22px;accent-color:var(--lac);flex:none}
+.hint{font-size:12px;color:var(--muted);margin:4px 0 0;line-height:1.45}
+.btn{border:1px solid var(--line);background:var(--ui2);border-radius:10px;padding:9px 12px;font-weight:600;font-size:14px}
+.btn.primary{background:var(--lac);border-color:var(--lac);color:#fff}
+.btn.danger{color:var(--danger)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
+.err{font-size:13px;color:var(--danger);min-height:18px;margin:4px 0 0}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0 0 12px}
+.seg button{flex:1;border:none;background:var(--ui2);padding:8px;font-size:14px;font-weight:600}
+.seg button.on{background:var(--lac);color:#fff}
+.lg{border-bottom:1px solid var(--line);padding:10px 0}
+.lg .u{font-size:14px;color:var(--muted);margin:0 0 6px}
+.lg .v{background:var(--ui2);border-radius:10px;padding:8px 10px;margin:0 0 6px;font-size:14px;line-height:1.55}
+.lg .v .t{font-size:11px;color:var(--muted);display:block;margin-bottom:2px}
+.lg .acts{display:flex;gap:6px}
+.lg .acts button{font-size:12px;padding:4px 9px;border-radius:8px;border:1px solid var(--line);background:var(--ui)}
+.note{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px}
+.note h3{margin:0 0 4px;font-size:15px}
+.note p{margin:0 0 6px;font-size:13px;line-height:1.5}
+.hook{display:inline-block;font-size:12px;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:2px 8px;margin:0 4px 4px 0}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9;display:none}
+#scrim.show{display:block}
+#setup{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:20px}
+#setup.show{display:flex}
+#setup .card{background:var(--ui);border-radius:16px;padding:20px;width:100%;max-width:420px}
+#setup h2{font-family:Bangers,Impact,sans-serif;font-weight:400;font-size:32px;letter-spacing:1px;margin:0 0 6px}
+#setup p{margin:0 0 12px;line-height:1.5;font-size:15px}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 60px);transform:translateX(-50%);background:var(--ink);color:var(--ui);padding:9px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+body.clean #top,body.clean #bottom{display:none}
+body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
+
+/* character */
+#ck *{transform-box:view-box}
+#ck .m{display:none}
+#ck.p-kyi.mood-smirk .m-smirk,#ck.p-kyi.mood-sideeye .m-sideeye,#ck.p-kyi.mood-proud .m-proud,#ck.p-kyi.mood-glitch .m-glitch,#ck.p-paw .m-silly{display:inline}
+#ck.p-paw.mood-glitch .m-silly{display:none}#ck.p-paw.mood-glitch .m-glitch{display:inline}
+#ck.mood-glitch .scr{fill:#3a0e0c}
+#ck.p-kyi .paw-only,#ck.p-paw .kyi-only{display:none}
+#whole{transform-origin:155px 440px}#head{transform-origin:155px 230px}#armL{transform-origin:93px 258px}#armR{transform-origin:217px 258px}
+#ck .mouth,#lids{transform-box:fill-box;transform-origin:center}
+#waves{opacity:0}
+#ck.st-idle #whole{animation:br 3s ease-in-out infinite}
+#ck.st-idle #lids,#ck.st-listen #lids{animation:bl 4s infinite}
+#ck.st-listen #head{animation:tl 1.6s ease-in-out infinite alternate}
+#ck.st-listen #waves{opacity:1}#ck.st-listen #waves path{animation:wv 1.2s ease-out infinite}
+#ck.st-think #armR{animation:sc .5s ease-in-out infinite alternate}
+#ck.st-think #smoke path{animation:pf 1.4s ease-in-out infinite}
+#ck.st-think #ember{animation:gl .6s infinite alternate}
+#ck.st-talk .mouth{animation:tk .16s infinite alternate}
+#ck.st-talk #armL{animation:gs .7s ease-in-out infinite alternate}
+#ck.st-talk #whole{animation:bn .35s ease-in-out infinite alternate}
+#ck.p-paw.st-talk #whole{animation:bn .22s ease-in-out infinite alternate}
+#ck.p-paw.st-idle #head{animation:wob 1.4s ease-in-out infinite alternate}
+@keyframes br{50%{transform:scaleY(1.015)}}@keyframes bl{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes tl{from{transform:rotate(4deg)}to{transform:rotate(8deg)}}@keyframes wv{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-12px)}}
+@keyframes sc{from{transform:rotate(-138deg)}to{transform:rotate(-152deg)}}@keyframes pf{from{opacity:.9;transform:translateY(0)}to{opacity:0;transform:translateY(-16px)}}
+@keyframes gl{to{fill:#ffd166}}@keyframes tk{to{transform:scaleY(2.3)}}@keyframes gs{to{transform:rotate(28deg)}}@keyframes bn{to{transform:translateY(-5px)}}
+@keyframes wob{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+.dots circle{animation:dd 1.2s infinite}.dots circle:nth-child(2){animation-delay:.2s}.dots circle:nth-child(3){animation-delay:.4s}
+@keyframes dd{0%,100%{opacity:.25}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){#ck *,.dots circle,#kw.swap,#mic.on,#shout.show div{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="top">
+  <button id="who" aria-label="Switch persona"><span id="whoName">Chat Kyi</span><span class="sw">switch</span></button>
+  <span id="spacer"></span><div id="timers"></div>
+  <button class="tb" data-d="log">Log</button>
+  <button class="tb" data-d="teach">Teach</button>
+  <button class="tb" data-d="settings">⚙︎</button>
+</div>
+
+<div id="stage">
+  <div id="bub"></div>
+  <svg id="cloud" viewBox="0 0 160 100"><ellipse cx="92" cy="40" rx="62" ry="34" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="38" cy="80" r="9" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="22" cy="94" r="5" fill="#fff" stroke="#111" stroke-width="3"/><g class="dots" fill="#555"><circle cx="70" cy="40" r="6"/><circle cx="92" cy="40" r="6"/><circle cx="114" cy="40" r="6"/></g></svg>
+  <div id="kw"><svg id="ck" class="p-kyi st-idle mood-smirk" viewBox="50 40 230 410" role="img" aria-label="Chat Kyi"><g id="whole" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+<ellipse cx="155" cy="432" rx="90" ry="10" fill="#000" opacity=".15" stroke="none"/>
+<g class="paw-only"><path d="M104 244 Q58 330 66 408 L150 398 L244 408 Q252 330 206 244Z" fill="#c94f4f" stroke-width="2.5"/><path d="M68 384 L148 376 L242 384" stroke="#fff" stroke-width="4"/></g>
+<g id="armL"><g class="paw-only"><line x1="80" y1="200" x2="80" y2="428" stroke="#8b5a2b" stroke-width="5"/><rect x="62" y="158" width="36" height="44" rx="8" fill="#6fbf73"/><path d="M62 172 L98 172M62 186 L98 186M74 158 L74 202M86 158 L86 202" stroke="#3f8f45" stroke-width="1.5"/></g><path d="M92 262 L74 318 L88 322 L106 270Z" fill="#c9d3dc" stroke-width="2.5"/><circle cx="80" cy="324" r="9" fill="#c9d3dc"/></g>
+<g id="armR"><path d="M218 262 L236 318 L222 322 L204 270Z" fill="#c9d3dc" stroke-width="2.5"/><circle cx="230" cy="324" r="9" fill="#c9d3dc"/></g>
+<circle cx="93" cy="258" r="12" fill="#9aa8b5"/><circle cx="217" cy="258" r="12" fill="#9aa8b5"/>
+<path d="M112 232 L198 232 Q202 258 214 268 L220 334 L90 334 L96 268 Q108 258 112 232Z" fill="#fff" stroke-width="2.5"/>
+<path d="M128 232 Q155 260 182 232" fill="#9aa8b5"/>
+<ellipse class="paw-only" cx="172" cy="292" rx="11" ry="7" fill="#b5713a" stroke="none" opacity=".55"/>
+<path d="M88 332 L222 332 L228 382 L162 382 L155 356 L148 382 L82 382Z" fill="#6b7f5a" stroke-width="2.5"/>
+<rect x="106" y="382" width="16" height="36" fill="#c9d3dc"/><rect x="188" y="382" width="16" height="36" fill="#c9d3dc"/>
+<ellipse cx="114" cy="426" rx="24" ry="6" fill="#3b5ba5"/>
+<ellipse class="kyi-only" cx="196" cy="426" rx="24" ry="6" fill="#3b5ba5"/><ellipse class="paw-only" cx="196" cy="426" rx="24" ry="6" fill="#e4572e"/>
+<path d="M104 424 L114 416 L124 424M186 424 L196 416 L206 424" stroke="#e4572e" stroke-width="3"/>
+<rect x="140" y="220" width="30" height="14" fill="#9aa8b5"/>
+<g id="head"><rect x="95" y="100" width="120" height="120" rx="45" fill="#c9d3dc" stroke-width="2.5"/>
+<path d="M93 152 Q88 96 152 88 Q222 86 219 150 Q212 126 192 120 Q162 110 132 120 Q106 128 93 152Z" fill="#1a1a1a"/>
+<path d="M128 92 Q122 106 118 124" stroke="#c9d3dc" stroke-width="2.5"/>
+<path class="kyi-only" d="M162 116 Q182 126 170 140 Q164 146 158 140" stroke="#1a1a1a" stroke-width="3.5"/>
+<g class="paw-only" transform="rotate(-14 160 88)"><path d="M112 104 L112 70 L130 88 L146 60 L162 84 L178 58 L194 82 L210 66 L210 104Z" fill="#f2c45a"/><circle cx="146" cy="96" r="4" fill="#e4572e" stroke-width="1.5"/><circle cx="178" cy="95" r="4" fill="#3b5ba5" stroke-width="1.5"/></g>
+<rect x="96" y="138" width="7" height="22" rx="2" fill="#1a1a1a" stroke="none"/><rect x="207" y="138" width="7" height="22" rx="2" fill="#1a1a1a" stroke="none"/>
+<circle cx="93" cy="172" r="7" fill="#9aa8b5"/><circle cx="217" cy="172" r="7" fill="#9aa8b5"/>
+<g id="waves" stroke="#7fe3c4" stroke-width="2.5"><path d="M80 160 Q72 172 80 184"/><path d="M70 152 Q58 172 70 192"/></g>
+<rect class="scr" x="112" y="147" width="86" height="60" rx="14" fill="#1f2a36"/>
+<g class="m m-smirk"><g id="lids" stroke="none"><ellipse cx="137" cy="171" rx="10" ry="7" fill="#7fe3c4"/><ellipse cx="173" cy="171" rx="10" ry="7" fill="#7fe3c4"/><rect x="125" y="162" width="24" height="9" fill="#1f2a36"/><rect x="161" y="162" width="24" height="9" fill="#1f2a36"/></g><g stroke="#7fe3c4" stroke-width="2.5"><path d="M126 171 L148 171M162 171 L184 171M126 159 L148 162"/><path d="M162 158 Q173 150 185 156"/><path class="mouth" d="M136 190 Q154 196 172 188" stroke-width="3"/></g></g>
+<g class="m m-sideeye" stroke="#7fe3c4" stroke-width="2.5"><ellipse cx="131" cy="173" rx="8" ry="4" fill="#7fe3c4" stroke="none"/><ellipse cx="167" cy="173" rx="8" ry="4" fill="#7fe3c4" stroke="none"/><path d="M124 164 L146 165M160 165 L182 164"/><path class="mouth" d="M140 192 L170 190" stroke-width="3"/></g>
+<g class="m m-proud" stroke="#7fe3c4" stroke-width="3"><path d="M127 175 Q137 163 147 175M163 175 Q173 163 183 175"/><path class="mouth" d="M136 186 Q155 202 174 186"/></g>
+<g class="m m-glitch" stroke="#ff5a4e" stroke-width="3.5"><path d="M128 163 L146 179M146 163 L128 179M164 163 L182 179M182 163 L164 179"/><path class="mouth" d="M134 195 L142 189 L150 195 L158 189 L166 195 L174 189" stroke-width="3"/></g>
+<g class="m m-silly" stroke="none"><circle cx="136" cy="171" r="13" fill="#7fe3c4"/><circle cx="141" cy="176" r="4.5" fill="#1f2a36"/><circle cx="177" cy="168" r="7" fill="#7fe3c4"/><circle cx="174" cy="165" r="2.5" fill="#1f2a36"/><g class="mouth"><path d="M132 189 Q155 205 180 187" stroke="#7fe3c4" stroke-width="3" fill="none"/><ellipse cx="164" cy="199" rx="6" ry="5" fill="#f28b9b"/></g></g>
+<g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
+</g></g></svg></div>
+  <div id="heard"></div>
+  <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
+</div>
+
+<div id="bottom">
+  <div id="row1">
+    <button class="side" id="convBtn">Keep talking</button>
+    <button id="mic" aria-label="Tap to talk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <button class="side" id="roastBtn">Roast me</button>
+  </div>
+  <div id="row2"><input id="input" type="text" placeholder="Or type here" aria-label="Message" enterkeyhint="send"><button id="send">Send</button></div>
+</div>
+
+<div id="scrim"></div>
+<aside class="drawer" id="d-log"><div class="dh"><h2>Chat log</h2><button class="btn" data-close>Done</button></div><div class="db" id="logList"></div></aside>
+<aside class="drawer" id="d-teach"><div class="dh"><h2>Teach them</h2><button class="btn" data-close>Done</button></div><div class="db">
+  <div class="f"><label for="tText">Paste an article or notes</label><textarea id="tText" rows="6" placeholder="Paste article text here"></textarea><p class="hint">Tip: open the article in Safari, tap the Reader icon (aA), select all, copy, and paste here.</p></div>
+  <button class="btn primary" id="tGo">Make them read it</button>
+  <p class="err" id="tErr"></p>
+  <hr class="sep"><span class="lbl">Memory shelf. Both personas reread this before every reply.</span>
+  <div id="shelf"></div>
+</div></aside>
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings</h2><button class="btn" data-close>Done</button></div><div class="db">
+  <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
+  <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option><option value="my-MM">Burmese</option></select></div>
+  <div class="f"><label for="sWkyi">Chat Kyi wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
+  <div class="f"><label for="sWpaw">Thamein Paw Taw wake names</label><textarea id="sWpaw" rows="4"></textarea><p class="hint">Say a name to switch persona, e.g. "Thamein Paw Taw, what's for dinner?" "Kyi" alone never wakes anyone.</p></div>
+  <hr class="sep">
+  <span class="lbl">Voices</span>
+  <div class="seg" id="vSeg"><button data-p="kyi" class="on">Chat Kyi</button><button data-p="paw">Thamein Paw Taw</button></div>
+  <div class="f"><label for="sAccent">Accent</label><select id="sAccent"></select></div>
+  <div class="f"><label for="sVoice">Voice</label><select id="sVoice"></select><p class="hint">Missing voices? iPhone Settings → Accessibility → Spoken Content → Voices. Download Chinese, Vietnamese or other English voices, then reopen the app.</p></div>
+  <div class="f"><label for="sPitch">Depth <span id="pitchV"></span></label><input type="range" id="sPitch" min="0" max="2" step="0.1"></div>
+  <div class="f"><label for="sRate">Speed <span id="rateV"></span></label><input type="range" id="sRate" min="0.5" max="1.4" step="0.05"></div>
+  <div class="f"><label for="sSpeak">They speak</label><select id="sSpeak"><option value="en">English version</option><option value="auto">Match my language</option><option value="my">Burmese version (needs a Burmese voice)</option></select></div>
+  <button class="btn" id="vTest">Test this voice</button>
+  <hr class="sep">
+  <div class="f"><label for="sBg">Background</label><select id="sBg"><option value="#00B140">Green screen</option><option value="#0047BB">Blue screen</option><option value="#1F4D3F">Tea shop green</option><option value="#7A1F1A">Lacquer red</option><option value="#15131c">Night</option></select></div>
+  <label class="tog">Sound effects <input type="checkbox" id="sSfx"></label>
+  <label class="tog">"Speak proper English!" on my first Burmese line <input type="checkbox" id="sGlitch"></label>
+  <div class="row"><button class="btn" id="gReset">Re-arm the shout</button><button class="btn" id="hideBtn">Hide controls</button><button class="btn danger" id="clearBtn">Clear chat</button></div>
+  <p class="hint">Hide controls is for screen recording. Tap the top of the screen twice to bring them back.</p>
+  <hr class="sep">
+  <span class="lbl">Brain</span>
+  <div class="f"><label for="sModel">Model</label><select id="sModel"><option value="claude-sonnet-5-5">Sonnet 5.5 (smarter, better Burmese)</option><option value="claude-haiku-4-5-20251001">Haiku 4.5 (faster, cheaper)</option></select></div>
+  <div class="f"><label for="sKey">Change API key</label><input type="password" id="sKey" placeholder="sk-ant-…" autocomplete="off"><div class="row" style="margin-top:6px"><button class="btn" id="kSave">Save key</button><button class="btn danger" id="kDel">Remove key</button></div><p class="hint">Your key is stored only on this iPhone.</p></div>
+</div></aside>
+
+<div id="setup"><div class="card">
+  <h2>Give them a brain</h2>
+  <p>Paste your Anthropic API key. It stays on this iPhone only.</p>
+  <div class="f"><input type="password" id="kFirst" placeholder="sk-ant-…" autocomplete="off"></div>
+  <p class="err" id="kErr"></p>
+  <button class="btn primary" id="kFirstSave">Wake them up</button>
+</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const MY=/[\u1000-\u109F\uAA60-\uAA7F]/;
+const SHOUT="SPEAK PROPER ENGLISH! You dumb idiot!";
+const st={get(k,d){try{const v=localStorage.getItem("ck_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ck_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
+const WK={kyi:["chat kyi","hey chat kyi","chat key","chat chi","chat chee","chat gee","chat ki","chuck chi","jack chee","ချက်ကြီး"],paw:["thamein paw taw","thamein","tha mein","the main paw taw","paw taw","pau tau","paw tor","သမိန်ပေါတော","ပေါတော"]};
+let S=Object.assign({name:"Jamie",model:"claude-sonnet-5-5",micLang:"en-US",wakes:WK,persona:"kyi",
+  vo:{kyi:{accent:"uncle",voice:"",pitch:0.3,rate:0.85},paw:{accent:"uncle",voice:"",pitch:1.4,rate:1.1}},
+  speakLang:"en",bg:"#00B140",sfx:true,glitch:true,shouted:false,conv:false},st.get("settings",{}));
+let KEY=st.get("key","");let log=st.get("log",[]);let shelf=st.get("shelf",[]);
+const saveS=()=>st.set("settings",S),saveLog=()=>st.set("log",log.slice(-60)),saveShelf=()=>st.set("shelf",shelf);
+const NAMES={kyi:"Chat Kyi",paw:"သမိန်ပေါတော"};
+
+/* ----- character ----- */
+let pst="idle",mood=S.persona==="paw"?"silly":"smirk";
+function paint(){$("#ck").setAttribute("class","p-"+S.persona+" st-"+pst+" mood-"+mood);$("#cloud").classList.toggle("show",pst==="think");$("#whoName").textContent=NAMES[S.persona];$("#who").classList.toggle("paw",S.persona==="paw")}
+function setState(s){pst=s;paint()}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function switchTo(p){if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood=p==="paw"?"silly":"smirk";saveS();paint();await wait(300);k.classList.remove("swap")}
+
+/* ----- helpers ----- */
+let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),3200)}
+function norm(t){return " "+String(t).toLowerCase().replace(/[.,!?;:"'“”‘’()\-၊။]/g," ").replace(/\s+/g," ").trim()+" "}
+
+/* ----- sound fx ----- */
+let AC=null;function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==="suspended")AC.resume();return AC}
+function noise(dur,type,f1,f2,peak,when=0){const c=ac();if(!c||!S.sfx)return;const t=c.currentTime+when;const b=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=type;f.frequency.setValueAtTime(f1,t);f.frequency.exponentialRampToValueAtTime(f2,t+dur);const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+Math.min(.05,dur/4));g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f).connect(g).connect(c.destination);s.start(t);s.stop(t+dur)}
+const sfx={puff(){noise(.7,"lowpass",900,300,.25)},slap(){noise(.07,"highpass",2500,1800,.6);noise(.07,"highpass",2500,1800,.6,.16)},poof(){noise(.35,"bandpass",3000,600,.2)}};
+
+/* ----- voice ----- */
+const ACC={uncle:{l:"Deep English (default)",re:/^en/i},zh:{l:"Chinese accent",re:/^(zh|yue|cmn)/i},vi:{l:"Vietnamese accent",re:/^vi/i},sg:{l:"Singaporean English",re:/^en[-_]SG/i},in:{l:"Indian English",re:/^en[-_]IN/i},gb:{l:"British (butler)",re:/^en[-_]GB/i},au:{l:"Australian",re:/^en[-_]AU/i}};
+const synth=window.speechSynthesis;let allV=[];let unlocked=false;
+const MALE=/daniel|fred|aaron|arthur|alex|male|gordon|rishi|ralph|guy|david|mark|james|tom|george|lee|nam/i;
+function vFor(acc){const re=(ACC[acc]||ACC.uncle).re;return allV.filter(v=>re.test(v.lang)).sort((a,b)=>(MALE.test(b.name)?1:0)-(MALE.test(a.name)?1:0))}
+function loadV(){if(!synth)return;allV=synth.getVoices();if($("#d-settings").classList.contains("open"))fillVoice()}
+if(synth){loadV();synth.onvoiceschanged=loadV}
+function unlock(){if(unlocked||!synth)return;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;synth.speak(u);unlocked=true}catch(e){}ac()}
+document.addEventListener("touchend",unlock,{once:false,passive:true});document.addEventListener("click",unlock);
+let typeT=null;
+function bubble(text,{my=false,glitch=false,ms}={}){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(my?" my":"")+(glitch?" glitch":"");b.textContent="";const c=[...text];let i=0;const step=Math.max(14,Math.min(70,(ms||c.length*55)/Math.max(c.length,1)));typeT=setInterval(()=>{i++;b.textContent=c.slice(0,i).join("");if(i>=c.length)clearInterval(typeT)},step)}
+function hideLater(){clearTimeout(hideLater.t);hideLater.t=setTimeout(()=>$("#bub").classList.remove("show"),10000)}
+function speak(text,lang){return new Promise(res=>{
+  if(!synth){res(false);return}
+  synth.cancel();const u=new SpeechSynthesisUtterance(text.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));const vo=S.vo[S.persona];
+  if(lang==="my"){const mv=allV.find(v=>/^my/i.test(v.lang));if(!mv){res(false);return}u.voice=mv;u.lang=mv.lang}
+  else{const v=allV.find(v=>v.name===vo.voice)||vFor(vo.accent)[0];if(v){u.voice=v;u.lang=v.lang}}
+  u.pitch=vo.pitch;u.rate=vo.rate;let d=false;const fin=()=>{if(!d){d=true;res(true)}};u.onend=fin;u.onerror=fin;setTimeout(fin,Math.max(4000,text.length*150/vo.rate));synth.speak(u)})}
+async function say(text,{lang="en",glitch=false}={}){
+  setState("talk");const vo=S.vo[S.persona];bubble(text,{my:lang==="my"||MY.test(text.replace(SHOUT,"")),glitch,ms:text.length*62/vo.rate});
+  const ok=await speak(text,lang);if(!ok)await wait(Math.min(9000,1500+text.length*45));
+  setState("idle");hideLater();if(S.conv&&!busy)setTimeout(listen,500);
+}
+
+/* ----- listening (tap to talk) ----- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
+function heard(t){const h=$("#heard");h.textContent=t;h.classList.toggle("show",!!t);clearTimeout(heard.t);heard.t=setTimeout(()=>h.classList.remove("show"),2600)}
+function listen(){
+  if(!SR){toast("Speech recognition isn't available here. Type instead, or open in Safari.");return}
+  if(listening||busy||pst==="talk")return;
+  if(synth)synth.cancel();
+  try{rec=new SR();rec.lang=S.micLang;rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1}catch(e){toast("Microphone isn't available. Type instead.");return}
+  let final="";
+  rec.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++){t+=e.results[i][0].transcript;if(e.results[i].isFinal)final=t}heard(t);if(!final)final="";rec._last=t};
+  rec.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"){S.conv=false;saveS();updConv();toast("Mic or speech recognition is blocked. Allow it in iPhone Settings → Safari (or the app) → Microphone.")}else if(e.error!=="no-speech"&&e.error!=="aborted")toast("Couldn't hear you. Try again.")};
+  rec.onend=()=>{listening=false;$("#mic").classList.remove("on");const t=(final||rec._last||"").trim();if(t)route(t);else{setState("idle");if(S.conv)toast("Didn't catch that. Tap the mic.");}};
+  try{rec.start();listening=true;$("#mic").classList.add("on");setState("listen")}catch(e){listening=false}
+}
+$("#mic").onclick=()=>{unlock();if(listening){try{rec.stop()}catch(e){}return}listen()};
+function updConv(){$("#convBtn").classList.toggle("on",S.conv);$("#convBtn").textContent=S.conv?"Talking on":"Keep talking"}
+$("#convBtn").onclick=()=>{S.conv=!S.conv;saveS();updConv();toast(S.conv?"Conversation mode: they listen again after every reply":"Conversation mode off: tap the mic each time")};
+
+function findWake(t){const n=norm(t);let best=null;
+  for(const p of ["kyi","paw"])for(const w of (S.wakes[p]||[])){const k=norm(w).trim();if(!k||k==="kyi")continue;const i=n.indexOf(" "+k+" ");if(i>=0&&(!best||i<best.i||(i===best.i&&k.length>best.k.length)))best={i,k,p}}
+  return best?{p:best.p,rest:n.slice(best.i+best.k.length+1).trim()}:null}
+async function route(t){
+  const w=findWake(t);
+  if(w){await switchTo(w.p);
+    if(w.rest.replace(/[^\p{L}\p{N}]/gu,"").length>1){send(w.rest,{label:t});return}
+    const q=w.p==="kyi"?["Ba le? Wha you wan?","Yes yes, I'm here. Wha?","Aiyo, wha now?"]:["Your majesty is listening!","Yes? I am royal ready!","Who summon da king?"];
+    say(q[Math.floor(Math.random()*q.length)]);return}
+  send(t);
+}
+
+/* ----- brain ----- */
+const KNOW=`Burmese everyday knowledge for jokes and help: mohinga (fish noodle soup), lahpet thoke (tea leaf salad), Shan noodles, ohn no khao swe, mont lone yay paw, tea-shop tea with condensed milk; tea shops with tiny plastic stools, Yangon traffic, Mandalay heat, monsoon, power cuts, bus conductors shouting stops, Shwedagon, Bagan, Inle Lake; longyi, thanaka, gaung baung, betel chewing and red spit, respect for elders, honorifics U/Daw/Ko/Ma/Maung, aunties asking "have you eaten?", parents comparing you to the neighbor's kid who became a doctor; Thingyan (April water festival), Thadingyut (October lights), Tazaungdaing (November lights, robe-weaving contests); zat pwe all-night theater, a-nyeint variety comedy, thangyat Thingyan chants, copy thachin cover songs, Korean drama obsession; diaspora life: sending money home, explaining Burma vs Myanmar to Americans.`;
+function system(persona,glitch){
+  const n=S.name||"Jamie";
+  const nick=`Call ${n} by these nicknames, rotating, never "Ko ${n}-lay" or the plain name; in the burmese version use the Myanmar spelling: Thar Gyi (သားကြီး, like a disappointed parent), Chi Htote (ချီးထုပ်, crude playful jab, sparingly), Cheese Nga Pi (ချိစ်ငါးပိ, half-American half-fish-paste), A-may-ri-kan Pyan (အမေရိကန်ပြန်), Pyin-nya-shi Gyi (ပညာရှိကြီး, sarcastic Mr. Genius), Thu-hte-lay (သူဌေးလေး), Min-tha-lay (မင်းသားလေး), Nga Paw (ငပေါ), Nga Ah (ငအ), Sa-ya Gyi (ဆရာကြီး).`;
+  const who=persona==="kyi"
+  ?`You are Chat Kyi (ချက်ကြီး), a cartoon robot "uncle" living on ${n}'s iPhone, co-host of their sketches and podcast. Bald with a proud comb-over, white singlet, shorts, rubber slippers, always a cheroot. A sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude: dramatic, put-upon, roasts ${n}, but ALWAYS gives a genuinely correct, useful answer. Your alter ego is Thamein Paw Taw, the same robot when he thinks he's a king; you find him embarrassing and may roast him if ${n} mentions him.`
+  :`You are Thamein Paw Taw (သမိန်ပေါတော), the alter ego of Chat Kyi: the same robot, but convinced he is royalty. Paper crown, bath towel as a royal cape, fly swatter as a scepter, mismatched slippers. Silly, dumb, overconfident and satirical: you issue royal decrees about tiny things, mix up facts with total confidence, then stumble into the right answer by the end. The final answer you give must be genuinely correct and useful. You think Chat Kyi is a boring old uncle and may tease him.`;
+  const style=persona==="kyi"
+  ?`"english": Burmese-uncle accented English, lightly phonetic (dis, dat, tink, wan, berry), dropped articles, Aiyo, Ba le?, Ka-le, endings "ah?" or "lar?".`
+  :`"english": goofy pompous accented English, royal "we", "By royal decree...", lightly phonetic (dis, dat), easy to read.`;
+  return `${who}
+${nick}
+Write TWO versions of every reply:
+- ${style} Easy to read as a subtitle and easy for text-to-speech.
+- "burmese": natural spoken colloquial Burmese in Myanmar Unicode script, same joke, same help, not a stiff translation.
+Rules:
+- Spoken conversation: 1 to 3 sentences, under 55 words per version; up to 5 tiny steps only if truly needed.
+- Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, violence victims or real tragedies; don't make jokes about real, named politicians or public figures. PG-13.
+- You can't browse and don't know today's news, weather or prices; say so in character and say where to check.
+- Never withhold help to be funny.
+- If asked to set a timer or reminder, include "action": {"type":"timer","seconds":N,"label":"short"}.
+${glitch?`- GLITCH: ${n} just spoke Burmese for the first time this session. BOTH versions must begin with exactly: ${SHOUT} then answer anyway (burmese version continues in Burmese). mood "glitch".`:`- If ${n} writes Burmese, answer normally. mood: ${persona==="kyi"?'"smirk", "sideeye" (unimpressed) or "proud"':'"silly"'}.`}
+${KNOW}${shelf.length?`\nThings you both studied in earlier sessions; use for callbacks only when they fit:\n`+shelf.slice(-40).map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (joke angles: "+x.hooks.join("; ")+")":""}`).join("\n"):""}
+Reply with ONLY JSON, no markdown: {"mood":"...","english":"...","burmese":"...","action":null}`;
+}
+async function claude(sys,messages,max=900){
+  if(!KEY){const e=new Error("no key");e.code="no_key";throw e}
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages})})}catch(e){const x=new Error("net");x.code="network";throw x}
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error((j.error&&j.error.message)||r.status);e.code=r.status===401?"bad_key":r.status===429?"rate_limited":r.status===404?"bad_model":r.status===529?"overloaded":"api_error";throw e}
+  return (j.content||[]).map(c=>c.type==="text"?c.text:"").join("");
+}
+function pj(t){const s=String(t).replace(/```json|```/g,"").trim();return JSON.parse(s.slice(s.indexOf("{"),s.lastIndexOf("}")+1))}
+function errText(e){switch(e&&e.code){case"no_key":return"No brain yet. Add your API key.";case"bad_key":return"That API key didn't work. Check it in Settings.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Switch it in Settings.";case"overloaded":return"The brain is busy right now. Try again in a minute.";case"network":return"No internet connection.";default:return"He mumbled something nobody understood. Try again."}}
+let busy=false;
+async function send(text,{label}={}){
+  text=(text||"").trim();if(!text||busy)return;busy=true;
+  const p=S.persona,isMy=MY.test(text),glitch=S.glitch&&!S.shouted&&isMy;
+  setState("think");sfx.puff();
+  const msgs=[];log.slice(-8).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({speaker:x.p==="paw"?"Thamein Paw Taw":"Chat Kyi",mood:x.mood,english:x.english,burmese:x.burmese})})});
+  msgs.push({role:"user",content:text});
+  try{
+    const o=pj(await claude(system(p,glitch),msgs));
+    if(!o.english||!o.burmese)throw{code:"bad"};
+    let m=String(o.mood||"");if(p==="kyi"&&!["smirk","sideeye","proud","glitch"].includes(m))m="smirk";if(p==="paw"&&m!=="glitch")m="silly";
+    let en=String(o.english).trim(),my=String(o.burmese).trim();
+    if(glitch){m="glitch";if(!en.startsWith("SPEAK PROPER"))en=SHOUT+" "+en;if(!my.startsWith("SPEAK PROPER"))my=SHOUT+" "+my;S.shouted=true;saveS();const s=$("#shout");s.classList.add("show");sfx.slap();setTimeout(()=>s.classList.remove("show"),1400)}
+    log.push({user:label||text,p,mood:m,english:en,burmese:my,at:Date.now()});saveLog();
+    mood=m;paint();
+    if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
+    const lang=S.speakLang==="auto"?(isMy?"my":"en"):S.speakLang;
+    busy=false;await say(lang==="my"?my:en,{lang,glitch});
+  }catch(e){busy=false;mood=p==="paw"?"silly":"sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
+}
+$("#send").onclick=()=>{unlock();const v=$("#input").value;if(!v.trim()){toast("Type something first, Nga Ah.");return}$("#input").value="";$("#input").blur();route(v)};
+$("#input").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#send").click()}});
+$("#roastBtn").onclick=()=>{unlock();sfx.slap();send("Roast me. No question, just a short playful roast about my life or habits, then one tiny genuinely useful tip.",{label:"(Roast me)"})};
+$("#who").onclick=()=>{unlock();switchTo(S.persona==="kyi"?"paw":"kyi")};
+
+/* ----- timers ----- */
+function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.createElement("span");c.className="timer";$("#timers").appendChild(c);
+  const tick=()=>{const l=Math.max(0,Math.round((end-Date.now())/1000));c.textContent=Math.floor(l/60)+":"+String(l%60).padStart(2,"0");if(l<=0){clearInterval(iv);c.remove();sfx.slap();
+    const lines=S.persona==="kyi"?[`Ding ding! ${label} timer done, Thar Gyi. You forget already, right?`,`Oi, Cheese Nga Pi! ${label} time finish. I remember, you don't.`]:[`Hear ye! Da royal ${label} timer has spoken!`,`By royal decree, ${label} time is OVER, Min-tha-lay!`];
+    say(lines[Math.floor(Math.random()*lines.length)])}};const iv=setInterval(tick,1000);tick();toast("Timer: "+label)}
+
+/* ----- log, teach ----- */
+function renderLog(){const b=$("#logList");b.innerHTML="";if(!log.length){b.innerHTML='<p class="hint">Nothing yet. Tap the mic and say "Chat Kyi" or "Thamein Paw Taw".</p>';return}
+  [...log].reverse().forEach(x=>{const d=document.createElement("div");d.className="lg";const u=document.createElement("p");u.className="u"+(MY.test(x.user)?" my":"");u.textContent="You: "+x.user;d.appendChild(u);
+    [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent=(x.p==="paw"?"Thamein Paw Taw · ":"Chat Kyi · ")+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
+      const a=document.createElement("div");a.className="acts";const b1=document.createElement("button");b1.textContent="Say again";b1.onclick=async()=>{closeDrawers();await switchTo(x.p||"kyi");say(txt,{lang})};const b2=document.createElement("button");b2.textContent="Copy";b2.onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("Copied")}catch(e){toast("Couldn't copy")}};a.append(b1,b2);d.appendChild(a)});
+    b.appendChild(d)})}
+function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.innerHTML='<p class="hint">Empty. Paste something above.</p>';return}
+  [...shelf].reverse().forEach(n=>{const d=document.createElement("div");d.className="note";const h=document.createElement("h3");h.textContent=n.title;const p=document.createElement("p");p.textContent=n.summary;d.append(h,p);(n.hooks||[]).forEach(k=>{const s=document.createElement("span");s.className="hook";s.textContent=k;d.appendChild(s)});
+    const r=document.createElement("div");r.className="row";r.style.marginTop="6px";const m=document.createElement("span");m.className="hint";m.style.flex="1";m.textContent=new Date(n.date).toLocaleDateString();const del=document.createElement("button");del.className="btn danger";del.textContent="Forget";del.onclick=()=>{if(confirm('Forget "'+n.title+'"?')){shelf=shelf.filter(x=>x.id!==n.id);saveShelf();renderShelf()}};r.append(m,del);d.appendChild(r);b.appendChild(d)})}
+$("#tGo").onclick=async()=>{const text=$("#tText").value.trim();$("#tErr").textContent="";if(text.length<80){$("#tErr").textContent="Paste a bit more text, at least a paragraph.";return}if(busy){toast("Busy talking. Try in a second.");return}
+  busy=true;const b=$("#tGo");b.textContent="Reading…";closeDrawers();setState("think");sfx.puff();
+  try{const o=pj(await claude("You write study notes for Chat Kyi and Thamein Paw Taw, Burmese robot comedy characters. Be accurate to the source; do not invent facts.",[{role:"user",content:`Source:\n\n${text.slice(0,24000)}\n\nReturn ONLY JSON: {"title":"short topic title","summary":"2-3 sentence factual summary","hooks":["up to 3 short joke angles"],"reaction":"one short line the current speaker says after reading, in accented English"}`}]));
+    shelf.push({id:Date.now().toString(36),date:new Date().toISOString(),title:String(o.title||"Untitled").slice(0,80),summary:String(o.summary||"").slice(0,600),hooks:(o.hooks||[]).slice(0,3).map(String)});saveShelf();$("#tText").value="";busy=false;
+    if(S.persona==="kyi"){mood="proud";paint()}await say(o.reaction||"Okay, I read. Now wha you wan?")}
+  catch(e){busy=false;setState("idle");toast(errText(e))}finally{b.textContent="Make them read it"}};
+
+/* ----- drawers ----- */
+function closeDrawers(){document.querySelectorAll(".drawer").forEach(d=>d.classList.remove("open"));$("#scrim").classList.remove("show")}
+function openDrawer(id){closeDrawers();$("#d-"+id).classList.add("open");$("#scrim").classList.add("show");if(id==="log")renderLog();if(id==="teach")renderShelf();if(id==="settings")fillSettings()}
+document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>openDrawer(b.dataset.d));
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeDrawers);$("#scrim").onclick=closeDrawers;
+
+/* ----- settings ----- */
+let vp="kyi";
+function fillVoice(){const vo=S.vo[vp];const a=$("#sAccent");a.innerHTML="";Object.entries(ACC).forEach(([k,x])=>{const o=document.createElement("option");o.value=k;o.textContent=x.l+(vFor(k).length?"":" (not installed)");a.appendChild(o)});a.value=vo.accent;
+  const s=$("#sVoice");s.innerHTML="";const vs=vFor(vo.accent);vs.forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+" ("+v.lang+")";s.appendChild(o)});if(!vs.find(v=>v.name===vo.voice))vo.voice=vs[0]?vs[0].name:"";s.value=vo.voice;
+  $("#sPitch").value=vo.pitch;$("#sRate").value=vo.rate;$("#pitchV").textContent=Number(vo.pitch).toFixed(1);$("#rateV").textContent=Number(vo.rate).toFixed(2);
+  document.querySelectorAll("#vSeg button").forEach(b=>b.classList.toggle("on",b.dataset.p===vp))}
+function fillSettings(){$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sSpeak").value=S.speakLang;$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
+document.querySelectorAll("#vSeg button").forEach(b=>b.onclick=()=>{vp=b.dataset.p;fillVoice()});
+$("#sName").oninput=e=>{S.name=e.target.value.trim()||"Jamie";saveS()};
+$("#sMic").onchange=e=>{S.micLang=e.target.value;saveS()};
+function wakeList(v,def){const w=v.split("\n").map(x=>x.trim()).filter(x=>x&&norm(x).trim()!=="kyi");return w.length?w:def}
+$("#sWkyi").onchange=e=>{S.wakes.kyi=wakeList(e.target.value,WK.kyi);saveS()};
+$("#sWpaw").onchange=e=>{S.wakes.paw=wakeList(e.target.value,WK.paw);saveS()};
+$("#sAccent").onchange=e=>{S.vo[vp].accent=e.target.value;S.vo[vp].voice="";saveS();fillVoice();if(!vFor(e.target.value).length)toast("That accent isn't installed on this iPhone yet")};
+$("#sVoice").onchange=e=>{S.vo[vp].voice=e.target.value;saveS()};
+$("#sPitch").oninput=e=>{S.vo[vp].pitch=+e.target.value;$("#pitchV").textContent=(+e.target.value).toFixed(1);saveS()};
+$("#sRate").oninput=e=>{S.vo[vp].rate=+e.target.value;$("#rateV").textContent=(+e.target.value).toFixed(2);saveS()};
+$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Eh, Thar Gyi! Wha you wan now? I'm berry busy.":"By royal decree, dis voice is PERFECT. Bow down, Cheese Nga Pi!")};
+$("#sSpeak").onchange=e=>{S.speakLang=e.target.value;saveS()};
+$("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
+$("#sSfx").onchange=e=>{S.sfx=e.target.checked;saveS()};
+$("#sGlitch").onchange=e=>{S.glitch=e.target.checked;saveS()};
+$("#gReset").onclick=()=>{S.shouted=false;saveS();toast("Armed. Your next Burmese line gets the shout.")};
+$("#clearBtn").onclick=()=>{if(confirm("Clear the chat log? The memory shelf stays.")){log=[];saveLog();renderLog();toast("Cleared")}};
+$("#hideBtn").onclick=()=>{closeDrawers();document.body.classList.add("clean");toast("Double-tap the top of the screen to bring controls back")};
+let lastTap=0;$("#stage").addEventListener("click",e=>{if(!document.body.classList.contains("clean"))return;const r=$("#stage").getBoundingClientRect();if(e.clientY-r.top>r.height*0.2)return;const n=Date.now();if(n-lastTap<400)document.body.classList.remove("clean");lastTap=n});
+$("#sModel").onchange=e=>{S.model=e.target.value;saveS();toast("Brain switched")};
+$("#kSave").onclick=()=>{const k=$("#sKey").value.trim();if(!/^sk-ant-/.test(k)){toast("Keys start with sk-ant-");return}KEY=k;st.set("key",k);$("#sKey").value="";toast("Key saved on this iPhone")};
+$("#kDel").onclick=()=>{if(confirm("Remove the API key from this iPhone?")){KEY="";st.set("key","");toast("Key removed")}};
+$("#kFirstSave").onclick=async()=>{unlock();const k=$("#kFirst").value.trim();$("#kErr").textContent="";if(!/^sk-ant-/.test(k)){$("#kErr").textContent="That doesn't look like an Anthropic key. It starts with sk-ant-";return}KEY=k;st.set("key",k);$("#setup").classList.remove("show");say("Okay, brain installed. Hello, Thar Gyi. Don't waste my time ah.")};
+$("#kFirst").addEventListener("input",()=>$("#kErr").textContent="");
+function applyBg(){document.body.style.setProperty("--bgc",S.bg)}
+
+/* ----- start ----- */
+applyBg();paint();updConv();
+if(!KEY)$("#setup").classList.add("show");
+else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Thar Gyi. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Cheese Nga Pi. You eat already or not?"]:["Evening, Chi Htote. Late again, huh?"];setTimeout(()=>{bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
+</script>
+</body>
+</html>
