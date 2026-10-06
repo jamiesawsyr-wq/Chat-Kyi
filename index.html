@@ -232,7 +232,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="f"><label for="aUrl">Or a link for him to read first (optional)</label><input type="text" id="aUrl" placeholder="https://…" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
   <div class="f"><label for="aScript">Script (optional)</label><textarea id="aScript" rows="6" placeholder="Paste your episode script. Mark his spots:
 [KYI] = he reacts in his own words
-KYI: line = he says that line word for word"></textarea><p class="hint">Use [KYI] or KYI: for Chat Kyi, [PAW] or PAW: for Thamein Paw Taw ([CO] or CO: works for either). He follows along as you read and comes in at each mark. Tapping him on screen fires the next cue if he misses one.</p></div>
+KYI: text = he reads it word for word (can run several lines until a blank line)"></textarea><p class="hint">Use [KYI] or KYI: for Chat Kyi, [PAW] or PAW: for Thamein Paw Taw ([CO] or CO: works for either). He follows along as you read and comes in at each mark. Tapping him on screen fires the next cue if he misses one.</p></div>
   <div class="f"><label for="aMode">He jumps in</label><select id="aMode"><option value="called">When I say his name</option><option value="every">After every line I say</option></select></div>
   <label class="tog">Show the ON AIR light in recordings <input type="checkbox" id="aLight" checked></label>
   <button class="btn primary" id="aGo" style="width:100%">Go On Air</button>
@@ -364,6 +364,7 @@ async function route(t){
   if(air){
     if(air.cues&&air.ci<air.cues.length){heardBuf.push(...wordsOf(t));if(heardBuf.length>80)heardBuf=heardBuf.slice(-80);if(cueReached()){fireCue();return}}
     const mine=w&&w.p===air.persona,rest=mine?w.rest:"";
+    if(mine&&air.cues&&air.ci<air.cues.length&&/\bread\b.*\b(next|your|my|part|line)\b|\byour (line|part|turn)\b|\bgo ahead\b/i.test(rest)){fireCue();return}
     if(air.mode==="every"){send(mine&&rest.replace(/[^\p{L}\p{N}]/gu,"").length>1?rest:t,{label:t});return}
     if(mine){if(rest.replace(/[^\p{L}\p{N}]/gu,"").length>1){send(rest,{label:t});return}awaitUntil=Date.now()+9000;say(air.persona==="kyi"?"Yes? Go on.":"The king is listening!");return}
     if(Date.now()<awaitUntil){awaitUntil=0;send(t);return}
@@ -389,7 +390,7 @@ function system(persona,glitch){
   const notes=shelf.filter(x=>x.kind!=="exp").slice(-12),exps=shelf.filter(x=>x.kind==="exp").slice(-10);
   const shelfTxt=(notes.length?`\nNotes from earlier sessions, for callbacks only when they fit:\n`+notes.map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"")
    +(exps.length?`\nPast discussions with ${n}. Occasionally (about 1 reply in 4, only when it fits naturally) tease ${n} about what they said:\n`+exps.map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (tease angles: "+x.hooks.join("; ")+")":""}`).join("\n"):"")
-   +(air?`\nON AIR: you are co-hosting an episode of ${n}'s show, recorded for an audience${air.title?` about "${air.title}"`:""}. Act like a co-host, not an assistant: short punchy reactions, build on what ${n} just said, sometimes ask a quick follow-up, tease lightly, and keep it entertaining for listeners. Stay on the episode topic. Up to 3 sentences / 45 words.${air.brief?` Episode brief: ${air.brief}`:""}`:"")
+   +(air?`\nON AIR: you are co-hosting an episode of ${n}'s show, recorded for an audience${air.title?` about "${air.title}"`:""}. Act like a co-host, not an assistant: short punchy reactions, build on what ${n} just said, sometimes ask a quick follow-up, tease lightly, and keep it entertaining for listeners. Stay on the episode topic. Up to 3 sentences / 45 words.${air.brief?` Episode brief: ${air.brief}`:""}${air.script?`\nYou have the full episode script below. Your parts are marked with your tag. If ${n} asks you to read something from the script (your part, the intro, the next section, anything), read exactly that part word for word, without the tags, and ignore the length limit for that reply.\nSCRIPT:\n${air.script}`:""}`:"")
    +(!air&&disc?`\nCURRENT DISCUSSION with ${n} about "${disc.title}". Brief: ${disc.brief}\nStay on this topic, react with in-character opinions, push back on ${n}'s takes, and sometimes end with one short pointed question. Keep facts consistent with the brief. You may use up to 3 sentences / 50 words.`:"");
   const fmt=bur?`{"mood":"...","english":"...","burmese":"...","action":null}`:`{"mood":"...","english":"...","action":null}`;
   return `${who}
@@ -465,7 +466,7 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const full=await claudeStream(system(p,glitch),msgs,S.burmese?700:(disc?300:230),onText);
+    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:S.burmese?700:(disc||air?300:230),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
     log.push({user:label||text,p,mood,english:enFinal,burmese:o.burmese?String(o.burmese):"",at:Date.now()});saveLog();
@@ -495,7 +496,7 @@ function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.in
   [...shelf].reverse().forEach(n=>{const d=document.createElement("div");d.className="note";const h=document.createElement("h3");h.textContent=n.title;const p=document.createElement("p");p.textContent=n.summary;d.append(h,p);(n.hooks||[]).forEach(k=>{const s=document.createElement("span");s.className="hook";s.textContent=k;d.appendChild(s)});
     const r=document.createElement("div");r.className="row";r.style.marginTop="6px";const m=document.createElement("span");m.className="hint";m.style.flex="1";m.textContent=new Date(n.date).toLocaleDateString();const del=document.createElement("button");del.className="btn danger";del.textContent="Forget";del.onclick=()=>{if(confirm('Forget "'+n.title+'"?')){shelf=shelf.filter(x=>x.id!==n.id);saveShelf();renderShelf()}};r.append(m,del);d.appendChild(r);b.appendChild(d)})}
 let disc=st.get("disc",null);
-function showDisc(){const on=!!air||!!disc;$("#discBar").hidden=!on||(!!air&&!air.title);$("#discTitle").textContent=air?(air.title||""):disc?"Discussing: "+disc.title:"";$("#dEnd").textContent=air?"Off Air":"End discussion";
+function showDisc(){const on=!!air||!!disc;$("#discBar").hidden=!on||(!!air&&!air.title);$("#discTitle").textContent=air?(air.title||""):disc?"Discussing: "+disc.title:"";$("#dEnd").textContent="End discussion";$("#dEnd").hidden=!!air;
   $("#stage").classList.toggle("disc",on);$("#stage").classList.toggle("onair",!!air);$("#stage").classList.toggle("nolight",!!air&&!air.light);
   const ab=$("#airBtn");ab.classList.toggle("live",!!air);ab.textContent=air?"Off Air":"On Air";$("#who .sw").textContent=air?"locked":"switch"}
 function srcErr(t){$("#tErr").textContent=t}
@@ -558,7 +559,7 @@ $("#aGo").onclick=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl")
   closeDrawers();micHold=false;await switchTo(aPick);
   const scriptRaw=$("#aScript").value.trim(),cues=scriptRaw?parseScript(scriptRaw):[];
   if(scriptRaw&&!cues.length){toast("No [KYI] or KYI: marks found in the script, so he'll only answer when called.")}
-  air={persona:aPick,title,brief:"",mode:cues.length?"called":$("#aMode").value,light:$("#aLight").checked,startedAt:Date.now(),cues,ci:0};heardBuf=[];updCue();
+  air={persona:aPick,title,brief:"",mode:cues.length?"called":$("#aMode").value,light:$("#aLight").checked,startedAt:Date.now(),cues,ci:0,script:scriptRaw.slice(0,6000)};heardBuf=[];updCue();
   const n=S.name||"Jamie",who=aPick==="paw"?"Thamein Paw Taw (silly self-declared king)":"Chat Kyi (condescending robot uncle)";
   if(url||title){busy=true;setState("think");sfx.puff();
     try{const o=await readSource(url?{url,text:""}:{url:"",text:title},`Return ONLY JSON: {"title":"short episode title","brief":"about 120 words of key facts for the episode","opener":"one short line ${who} says to open the show as co-host, in character, introducing the topic to listeners"}. If the page can't be read, return {"error":"short reason"}.`,1200);
@@ -593,8 +594,10 @@ const TAG="(?:KYI|PAW|CO|CO-?HOST|CHAT\\s*KYI|THAMEIN(?:\\s*PAW\\s*TAW)?)";
 function wordsOf(t){return norm(t).trim().split(" ").filter(Boolean)}
 function parseScript(raw){
   const cues=[];let host="";const lineRe=new RegExp("^\\s*"+TAG+"\\s*:\\s*(.+)$","i"),inl=new RegExp("\\["+TAG+"\\]","i");
+  let cur=null;
   for(const line of String(raw).split(/\r?\n/)){
-    const m=line.match(lineRe);if(m){cues.push({type:"line",text:m[1].trim(),host:host.trim()});host="";continue}
+    const m=line.match(lineRe);if(m){cur={type:"line",text:m[1].trim(),host:host.trim()};cues.push(cur);host="";continue}
+    if(cur){if(line.trim()&&!inl.test(line)){cur.text+=" "+line.trim();continue}cur=null;if(!line.trim())continue}
     const parts=line.split(inl);parts.forEach((pt,i)=>{host+=pt+" ";if(i<parts.length-1){cues.push({type:"improv",host:host.trim()});host=""}});host+="\n";
   }
   cues.forEach(c=>{const w=wordsOf(c.host).filter(x=>!STOP.has(x)&&x.length>1);c.anchor=w.slice(-6)});
