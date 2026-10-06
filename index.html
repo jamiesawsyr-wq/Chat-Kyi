@@ -108,21 +108,23 @@ button{cursor:pointer}
 #setup p{margin:0 0 12px;line-height:1.5;font-size:15px}
 #toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 60px);transform:translateX(-50%);background:var(--ink);color:var(--ui);padding:9px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw;text-align:center}
 #toast.show{opacity:1}
-#discBar{position:absolute;top:2%;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(20,14,12,.82);color:#fff;border-radius:999px;padding:5px 6px 5px 12px;font-size:13px;max-width:92%;z-index:2}
+#discBar{flex:none;display:flex;align-items:center;gap:8px;background:var(--ui);border-bottom:1px solid var(--line);padding:6px 12px;font-size:13px;color:var(--ink)}
+#discBar[hidden]{display:none}
+#discBar span{flex:1;min-width:0}
 #discBar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #discBar button{border:none;background:#C0352B;color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap}
-#stage.disc #bub{top:calc(2% + 52px);max-height:30%}
+
 #airLight{position:absolute;top:2%;left:3%;font-size:12px;font-weight:800;letter-spacing:2px;color:#fff;background:#C0352B;padding:4px 10px;border-radius:6px;box-shadow:0 0 10px rgba(255,80,60,.75);z-index:3;display:none}
 #stage.onair #airLight{display:block}
 .idea{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--ui2);border-radius:12px;padding:10px 12px;margin:8px 0 0}
 .idea b{display:block;font-size:15px}.idea span{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
 #cueChip{position:absolute;top:calc(2% + 30px);left:3%;border:none;background:rgba(20,14,12,.82);color:#fff;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;z-index:3}
 body.clean #cueChip{display:none}
-#stage.onair #discBar{left:auto;right:3%;transform:none;max-width:68%}
+
 body.clean #stage.onair.nolight #airLight{display:none}
 #airBtn{border:1px solid var(--line);background:var(--ui2);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
 #airBtn::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
-#airBtn.live{background:#C0352B;border-color:#C0352B;color:#fff}#airBtn.live::before{background:#fff}#stage.disc #cloud{top:calc(2% + 56px)}
+#airBtn.live{background:#C0352B;border-color:#C0352B;color:#fff}#airBtn.live::before{background:#fff}
 body.clean #discBar{display:none}
 body.clean #top,body.clean #bottom{display:none}
 body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
@@ -168,6 +170,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <button class="tb" data-d="settings">⚙︎</button>
 </div>
 
+<div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
 <div id="stage">
   <div id="bub"></div>
   <svg id="cloud" viewBox="0 0 160 100"><ellipse cx="92" cy="40" rx="62" ry="34" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="38" cy="80" r="9" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="22" cy="94" r="5" fill="#fff" stroke="#111" stroke-width="3"/><g class="dots" fill="#555"><circle cx="70" cy="40" r="6"/><circle cx="92" cy="40" r="6"/><circle cx="114" cy="40" r="6"/></g></svg>
@@ -202,7 +205,6 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <g class="m m-silly" stroke="none"><circle cx="136" cy="171" r="13" fill="#7fe3c4"/><circle cx="141" cy="176" r="4.5" fill="#1f2a36"/><circle cx="177" cy="168" r="7" fill="#7fe3c4"/><circle cx="174" cy="165" r="2.5" fill="#1f2a36"/><g class="mouth"><path d="M132 189 Q155 205 180 187" stroke="#7fe3c4" stroke-width="3" fill="none"/><ellipse cx="164" cy="199" rx="6" ry="5" fill="#f28b9b"/></g></g>
 <g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
 </g></g></svg></div>
-    <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
   <div id="heard"></div>
   <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
 </div>
@@ -229,7 +231,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v2.1</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v2.2</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option><option value="my-MM">Burmese (most iPhones can't)</option></select></div>
   <div class="f"><label for="sWkyi">Wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
@@ -255,6 +257,15 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="row"><button class="btn" id="xExport">Export memories</button><button class="btn" id="xImport">Import memories</button></div>
   <input type="file" id="xFile" accept=".json,application/json" hidden>
   <p class="hint">Exports topics, discussions, episodes and settings to a file you can save to Files or iCloud. Your API key is never included. Import merges into what's already here.</p>
+  <hr class="sep">
+  <span class="lbl">Burmese voice and listening (Azure)</span>
+  <label class="tog">Use Azure for Burmese <input type="checkbox" id="azOn"></label>
+  <div class="f"><label for="azKey">Azure Speech key</label><input type="password" id="azKey" placeholder="Key 1 from your Speech resource" autocomplete="off"></div>
+  <div class="f"><label for="azRegion">Azure region</label><input type="text" id="azRegion" placeholder="e.g. eastus" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+  <div class="f"><label for="azListen">Listen for</label><select id="azListen"><option value="auto">English and Burmese (auto-detect)</option><option value="my-MM">Burmese only</option><option value="en-US">English only</option></select></div>
+  <div class="f"><label for="azVoice">Burmese voice</label><select id="azVoice"><option value="my-MM-ThihaNeural">Thiha (male)</option><option value="my-MM-NilarNeural">Nilar (female)</option></select></div>
+  <div class="row"><button class="btn" id="azSave">Save Azure settings</button><button class="btn" id="azTest">Test Burmese voice</button></div>
+  <p class="hint" id="azStatus">When on, he hears Burmese and English, and answers out loud in Burmese whenever you speak Burmese. Key stays on this iPhone.</p>
   <hr class="sep">
   <span class="lbl">Brain</span>
   <div class="f"><label for="sModel">Model</label><select id="sModel"><option value="claude-haiku-4-5-20251001">Haiku 4.5 (fastest, recommended)</option><option value="claude-sonnet-5-5">Sonnet 5.5 (smarter, slower)</option></select></div>
@@ -330,12 +341,60 @@ async function say(text,{lang="en",glitch=false}={}){
   setState("idle");hideLater();if(handsFree())setTimeout(listen,500);
 }
 
+/* ----- Azure speech ----- */
+let AZ=Object.assign({on:false,key:"",region:"",listen:"auto",voice:"my-MM-ThihaNeural"},st.get("azure",{}));
+function azReady(){return AZ.on&&AZ.key&&AZ.region}
+let sdkP=null;
+function loadSDK(){if(window.SpeechSDK)return Promise.resolve(window.SpeechSDK);if(sdkP)return sdkP;
+  sdkP=new Promise((ok,bad)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js";sc.onload=()=>window.SpeechSDK?ok(window.SpeechSDK):bad(new Error("sdk"));sc.onerror=()=>{sdkP=null;bad(new Error("sdk"))};document.head.appendChild(sc)});return sdkP}
+function azCfg(sdk){const c=sdk.SpeechConfig.fromSubscription(AZ.key,AZ.region.trim());return c}
+function xesc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;")}
+const AZMOOD={smirk:{pitch:"-6%",rate:"-10%",vol:"+0%"},sideeye:{pitch:"-10%",rate:"-16%",vol:"-5%"},proud:{pitch:"-2%",rate:"-4%",vol:"+10%"},glitch:{pitch:"+6%",rate:"+12%",vol:"+15%"}};
+function azSSML(lines,md){const pr=AZMOOD[md]||AZMOOD.smirk;const ls=lines.map(x=>String(x).trim()).filter(Boolean);
+  const body=ls.map((l,i)=>{const last=i===ls.length-1&&ls.length>1;return (last?'<break time="450ms"/>':'')+`<prosody pitch="${pr.pitch}" rate="${pr.rate}" volume="${pr.vol}">${xesc(l)}</prosody>`+(i<ls.length-1?'<break time="250ms"/>':'')}).join("");
+  return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="my-MM"><voice name="${AZ.voice}">${body}</voice></speak>`}
+let azSrc=null;
+function azStop(){try{if(azSrc)azSrc.stop()}catch(e){}azSrc=null}
+async function azSpeak(lines,md){
+  const sdk=await loadSDK();const cfg=azCfg(sdk);cfg.speechSynthesisOutputFormat=sdk.SpeechSynthesisOutputFormat.Audio24Khz48KBitRateMonoMp3;
+  const syn=new sdk.SpeechSynthesizer(cfg,null);
+  const data=await new Promise((ok,bad)=>syn.speakSsmlAsync(azSSML(lines,md),r=>{syn.close();if(r.reason===sdk.ResultReason.SynthesizingAudioCompleted)ok(r.audioData);else bad(new Error(r.errorDetails||"tts"))},e=>{syn.close();bad(new Error(String(e)))}));
+  const c=ac();if(!c)throw new Error("audio");if(c.state==="suspended")await c.resume();
+  const buf=await c.decodeAudioData(data.slice(0));
+  await new Promise(done=>{azStop();const src=c.createBufferSource();src.buffer=buf;src.connect(c.destination);src.onended=done;azSrc=src;src.start();setTimeout(done,buf.duration*1000+1500)});
+  azSrc=null;
+}
+let azRec=null;
+async function azListen(){
+  const sdk=await loadSDK();const cfg=azCfg(sdk);const audio=sdk.AudioConfig.fromDefaultMicrophoneInput();
+  let r;
+  if(AZ.listen==="auto"){const ad=sdk.AutoDetectSourceLanguageConfig.fromLanguages(["en-US","my-MM"]);r=sdk.SpeechRecognizer.FromConfig(cfg,ad,audio)}
+  else{cfg.speechRecognitionLanguage=AZ.listen;r=new sdk.SpeechRecognizer(cfg,audio)}
+  azRec=r;r.recognizing=(s,e)=>heard(e.result.text);
+  return new Promise((ok,bad)=>r.recognizeOnceAsync(res=>{r.close();azRec=null;
+    if(res.reason===sdk.ResultReason.RecognizedSpeech){let lang="";try{lang=sdk.AutoDetectSourceLanguageResult.fromResult(res).language||""}catch(e){}ok({text:res.text,lang})}
+    else if(res.reason===sdk.ResultReason.NoMatch)ok({text:"",lang:""});
+    else{const d=sdk.CancellationDetails.fromResult(res);bad(new Error(d.errorDetails||"cancelled"))}},
+    e=>{try{r.close()}catch(x){}azRec=null;bad(new Error(String(e)))}));
+}
+function azErr(e){const m=String(e&&e.message||e);if(/401|1006|auth|subscription/i.test(m))return"Azure key or region is wrong. Check them in Settings.";if(/sdk/.test(m))return"Couldn't load the Azure speech library. Check your internet.";if(/microphone|Permission|NotAllowed/i.test(m))return"Microphone is blocked. Allow it in iPhone Settings for Safari.";return"Azure speech error: "+m.slice(0,80)}
+let lastHeardLang="";
+
 /* ----- listening (tap to talk) ----- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
 function heard(t){const h=$("#heard");h.textContent=t;h.classList.toggle("show",!!t);clearTimeout(heard.t);heard.t=setTimeout(()=>h.classList.remove("show"),2600)}
+async function listenAzure(){
+  listening=true;$("#mic").classList.add("on");setState("listen");
+  try{const r=await azListen();listening=false;$("#mic").classList.remove("on");
+    if(micHold)return;
+    const t=(r.text||"").trim();lastHeardLang=r.lang||(MY.test(t)?"my-MM":"");
+    if(t)route(t);else{setState("idle");if(handsFree())setTimeout(listen,400)}}
+  catch(e){listening=false;$("#mic").classList.remove("on");setState("idle");micHold=true;toast(azErr(e))}
+}
 function listen(){
-  if(!SR){toast("Speech recognition isn't available here. Type instead, or open in Safari.");return}
   if(listening||busy||pst==="talk")return;
+  if(azReady()){if(synth)synth.cancel();listenAzure();return}
+  if(!SR){toast("Speech recognition isn't available here. Type instead, or open in Safari.");return}
   if(synth)synth.cancel();
   try{rec=new SR();rec.lang=S.micLang;rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1}catch(e){toast("Microphone isn't available. Type instead.");return}
   let final="";
@@ -345,7 +404,7 @@ function listen(){
   try{rec.start();listening=true;$("#mic").classList.add("on");setState("listen")}catch(e){listening=false}
 }
 let micHold=false;function handsFree(){return (S.conv||!!air)&&!micHold&&!busy}
-$("#mic").onclick=()=>{unlock();if(listening){micHold=true;try{rec.abort()}catch(e){}listening=false;$("#mic").classList.remove("on");setState("idle");if(air)toast("Mic paused. Tap again to resume.");return}micHold=false;listen()};
+$("#mic").onclick=()=>{unlock();if(listening){micHold=true;try{rec&&rec.abort()}catch(e){}try{if(azRec)azRec.close()}catch(e){}azRec=null;listening=false;$("#mic").classList.remove("on");setState("idle");if(air)toast("Mic paused. Tap again to resume.");return}micHold=false;listen()};
 function updConv(){$("#convBtn").classList.toggle("on",S.conv);$("#convBtn").textContent=S.conv?"Talking on":"Keep talking"}
 $("#convBtn").onclick=()=>{S.conv=!S.conv;saveS();updConv();toast(S.conv?"Conversation mode: they listen again after every reply":"Conversation mode off: tap the mic each time")};
 
@@ -391,7 +450,7 @@ const SPICE=["Work in one catchphrase naturally.","Mention your rival Uncle Siri
 let lastSpice=-1;function pickSpice(){if(Math.random()<0.55)return"No catchphrase or running gag this reply; just be in character.";let i;do{i=Math.floor(Math.random()*SPICE.length)}while(i===lastSpice);lastSpice=i;return SPICE[i]+" Keep it to a few words; don't let it take over the answer."}
 const PAW_NICKS=["Royal Peasant","Lord of the Group Chat","Duke of Leftovers","Baron of Boba"];
 function system(persona,glitch){
-  const n=S.name||"Jamie",bur=!!S.burmese;
+  const n=S.name||"Jamie",bur=!!S.burmese||myTurn;
   const pool=persona==="paw"?NICKS.concat(PAW_NICKS):NICKS;
   const used=log.slice(-12).map(x=>x.english||"").join(" ").toLowerCase();
   const fresh=pool.filter(k=>!used.includes(k.toLowerCase().replace(/\s*\(.*\)/,"")));
@@ -412,7 +471,7 @@ Ending: ${pickEnding()} Never end with generic filler like "What do you want to 
   const fmt=bur?`{"mood":"...","english":"...","burmese_lines":["..."],"action":null}`:`{"mood":"...","english":"...","action":null}`;
   return `${who}
 ${nick}
-${style}${bur?` After "english", write "burmese_lines": an array with exactly one Burmese subtitle (natural colloquial Burmese, Myanmar script) for each English sentence, in the same order. These are subtitles only; you still speak English.`:""}
+${style}${myTurn?` ${n} is speaking Burmese right now. Your "burmese_lines" are what you will SAY OUT LOUD in Burmese, and "english" becomes the subtitle. Write the Burmese fully in your character: a condescending know-it-all uncle, colloquial spoken Burmese, dramatic sighs like ဟာ… or အေးပါ…, patronizing "listen carefully" setups (သေချာနားထောင်), your catchphrases translated naturally, and your nickname for ${n} kept in English. Short sentences that sound good spoken.`:""}${bur?` After "english", write "burmese_lines": an array with exactly one Burmese subtitle (natural colloquial Burmese, Myanmar script) for each English sentence, in the same order. These are subtitles only; you still speak English.`:""}
 Rules: spoken reply, 1 to 3 short sentences, under 40 words. Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
 ${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"silly"'}.`}
 ${KNOW}${shelfTxt}
@@ -462,15 +521,16 @@ function pairBubble(en,lines,glitch){clearTimeout(hideLater.t);const b=$("#bub")
   for(let i=ss.length;i<lines.length;i++){const m=document.createElement("span");m.className="mm";m.textContent=lines[i];b.appendChild(m)}
   fitBubble()}
 function liveBubble(text,glitch){clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent=text;fitBubble()}
-let busy=false,accentWarned={};
+let busy=false,accentWarned={},myTurn=false;
 async function send(text,{label}={}){
   text=(text||"").trim();if(!text||busy)return;busy=true;
-  const p=air?air.persona:S.persona,isMy=MY.test(text),glitch=S.glitch&&!S.shouted&&isMy;
+  const p=air?air.persona:S.persona,isMy=MY.test(text)||/^my/i.test(lastHeardLang),glitch=S.glitch&&!S.shouted&&isMy;lastHeardLang="";
+  const azMy=isMy&&azReady();myTurn=azMy;
   const acc=S.vo[p].accent;if(!vFor(acc).length&&!accentWarned[acc]){accentWarned[acc]=true;toast(`No ${(ACC[acc]||{}).l||acc} voice installed yet, so using a standard one. Download it in iPhone Settings → Voices.`)}
   setState("think");sfx.puff();
   const msgs=[];log.slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
   msgs.push({role:"user",content:(p==="paw"?"[to Thamein Paw Taw] ":"[to Paw Taw] ")+text});
-  const sp=makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
+  const sp=azMy?{push(t){if(t===SHOUT&&synth){const u=new SpeechSynthesisUtterance("Speak proper English! You dumb idiot!");const v=pickVoice(S.vo[S.persona]);if(v){u.voice=v;u.lang=v.lang}synth.speak(u)}},finish(){return Promise.resolve()}}:makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
   const onText=full=>{
     if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];if(p==="kyi"&&!["smirk","sideeye","proud","glitch"].includes(m))m="smirk";if(p==="paw"&&m!=="glitch")m="silly";if(glitch)m="glitch";mood=m;paint()}}
     const m=full.match(/"english"\s*:\s*"((?:[^"\\]|\\.)*)("?)/);if(!m)return;
@@ -490,7 +550,7 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:S.burmese?2000:(disc||air?300:230),onText);
+    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:(S.burmese||azMy)?2000:(disc||air?300:230),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
     let blines=Array.isArray(o.burmese_lines)?o.burmese_lines.map(String):[];
@@ -499,7 +559,9 @@ async function send(text,{label}={}){
       claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script). Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(sents)}],2500)
         .then(t=>{const m=t.match(/\[[\s\S]*\]/);if(!m)return;const arr=JSON.parse(m[0]).map(String);const last=log[log.length-1];if(last&&last.english===enFinal){last.burmese=arr.join("\n");saveLog()}
           if($("#bub").classList.contains("show")&&Date.now()-at<60000)pairBubble(enFinal,arr,glitch)}).catch(()=>{})}
+    if(azMy&&blines.length<splitSent(enFinal).length){try{const t=await claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script) in the voice of a condescending robot uncle. Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(splitSent(enFinal))}],2500);const mm=t.match(/\[[\s\S]*\]/);if(mm)blines=JSON.parse(mm[0]).map(String)}catch(e){}}
     if(blines.length)pairBubble(enFinal,blines,glitch);
+    if(azMy&&blines.length){setState("talk");try{await azSpeak(blines,mood)}catch(e){toast(azErr(e))}}
     log.push({user:label||text,p,mood,english:enFinal,burmese:blines.length?blines.join("\n"):(o.burmese?String(o.burmese):""),at:Date.now()});saveLog();
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
     await sp.finish();
@@ -527,7 +589,7 @@ function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.in
   [...shelf].reverse().forEach(n=>{const d=document.createElement("div");d.className="note";const h=document.createElement("h3");h.textContent=n.title;const p=document.createElement("p");p.textContent=n.summary;d.append(h,p);(n.hooks||[]).forEach(k=>{const s=document.createElement("span");s.className="hook";s.textContent=k;d.appendChild(s)});
     const r=document.createElement("div");r.className="row";r.style.marginTop="6px";const m=document.createElement("span");m.className="hint";m.style.flex="1";m.textContent=new Date(n.date).toLocaleDateString();const del=document.createElement("button");del.className="btn danger";del.textContent="Forget";del.onclick=()=>{if(confirm('Forget "'+n.title+'"?')){shelf=shelf.filter(x=>x.id!==n.id);saveShelf();renderShelf()}};r.append(m,del);d.appendChild(r);b.appendChild(d)})}
 let disc=st.get("disc",null);
-function showDisc(){const on=!!air||!!disc;$("#discBar").hidden=!on||(!!air&&!air.title);$("#discTitle").textContent=air?(air.title||""):disc?"Discussing: "+disc.title:"";$("#dEnd").textContent="End discussion";$("#dEnd").hidden=!!air;
+function showDisc(){const on=!!air||!!disc;$("#discBar").hidden=!on||(!!air&&!air.title);$("#discTitle").textContent=disc?"Discussing: "+(disc.title||"topic"):"";$("#dEnd").textContent="End discussion";$("#dEnd").hidden=!!air;
   $("#stage").classList.toggle("disc",on);$("#stage").classList.toggle("onair",!!air);$("#stage").classList.toggle("nolight",!!air&&!air.light);
   $("#who .sw").textContent=air?"locked":"switch"}
 function srcErr(t){$("#tErr").textContent=t}
@@ -707,7 +769,7 @@ function fillVoice(){const vo=S.vo[vp];const a=$("#sAccent");a.innerHTML="";Obje
   const s=$("#sVoice");s.innerHTML="";const vs=vFor(vo.accent);vs.forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+" ("+v.lang+")";s.appendChild(o)});if(!vs.find(v=>v.name===vo.voice))vo.voice=vs[0]?vs[0].name:"";s.value=vo.voice;
   $("#sPitch").value=vo.pitch;$("#sRate").value=vo.rate;$("#pitchV").textContent=Number(vo.pitch).toFixed(1);$("#rateV").textContent=Number(vo.rate).toFixed(2);
   document.querySelectorAll("#vSeg button").forEach(b=>b.classList.toggle("on",b.dataset.p===vp))}
-function fillSettings(){$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
+function fillSettings(){$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
 document.querySelectorAll("#vSeg button").forEach(b=>b.onclick=()=>{vp=b.dataset.p;fillVoice()});
 $("#sName").oninput=e=>{S.name=e.target.value.trim()||"Jamie";saveS()};
 $("#sMic").onchange=e=>{S.micLang=e.target.value;saveS()};
@@ -728,6 +790,15 @@ $("#vAud").onclick=async()=>{unlock();const my=++audRun;const vo=S.vo[vp];const 
     b.classList.remove("primary");await wait(300)}
   if(my===audRun)$("#vAudNow").textContent="Done. Tap a name to use that voice."};
 $("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Okay. Listen carefully, Boba Boy. I explain this only one time.":"By royal decree, dis voice is PERFECT. Bow down, Royal Peasant!")};
+function fillAzure(){$("#azOn").checked=!!AZ.on;$("#azKey").value=AZ.key?"••••••••":"";$("#azRegion").value=AZ.region||"";$("#azListen").value=AZ.listen;$("#azVoice").value=AZ.voice}
+function saveAZ(){st.set("azure",AZ)}
+$("#azOn").onchange=e=>{AZ.on=e.target.checked;saveAZ();if(AZ.on&&(!AZ.key||!AZ.region))toast("Add your Azure key and region, then Save");else toast(AZ.on?"Azure Burmese on":"Azure Burmese off")};
+$("#azListen").onchange=e=>{AZ.listen=e.target.value;saveAZ()};
+$("#azVoice").onchange=e=>{AZ.voice=e.target.value;saveAZ()};
+$("#azSave").onclick=()=>{const k=$("#azKey").value.trim(),r=$("#azRegion").value.trim().toLowerCase().replace(/\s+/g,"");if(k&&!/^•+$/.test(k))AZ.key=k;if(r)AZ.region=r;saveAZ();fillAzure();$("#azStatus").textContent=AZ.key&&AZ.region?"Saved. Tap Test Burmese voice to check it works.":"Add both a key and a region."};
+$("#azTest").onclick=async()=>{unlock();if(!AZ.key||!AZ.region){toast("Save your Azure key and region first");return}$("#azStatus").textContent="Testing…";
+  try{setState("talk");await azSpeak(["သေချာနားထောင်။","ငါ တစ်ခါပဲ ရှင်းပြမယ်။","ဒါက အခြေခံပဲ။ အခြေခံ!"],"smirk");$("#azStatus").textContent="Working. That was "+($("#azVoice").selectedOptions[0]||{}).textContent+"."}
+  catch(e){$("#azStatus").textContent=azErr(e)}finally{setState("idle")}};
 $("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese subtitles on":"Burmese subtitles off")};
 $("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
 $("#sSfx").onchange=e=>{S.sfx=e.target.checked;saveS()};
