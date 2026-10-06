@@ -227,7 +227,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings</h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.5</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option><option value="my-MM">Burmese (most iPhones can't)</option></select></div>
   <div class="f"><label for="sWkyi">Chat Kyi wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
@@ -311,8 +311,8 @@ if(synth){loadV();synth.onvoiceschanged=loadV}
 function unlock(){if(unlocked||!synth)return;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;synth.speak(u);unlocked=true}catch(e){}ac()}
 document.addEventListener("touchend",unlock,{once:false,passive:true});document.addEventListener("click",unlock);
 let typeT=null;
-function bubble(text,{my=false,glitch=false,ms}={}){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(my?" my":"")+(glitch?" glitch":"");b.textContent="";const c=[...text];let i=0;const step=Math.max(14,Math.min(70,(ms||c.length*55)/Math.max(c.length,1)));typeT=setInterval(()=>{i++;b.textContent=c.slice(0,i).join("");fitBubble();if(i>=c.length)clearInterval(typeT)},step)}
-function hideLater(){clearTimeout(hideLater.t);hideLater.t=setTimeout(()=>$("#bub").classList.remove("show"),10000)}
+function bubble(text,{my=false,glitch=false,ms}={}){clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(my?" my":"")+(glitch?" glitch":"");b.textContent="";const c=[...text];let i=0;const step=Math.max(14,Math.min(70,(ms||c.length*55)/Math.max(c.length,1)));typeT=setInterval(()=>{i++;b.textContent=c.slice(0,i).join("");fitBubble();if(i>=c.length)clearInterval(typeT)},step)}
+function hideLater(){clearTimeout(hideLater.t);hideLater.t=setTimeout(function h(){if(busy||(synth&&synth.speaking)||pst==="talk"){hideLater.t=setTimeout(h,1500);return}$("#bub").classList.remove("show")},20000)}
 function speak(text,lang){return new Promise(res=>{
   if(!synth){res(false);return}
   synth.cancel();const u=new SpeechSynthesisUtterance(text.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));const vo=S.vo[S.persona];
@@ -423,12 +423,12 @@ function makeSpeaker(){
     push(t){pending++;const dur=800+t.length*85/vo.rate;eta=Math.max(eta,Date.now())+dur;let d=false;const f=()=>{if(d)return;d=true;pending--;check()};
       setTimeout(f,eta-Date.now()+3500);
       if(!synth)return;const u=new SpeechSynthesisUtterance(t.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));if(v){u.voice=v;u.lang=v.lang}u.pitch=vo.pitch;u.rate=vo.rate;u.onend=f;u.onerror=f;synth.speak(u)},
-    finish(){finished=true;check();return done}};
+    finish(){finished=true;check();return done.then(()=>new Promise(r=>{const t0=Date.now();(function poll(){if(!synth||!synth.speaking||Date.now()-t0>60000)return r();setTimeout(poll,250)})()}))}};
 }
 function fitBubble(){const b=$("#bub");b.style.fontSize="";let fs=parseFloat(getComputedStyle(b).fontSize)||20;
   while(b.scrollHeight>b.clientHeight+1&&fs>13){fs-=1;b.style.fontSize=fs+"px"}b.scrollTop=b.scrollHeight}
 function clean(t){return String(t).replace(/,?\s*\b(?:ba\s*le|ka-?\s*le|lar)\b([?!.,]?)/gi,(m,p)=>p==="?"||p==="!"||p==="."?".":"").replace(/\s+([?!.,])/g,"$1").replace(/([.!?])\1+/g,"$1").replace(/([.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/^\.\s*/,"").replace(/\s{2,}/g," ").trim()}
-function liveBubble(text,glitch){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent=text;fitBubble()}
+function liveBubble(text,glitch){clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent=text;fitBubble()}
 let busy=false,accentWarned={};
 async function send(text,{label}={}){
   text=(text||"").trim();if(!text||busy)return;busy=true;
