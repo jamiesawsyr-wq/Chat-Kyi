@@ -199,7 +199,6 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
 </g></g></svg></div>
   <div id="airLight">ON AIR</div>
-  <button id="cueChip" hidden></button>
   <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
   <div id="heard"></div>
   <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
@@ -230,14 +229,11 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="seg" id="aSeg"><button data-p="kyi" class="on">Chat Kyi</button><button data-p="paw">Thamein Paw Taw</button></div>
   <div class="f"><label for="aTitle">Episode topic (optional)</label><input type="text" id="aTitle" placeholder="e.g. Moving out of your parents' house"></div>
   <div class="f"><label for="aUrl">Or a link for him to read first (optional)</label><input type="text" id="aUrl" placeholder="https://…" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
-  <div class="f"><label for="aScript">Script (optional)</label><textarea id="aScript" rows="6" placeholder="Paste your episode script. Mark his spots:
-[KYI] = he reacts in his own words
-KYI: text = he reads it word for word (can run several lines until a blank line)"></textarea><p class="hint">Use [KYI] or KYI: for Chat Kyi, [PAW] or PAW: for Thamein Paw Taw ([CO] or CO: works for either). He follows along as you read and comes in at each mark. Tapping him on screen fires the next cue if he misses one.</p></div>
   <div class="f"><label for="aMode">He jumps in</label><select id="aMode"><option value="called">When I say his name</option><option value="every">After every line I say</option></select></div>
   <label class="tog">Show the ON AIR light in recordings <input type="checkbox" id="aLight" checked></label>
   <button class="btn primary" id="aGo" style="width:100%">Go On Air</button>
   <p class="err" id="aErr"></p>
-  <p class="hint">The co-host is locked for the whole episode. The mic stays on between replies; tap the mic to pause it. Tap Off Air to end, and he'll remember the episode.</p>
+  <p class="hint">The co-host is locked for the whole episode. Talk naturally: he answers when you say his name, or after every line if you chose that. The mic stays on between replies; tap the mic to pause it. Tap Off Air to end, and he'll remember the episode.</p>
 </div></aside>
 <aside class="drawer" id="d-settings"><div class="dh"><h2>Settings</h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
@@ -557,18 +553,17 @@ $("#aGo").onclick=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl")
   if(busy){toast("Busy talking. Try in a second.");return}
   if(disc)await endDiscussion(true);
   closeDrawers();micHold=false;await switchTo(aPick);
-  const scriptRaw=$("#aScript").value.trim(),cues=scriptRaw?parseScript(scriptRaw):[];
-  if(scriptRaw&&!cues.length){toast("No [KYI] or KYI: marks found in the script, so he'll only answer when called.")}
+  const scriptRaw="",cues=[];
   air={persona:aPick,title,brief:"",mode:cues.length?"called":$("#aMode").value,light:$("#aLight").checked,startedAt:Date.now(),cues,ci:0,script:scriptRaw.slice(0,6000)};heardBuf=[];updCue();
   const n=S.name||"Jamie",who=aPick==="paw"?"Thamein Paw Taw (silly self-declared king)":"Chat Kyi (condescending robot uncle)";
   if(url||title){busy=true;setState("think");sfx.puff();
     try{const o=await readSource(url?{url,text:""}:{url:"",text:title},`Return ONLY JSON: {"title":"short episode title","brief":"about 120 words of key facts for the episode","opener":"one short line ${who} says to open the show as co-host, in character, introducing the topic to listeners"}. If the page can't be read, return {"error":"short reason"}.`,1200);
       air.title=String(o.title||title||"").slice(0,70);air.brief=String(o.brief||"").slice(0,1200);saveAir();showDisc();busy=false;
-      $("#aTitle").value="";$("#aUrl").value="";$("#aScript").value="";
+      $("#aTitle").value="";$("#aUrl").value="";
       if(cues.length){setState("idle");toast("On Air. Start reading your script.");if(!cues[0].anchor.length)fireCue();return}
       await say(o.opener||"And we are live. Try not to embarrass yourself.");return}
     catch(e){busy=false;toast(errText(e)+" Going on air without notes.")}}
-  saveAir();showDisc();setState("idle");$("#aScript").value="";
+  saveAir();showDisc();setState("idle");
   if(cues.length){toast("On Air. Start reading your script.");if(!cues[0].anchor.length)fireCue();else if(handsFree())setTimeout(listen,400);return}
   await say(aPick==="kyi"?"Okay. We are live. Try not to embarrass yourself, Boba Boy.":"Hear ye! The royal show begins! Bow to your listeners, Royal Peasant.");
 };
@@ -610,7 +605,7 @@ function cueReached(){const c=air&&air.cues&&air.cues[air.ci];if(!c)return false
   const recent=heardBuf.slice(-30);const hit=an.filter(a=>recent.some(r=>wEq(r,a))).length;
   const tail=an.slice(-2).some(a=>recent.slice(-10).some(r=>wEq(r,a)));
   return hit>=Math.max(1,Math.ceil(an.length*0.6))&&tail}
-function updCue(){const c=$("#cueChip");const on=!!(air&&air.cues&&air.cues.length);c.hidden=!on;if(!on)return;
+function updCue(){return;const c=$("#cueChip");const on=!!(air&&air.cues&&air.cues.length);c.hidden=!on;if(!on)return;
   c.textContent=air.ci<air.cues.length?`Cue ${air.ci+1}/${air.cues.length} ▸`:"Script done"}
 async function fireCue(){
   if(!air||!air.cues||air.ci>=air.cues.length||cueFiring)return;cueFiring=true;const c=air.cues[air.ci];
@@ -621,7 +616,6 @@ async function fireCue(){
   }finally{cueFiring=false}
   const n=air&&air.cues&&air.cues[air.ci];if(n&&!n.anchor.length)setTimeout(fireCue,250);
 }
-$("#cueChip").onclick=()=>{unlock();if(busy||cueFiring||pst==="talk")return;fireCue()};
 $("#kw").addEventListener("click",()=>{if(!air||!air.cues||!air.cues.length||busy||cueFiring||pst==="talk")return;unlock();fireCue()});
 
 /* ----- backup ----- */
