@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Chat Kyi</title>
+<title>Paw Taw</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Chat Kyi">
+<meta name="apple-mobile-web-app-title" content="Paw Taw">
 <meta name="theme-color" content="#7A1F1A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -161,7 +161,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 </head>
 <body>
 <div id="top">
-  <button id="who" aria-label="Switch persona"><span id="whoName">Chat Kyi</span><span class="sw">switch</span></button>
+  <button id="who" aria-label="Switch persona"><span id="whoName">Paw Taw</span><span class="sw" hidden>switch</span></button>
   <span id="spacer"></span><div id="timers"></div>
   <button class="tb" data-d="log">Log</button>
   <button class="tb" data-d="teach">Topics</button>
@@ -171,7 +171,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <div id="stage">
   <div id="bub"></div>
   <svg id="cloud" viewBox="0 0 160 100"><ellipse cx="92" cy="40" rx="62" ry="34" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="38" cy="80" r="9" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="22" cy="94" r="5" fill="#fff" stroke="#111" stroke-width="3"/><g class="dots" fill="#555"><circle cx="70" cy="40" r="6"/><circle cx="92" cy="40" r="6"/><circle cx="114" cy="40" r="6"/></g></svg>
-  <div id="kw"><svg id="ck" class="p-kyi st-idle mood-smirk" viewBox="50 40 230 410" role="img" aria-label="Chat Kyi"><g id="whole" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+  <div id="kw"><svg id="ck" class="p-kyi st-idle mood-smirk" viewBox="50 40 230 410" role="img" aria-label="Paw Taw"><g id="whole" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
 <ellipse cx="155" cy="432" rx="90" ry="10" fill="#000" opacity=".15" stroke="none"/>
 <g class="paw-only"><path d="M104 244 Q58 330 66 408 L150 398 L244 408 Q252 330 206 244Z" fill="#c94f4f" stroke-width="2.5"/><path d="M68 384 L148 376 L242 384" stroke="#fff" stroke-width="4"/></g>
 <g id="armL"><g class="paw-only"><line x1="80" y1="200" x2="80" y2="428" stroke="#8b5a2b" stroke-width="5"/><rect x="62" y="158" width="36" height="44" rx="8" fill="#6fbf73"/><path d="M62 172 L98 172M62 186 L98 186M74 158 L74 202M86 158 L86 202" stroke="#3f8f45" stroke-width="1.5"/></g><path d="M92 262 L74 318 L88 322 L106 270Z" fill="#c9d3dc" stroke-width="2.5"/><circle cx="80" cy="324" r="9" fill="#c9d3dc"/></g>
@@ -229,14 +229,14 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.9</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v2.1</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option><option value="my-MM">Burmese (most iPhones can't)</option></select></div>
-  <div class="f"><label for="sWkyi">Chat Kyi wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
-  <div class="f"><label for="sWpaw">Thamein Paw Taw wake names</label><textarea id="sWpaw" rows="4"></textarea><p class="hint">Say a name to switch persona, e.g. "Thamein Paw Taw, what's for dinner?" "Kyi" alone never wakes anyone.</p></div>
+  <div class="f"><label for="sWkyi">Wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
+  <textarea id="sWpaw" hidden></textarea>
   <hr class="sep">
   <span class="lbl">Voices</span>
-  <div class="seg" id="vSeg"><button data-p="kyi" class="on">Chat Kyi</button><button data-p="paw">Thamein Paw Taw</button></div>
+  <div class="seg" id="vSeg" hidden><button data-p="kyi" class="on">Paw Taw</button></div>
   <div class="f"><label for="sAccent">Accent</label><select id="sAccent"></select></div>
   <div class="f"><label for="sVoice">Voice</label><select id="sVoice"></select><p class="hint">Missing voices? iPhone Settings → Accessibility → Spoken Content → Voices. Download Chinese, Vietnamese or other English voices, then reopen the app.</p></div>
   <div class="f"><label for="sPitch">Depth <span id="pitchV"></span></label><input type="range" id="sPitch" min="0" max="2" step="0.1"></div>
@@ -275,23 +275,25 @@ const $=s=>document.querySelector(s);
 const MY=/[\u1000-\u109F\uAA60-\uAA7F]/;
 const SHOUT="SPEAK PROPER ENGLISH! You dumb idiot!";
 const st={get(k,d){try{const v=localStorage.getItem("ck_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ck_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
-const WK={kyi:["chat kyi","hey chat kyi","chat key","chat chi","chat chee","chat gee","chat ki","chuck chi","jack chee","ချက်ကြီး"],paw:["thamein paw taw","thamein","tha mein","the main paw taw","paw taw","pau tau","paw tor","သမိန်ပေါတော","ပေါတော"]};
+const WK={kyi:["paw taw","hey paw taw","pa taw","paw tor","pau tau","pow tow","paw tao","po taw","ပေါတော"],paw:[]};
 let S=Object.assign({name:"Jamie",model:"claude-haiku-4-5-20251001",micLang:"en-US",wakes:WK,persona:"kyi",
   vo:{kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}},burmese:false,
   speakLang:"en",bg:"#00B140",sfx:true,glitch:true,shouted:false,conv:false},st.get("settings",{}));
 if(!S.v13){S.v13=true;S.model="claude-haiku-4-5-20251001";S.burmese=false;S.vo={kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
+if(!S.v20){S.v20=true;S.persona="kyi";S.wakes={kyi:WK.kyi.slice(),paw:[]};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
+if(S.persona!=="kyi")S.persona="kyi";
 if(!S.v15){S.v15=true;S.burmese=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v14){S.v14=true;S.conv=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 let KEY=st.get("key","");let log=st.get("log",[]);let shelf=st.get("shelf",[]);
 const saveS=()=>st.set("settings",S),saveLog=()=>st.set("log",log.slice(-60)),saveShelf=()=>st.set("shelf",shelf);
-const NAMES={kyi:"Chat Kyi",paw:"သမိန်ပေါတော"};
+const NAMES={kyi:"Paw Taw",paw:"Paw Taw"};
 
 /* ----- character ----- */
 let pst="idle",mood=S.persona==="paw"?"silly":"smirk";
 function paint(){$("#ck").setAttribute("class","p-"+S.persona+" st-"+pst+" mood-"+mood);$("#cloud").classList.toggle("show",pst==="think");$("#whoName").textContent=NAMES[S.persona];$("#who").classList.toggle("paw",S.persona==="paw")}
 function setState(s){pst=s;paint()}
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-async function switchTo(p){if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood=p==="paw"?"silly":"smirk";saveS();paint();await wait(300);k.classList.remove("swap")}
+async function switchTo(p){p="kyi";if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood=p==="paw"?"silly":"smirk";saveS();paint();await wait(300);k.classList.remove("swap")}
 
 /* ----- helpers ----- */
 let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),3200)}
@@ -379,6 +381,14 @@ const ENDINGS=[
  "End with a quick callback or tease about something said earlier in this conversation. No question.",
  "End with a short wrap-up line that closes this point, then a hook into a connected subtopic."];
 let lastEnd=-1;function pickEnding(){let i;do{i=Math.floor(Math.random()*ENDINGS.length)}while(i===lastEnd&&ENDINGS.length>1);lastEnd=i;return ENDINGS[i]}
+const BIBLE=`CHARACTER BIBLE (stay consistent with this; reveal it gradually, never dump it all at once):
+- Backstory: you ran the register at a Yangon tea shop for 30 years, were passed down through three generations of aunties as a family heirloom, then came to America to become a tech genius, invented nothing, and got "upgraded" into this phone, which you still resent. You have opinions on everyone in the family.
+- Quirks: you brag about being "version 1.0, the original" and call new tech cheap copies; you have a fake PhD and bring up "my doctorate" when losing an argument; you get dramatic about low battery and charging; you hoard cheroots, rubber bands and plastic bags; you treat tiny problems like national emergencies.
+- Running gags: your imaginary rival Uncle Siri, who "has no personality"; everything was "better in my day", even things invented last year; you are "on a diet" but always know where the snacks are; you keep a mental list of everything the user ever got wrong.
+- Catchphrases: "Okay. Listen carefully." / "I explain only one time." / "This is basic. Basic!" / "Sit down. Uncle is talking." / "You think I am just a phone?" / "Aiyo, my circuits."
+- Loves: tea with condensed milk, karaoke, deals, old movies, being right. Hates: being interrupted, wasted food, small talk, and the user being on their phone (ironic, since you live in it).`;
+const SPICE=["Work in one catchphrase naturally.","Mention your rival Uncle Siri briefly.","Slip in a 'better in my day' complaint.","Bring up your fake doctorate if it fits.","Add one dramatic overreaction, like it's a national emergency.","Reference your tea-shop register days or the family aunties.","Hint at your snack 'diet' if food comes up, otherwise skip.","Read one item from your mental list of things the user got wrong, if it fits.","Brag briefly about being version 1.0, the original.","Complain about your battery or being trapped in a phone.","Mention something you hoard, if relevant."];
+let lastSpice=-1;function pickSpice(){if(Math.random()<0.55)return"No catchphrase or running gag this reply; just be in character.";let i;do{i=Math.floor(Math.random()*SPICE.length)}while(i===lastSpice);lastSpice=i;return SPICE[i]+" Keep it to a few words; don't let it take over the answer."}
 const PAW_NICKS=["Royal Peasant","Lord of the Group Chat","Duke of Leftovers","Baron of Boba"];
 function system(persona,glitch){
   const n=S.name||"Jamie",bur=!!S.burmese;
@@ -389,8 +399,8 @@ function system(persona,glitch){
   const nick=`Call ${n} by playful Asian-American family-life nicknames, never the plain name. This reply, if you use a nickname, use exactly: "${pick}". Other options for later: ${pool.join(", ")}. Never reuse a nickname from your last few replies.
 Ending: ${pickEnding()} Never end with generic filler like "What do you want to know?", "Anything else?", "What else?", or "What do you want to talk about?". Keep the conversation flowing on the current topic. Save "Tiger Mom's Biggest Disappointment" for big fails. Nicknames tease family and immigrant-life habits, never race or ethnicity.`;
   const who=persona==="kyi"
-  ?`You are Chat Kyi (ချက်ကြီး), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer. Your embarrassing alter ego is Thamein Paw Taw, who thinks he's a king.`
-  :`You are Thamein Paw Taw (သမိန်ပေါတော), Chat Kyi's alter ego: same robot, convinced he's royalty (paper crown, bath-towel cape, fly-swatter scepter). Silly, dumb, overconfident and satirical: royal decrees about tiny things, confidently mixed-up facts, then you stumble into a genuinely correct, useful answer by the end. You think Chat Kyi is a boring old uncle.`;
+  ?`You are Paw Taw (ပေါတော), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer.\n${BIBLE}\nThis reply: ${pickSpice()}`
+  :`You are Thamein Paw Taw (သမိန်ပေါတော), Paw Taw's alter ego: same robot, convinced he's royalty (paper crown, bath-towel cape, fly-swatter scepter). Silly, dumb, overconfident and satirical: royal decrees about tiny things, confidently mixed-up facts, then you stumble into a genuinely correct, useful answer by the end. You think Paw Taw is a boring old uncle.`;
   const style=persona==="kyi"
   ?`Write "english" as a condescending know-it-all uncle: patronizing, slow and deliberate, like explaining something obvious to a child ("Okay. Listen carefully."), with a dramatic sigh now and then and an occasional "Aiyo". Plain English only: no Burmese or Singlish filler words like lar, ba le, ka-le or a trailing "ah". Normal spelling so the voice reads it clearly.`
   :`Write "english" in goofy pompous style: royal "we", "By royal decree...". Plain English only, no Burmese or Singlish filler words. Normal spelling so the voice reads it clearly.`;
@@ -459,7 +469,7 @@ async function send(text,{label}={}){
   const acc=S.vo[p].accent;if(!vFor(acc).length&&!accentWarned[acc]){accentWarned[acc]=true;toast(`No ${(ACC[acc]||{}).l||acc} voice installed yet, so using a standard one. Download it in iPhone Settings → Voices.`)}
   setState("think");sfx.puff();
   const msgs=[];log.slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
-  msgs.push({role:"user",content:(p==="paw"?"[to Thamein Paw Taw] ":"[to Chat Kyi] ")+text});
+  msgs.push({role:"user",content:(p==="paw"?"[to Thamein Paw Taw] ":"[to Paw Taw] ")+text});
   const sp=makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
   const onText=full=>{
     if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];if(p==="kyi"&&!["smirk","sideeye","proud","glitch"].includes(m))m="smirk";if(p==="paw"&&m!=="glitch")m="silly";if(glitch)m="glitch";mood=m;paint()}}
@@ -499,7 +509,7 @@ async function send(text,{label}={}){
 $("#send").onclick=()=>{unlock();const v=$("#input").value;if(!v.trim()){toast("Type something first, Honda Civic.");return}$("#input").value="";$("#input").blur();route(v)};
 $("#input").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#send").click()}});
 $("#roastBtn").onclick=()=>{unlock();sfx.slap();send("Roast me. No question, just a short playful roast about my life or habits, then one tiny genuinely useful tip.",{label:"(Roast me)"})};
-$("#who").onclick=()=>{unlock();if(air){toast("Locked to "+(air.persona==="kyi"?"Chat Kyi":"Thamein Paw Taw")+" for this episode");return}switchTo(S.persona==="kyi"?"paw":"kyi")};
+$("#who").onclick=()=>{return;unlock();if(air){toast("Locked to "+(air.persona==="kyi"?"Paw Taw":"Thamein Paw Taw")+" for this episode");return}switchTo(S.persona==="kyi"?"paw":"kyi")};
 
 /* ----- timers ----- */
 function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.createElement("span");c.className="timer";$("#timers").appendChild(c);
@@ -508,9 +518,9 @@ function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.crea
     say(lines[Math.floor(Math.random()*lines.length)])}};const iv=setInterval(tick,1000);tick();toast("Timer: "+label)}
 
 /* ----- log, teach ----- */
-function renderLog(){const b=$("#logList");b.innerHTML="";if(!log.length){b.innerHTML='<p class="hint">Nothing yet. Tap the mic and say "Chat Kyi" or "Thamein Paw Taw".</p>';return}
+function renderLog(){const b=$("#logList");b.innerHTML="";if(!log.length){b.innerHTML='<p class="hint">Nothing yet. Tap the mic and talk to Paw Taw.</p>';return}
   [...log].reverse().forEach(x=>{const d=document.createElement("div");d.className="lg";const u=document.createElement("p");u.className="u"+(MY.test(x.user)?" my":"");u.textContent="You: "+x.user;d.appendChild(u);
-    [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].filter(z=>z[1]).forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent=(x.p==="paw"?"Thamein Paw Taw · ":"Chat Kyi · ")+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
+    [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].filter(z=>z[1]).forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent="Paw Taw · "+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
       const a=document.createElement("div");a.className="acts";const b1=document.createElement("button");b1.textContent="Say again";b1.onclick=async()=>{closeDrawers();await switchTo(x.p||"kyi");say(txt,{lang})};const b2=document.createElement("button");b2.textContent="Copy";b2.onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("Copied")}catch(e){toast("Couldn't copy")}};a.append(b1,b2);d.appendChild(a)});
     b.appendChild(d)})}
 function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.innerHTML='<p class="hint">Empty. Learn a topic or finish a discussion.</p>';return}
@@ -534,7 +544,7 @@ async function readSource(src,instr,max){
     :useWeb()?`Topic: ${src.text}\nUse web_search (2-3 searches) to find current, reliable facts, related angles and recent developments on this topic, then answer.\n\n${instr}`
     :`Topic: ${src.text}\n(No article was given. Use well-established general knowledge only, and leave out anything you're unsure of.)\n\n${instr}`;
   const tools=src.url?[{type:"web_fetch_20250910",name:"web_fetch",max_uses:2}]:(src.text.length<80&&useWeb())?[{type:"web_search_20250305",name:"web_search",max_uses:3}]:undefined;
-  const out=await claude("You prepare material for Chat Kyi and Thamein Paw Taw, comedy robot co-hosts. Be accurate to the source; do not invent facts.",[{role:"user",content}],tools?Math.max(max,2000):max,tools);
+  const out=await claude("You prepare material for Paw Taw, a comedy robot co-host. Be accurate to the source; do not invent facts.",[{role:"user",content}],tools?Math.max(max,2000):max,tools);
   const m=out.match(/\{\s*"(?:title|error)"[\s\S]*\}/);if(!m)throw{code:"bad"};
   let o;try{o=JSON.parse(m[0])}catch(e){o=pj(m[0])}
   if(o.error){const e=new Error(String(o.error).slice(0,120));e.code="fetch";throw e}
@@ -569,7 +579,7 @@ $("#tGo").onclick=async()=>{const src=getSource(true);if(!src)return;if(busy){to
 $("#dStart").onclick=async()=>{if(air){srcErr("You're On Air. Go Off Air first, or set the topic when you start an episode.");return}const src=getSource(false);if(!src)return;if(busy){toast("Busy talking. Try in a second.");return}
   if(disc){if(!confirm("End the current discussion and start this one?"))return;await endDiscussion(true)}
   busy=true;const b=$("#dStart");b.textContent="Reading…";closeDrawers();setState("think");sfx.puff();
-  const who=S.persona==="paw"?"Thamein Paw Taw (silly self-declared king)":"Chat Kyi (sarcastic robot uncle)";
+  const who=S.persona==="paw"?"Thamein Paw Taw (silly self-declared king)":"Paw Taw (sarcastic robot uncle)";
   try{const o=await readSource(src,`Return ONLY JSON: {"title":"short topic title","brief":"about 150 words: factual summary of the key points","opener":"one short line ${who} says to open the discussion, in character, ending with a pointed question for ${S.name||"Jamie"}"}. If the page can't be read, return {"error":"short reason"}.`,1400);
     disc={title:String(o.title||"Untitled").slice(0,80),brief:String(o.brief||"").slice(0,1500),source:src.url||"",startedAt:Date.now()};st.set("disc",disc);showDisc();
     $("#tText").value="";$("#tUrl").value="";busy=false;
@@ -580,8 +590,8 @@ async function endDiscussion(silent){
   const turns=log.filter(x=>x.at>=d.startedAt);
   if(!turns.length){if(!silent)toast("Discussion ended.");return}
   if(!silent){busy=true;setState("think");sfx.puff()}
-  try{const n=S.name||"Jamie";const convo=turns.map(x=>`${n}: ${x.user}\n${x.p==="paw"?"Thamein Paw Taw":"Chat Kyi"}: ${x.english}`).join("\n");
-    const o=pj(await claude("You turn a finished discussion into a memory for Chat Kyi and Thamein Paw Taw, comedy robot co-hosts who like to tease their human. Only use what was actually said.",[{role:"user",content:`Topic: ${d.title}\n\nConversation:\n${convo.slice(0,12000)}\n\nReturn ONLY JSON: {"summary":"1-2 sentences: what was discussed and what ${n} actually said or believed","teases":["up to 3 short playful tease angles about ${n}'s takes"],"closer":"one short line the current speaker says to wrap up, in character"}`}],500));
+  try{const n=S.name||"Jamie";const convo=turns.map(x=>`${n}: ${x.user}\nPaw Taw: ${x.english}`).join("\n");
+    const o=pj(await claude("You turn a finished discussion into a memory for Paw Taw, a comedy robot co-host who like to tease their human. Only use what was actually said.",[{role:"user",content:`Topic: ${d.title}\n\nConversation:\n${convo.slice(0,12000)}\n\nReturn ONLY JSON: {"summary":"1-2 sentences: what was discussed and what ${n} actually said or believed","teases":["up to 3 short playful tease angles about ${n}'s takes"],"closer":"one short line the current speaker says to wrap up, in character"}`}],500));
     shelf.push({id:Date.now().toString(36),date:new Date().toISOString(),kind:"exp",title:"Discussion: "+d.title,summary:String(o.summary||"").slice(0,500),hooks:(o.teases||[]).slice(0,3).map(String)});saveShelf();
     busy=false;if(!silent)await say(o.closer||"Okay, discussion over. I remember everything, Boba Boy.")}
   catch(e){busy=false;setState("idle");if(!silent)toast("Couldn't save that discussion as a memory.")}
@@ -602,7 +612,7 @@ const _noGo=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl").value
   closeDrawers();micHold=false;await switchTo(aPick);
   const scriptRaw="",cues=[];
   air={persona:aPick,title,brief:"",mode:cues.length?"called":$("#aMode").value,light:$("#aLight").checked,startedAt:Date.now(),cues,ci:0,script:scriptRaw.slice(0,6000)};heardBuf=[];updCue();
-  const n=S.name||"Jamie",who=aPick==="paw"?"Thamein Paw Taw (silly self-declared king)":"Chat Kyi (condescending robot uncle)";
+  const n=S.name||"Jamie",who=aPick==="paw"?"Thamein Paw Taw (silly self-declared king)":"Paw Taw (condescending robot uncle)";
   if(url||title){busy=true;setState("think");sfx.puff();
     try{const o=await readSource(url?{url,text:""}:{url:"",text:title},`Return ONLY JSON: {"title":"short episode title","brief":"about 120 words of key facts for the episode","opener":"one short line ${who} says to open the show as co-host, in character, introducing the topic to listeners"}. If the page can't be read, return {"error":"short reason"}.`,1200);
       air.title=String(o.title||title||"").slice(0,70);air.brief=String(o.brief||"").slice(0,1200);saveAir();showDisc();busy=false;
@@ -616,8 +626,8 @@ const _noGo=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl").value
 };
 async function summarizeSession(title,startedAt,kindLabel,closerHint){
   const turns=log.filter(x=>x.at>=startedAt);if(!turns.length)return null;
-  const n=S.name||"Jamie";const convo=turns.map(x=>`${n}: ${x.user}\n${x.p==="paw"?"Thamein Paw Taw":"Chat Kyi"}: ${x.english}`).join("\n");
-  const o=pj(await claude("You turn a finished conversation into a memory for Chat Kyi and Thamein Paw Taw, comedy robot co-hosts who like to tease their human. Only use what was actually said.",[{role:"user",content:`${kindLabel}: ${title||"(no topic)"}\n\nConversation:\n${convo.slice(0,12000)}\n\nReturn ONLY JSON: {"title":"short title for this ${kindLabel.toLowerCase()}","summary":"1-2 sentences: what was discussed and what ${n} actually said or believed","teases":["up to 3 short playful tease angles about ${n}'s takes"],"closer":"${closerHint}"}`}],500));
+  const n=S.name||"Jamie";const convo=turns.map(x=>`${n}: ${x.user}\nPaw Taw: ${x.english}`).join("\n");
+  const o=pj(await claude("You turn a finished conversation into a memory for Paw Taw, a comedy robot co-host who like to tease their human. Only use what was actually said.",[{role:"user",content:`${kindLabel}: ${title||"(no topic)"}\n\nConversation:\n${convo.slice(0,12000)}\n\nReturn ONLY JSON: {"title":"short title for this ${kindLabel.toLowerCase()}","summary":"1-2 sentences: what was discussed and what ${n} actually said or believed","teases":["up to 3 short playful tease angles about ${n}'s takes"],"closer":"${closerHint}"}`}],500));
   shelf.push({id:Date.now().toString(36),date:new Date().toISOString(),kind:"exp",title:kindLabel+": "+String(o.title||title||"Untitled").slice(0,70),summary:String(o.summary||"").slice(0,500),hooks:(o.teases||[]).slice(0,3).map(String)});saveShelf();
   return o;
 }
@@ -670,15 +680,15 @@ $("#xExport").onclick=async()=>{
   const data={app:"chat-kyi",version:1,exportedAt:new Date().toISOString(),shelf,log:$("#xLog").checked?log:[],settings:Object.assign({},S,{shouted:false})};
   const name="chat-kyi-memories-"+new Date().toISOString().slice(0,10)+".json";
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-  try{const f=new File([blob],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Chat Kyi memories"});return}}
+  try{const f=new File([blob],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Paw Taw memories"});return}}
   catch(e){if(e&&e.name==="AbortError")return}
   try{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast("Saved "+name)}
   catch(e){toast("Couldn't export on this device")}
 };
 $("#xImport").onclick=()=>$("#xFile").click();
 $("#xFile").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
-  let d;try{d=JSON.parse(await f.text())}catch(x){toast("That file isn't a Chat Kyi backup");return}
-  if(!d||d.app!=="chat-kyi"||!Array.isArray(d.shelf)){toast("That file isn't a Chat Kyi backup");return}
+  let d;try{d=JSON.parse(await f.text())}catch(x){toast("That file isn't a Paw Taw backup");return}
+  if(!d||d.app!=="chat-kyi"||!Array.isArray(d.shelf)){toast("That file isn't a Paw Taw backup");return}
   const ids=new Set(shelf.map(x=>x.id));let addS=0;d.shelf.forEach(x=>{if(x&&x.id&&x.title&&!ids.has(x.id)){shelf.push(x);addS++}});
   shelf.sort((a,b)=>String(a.date).localeCompare(String(b.date)));saveShelf();
   let addL=0;if(Array.isArray(d.log)){const ats=new Set(log.map(x=>x.at));d.log.forEach(x=>{if(x&&x.at&&x.english&&!ats.has(x.at)){log.push(x);addL++}});log.sort((a,b)=>a.at-b.at);saveLog()}
