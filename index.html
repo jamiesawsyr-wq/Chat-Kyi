@@ -217,7 +217,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="f"><label for="sVoice">Voice</label><select id="sVoice"></select><p class="hint">Missing voices? iPhone Settings → Accessibility → Spoken Content → Voices. Download Chinese, Vietnamese or other English voices, then reopen the app.</p></div>
   <div class="f"><label for="sPitch">Depth <span id="pitchV"></span></label><input type="range" id="sPitch" min="0" max="2" step="0.1"></div>
   <div class="f"><label for="sRate">Speed <span id="rateV"></span></label><input type="range" id="sRate" min="0.5" max="1.4" step="0.05"></div>
-  <div class="f"><label for="sSpeak">They speak</label><select id="sSpeak"><option value="en">English version</option><option value="auto">Match my language</option><option value="my">Burmese version (needs a Burmese voice)</option></select></div>
+  <label class="tog">Also write a Burmese version (slower) <input type="checkbox" id="sBur"></label>
   <button class="btn" id="vTest">Test this voice</button>
   <hr class="sep">
   <div class="f"><label for="sBg">Background</label><select id="sBg"><option value="#00B140">Green screen</option><option value="#0047BB">Blue screen</option><option value="#1F4D3F">Tea shop green</option><option value="#7A1F1A">Lacquer red</option><option value="#15131c">Night</option></select></div>
@@ -227,7 +227,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <p class="hint">Hide controls is for screen recording. Tap the top of the screen twice to bring them back.</p>
   <hr class="sep">
   <span class="lbl">Brain</span>
-  <div class="f"><label for="sModel">Model</label><select id="sModel"><option value="claude-sonnet-5-5">Sonnet 5.5 (smarter, better Burmese)</option><option value="claude-haiku-4-5-20251001">Haiku 4.5 (faster, cheaper)</option></select></div>
+  <div class="f"><label for="sModel">Model</label><select id="sModel"><option value="claude-haiku-4-5-20251001">Haiku 4.5 (fastest, recommended)</option><option value="claude-sonnet-5-5">Sonnet 5.5 (smarter, slower)</option></select></div>
   <div class="f"><label for="sKey">Change API key</label><input type="password" id="sKey" placeholder="sk-ant-…" autocomplete="off"><div class="row" style="margin-top:6px"><button class="btn" id="kSave">Save key</button><button class="btn danger" id="kDel">Remove key</button></div><p class="hint">Your key is stored only on this iPhone.</p></div>
 </div></aside>
 
@@ -246,9 +246,10 @@ const MY=/[\u1000-\u109F\uAA60-\uAA7F]/;
 const SHOUT="SPEAK PROPER ENGLISH! You dumb idiot!";
 const st={get(k,d){try{const v=localStorage.getItem("ck_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ck_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
 const WK={kyi:["chat kyi","hey chat kyi","chat key","chat chi","chat chee","chat gee","chat ki","chuck chi","jack chee","ချက်ကြီး"],paw:["thamein paw taw","thamein","tha mein","the main paw taw","paw taw","pau tau","paw tor","သမိန်ပေါတော","ပေါတော"]};
-let S=Object.assign({name:"Jamie",model:"claude-sonnet-5-5",micLang:"en-US",wakes:WK,persona:"kyi",
-  vo:{kyi:{accent:"uncle",voice:"",pitch:0.3,rate:0.85},paw:{accent:"uncle",voice:"",pitch:1.4,rate:1.1}},
+let S=Object.assign({name:"Jamie",model:"claude-haiku-4-5-20251001",micLang:"en-US",wakes:WK,persona:"kyi",
+  vo:{kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}},burmese:false,
   speakLang:"en",bg:"#00B140",sfx:true,glitch:true,shouted:false,conv:false},st.get("settings",{}));
+if(!S.v13){S.v13=true;S.model="claude-haiku-4-5-20251001";S.burmese=false;S.vo={kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 let KEY=st.get("key","");let log=st.get("log",[]);let shelf=st.get("shelf",[]);
 const saveS=()=>st.set("settings",S),saveLog=()=>st.set("log",log.slice(-60)),saveShelf=()=>st.set("shelf",shelf);
 const NAMES={kyi:"Chat Kyi",paw:"သမိန်ပေါတော"};
@@ -273,7 +274,9 @@ const sfx={puff(){noise(.7,"lowpass",900,300,.25)},slap(){noise(.07,"highpass",2
 const ACC={uncle:{l:"Deep English (default)",re:/^en/i},zh:{l:"Chinese accent",re:/^(zh|yue|cmn)/i},vi:{l:"Vietnamese accent",re:/^vi/i},sg:{l:"Singaporean English",re:/^en[-_]SG/i},in:{l:"Indian English",re:/^en[-_]IN/i},gb:{l:"British (butler)",re:/^en[-_]GB/i},au:{l:"Australian",re:/^en[-_]AU/i}};
 const synth=window.speechSynthesis;let allV=[];let unlocked=false;
 const MALE=/daniel|fred|aaron|arthur|alex|male|gordon|rishi|ralph|guy|david|mark|james|tom|george|lee|nam/i;
-function vFor(acc){const re=(ACC[acc]||ACC.uncle).re;return allV.filter(v=>re.test(v.lang)).sort((a,b)=>(MALE.test(b.name)?1:0)-(MALE.test(a.name)?1:0))}
+const QV=v=>(/premium/i.test(v.name+" "+v.voiceURI)?4:/enhanced/i.test(v.name+" "+v.voiceURI)?3:0)+(MALE.test(v.name)?1:0);
+function vFor(acc){const re=(ACC[acc]||ACC.uncle).re;return allV.filter(v=>re.test(v.lang)).sort((a,b)=>QV(b)-QV(a))}
+function pickVoice(vo){return allV.find(v=>v.name===vo.voice)||vFor(vo.accent)[0]||vFor("uncle")[0]||null}
 function loadV(){if(!synth)return;allV=synth.getVoices();if($("#d-settings").classList.contains("open"))fillVoice()}
 if(synth){loadV();synth.onvoiceschanged=loadV}
 function unlock(){if(unlocked||!synth)return;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;synth.speak(u);unlocked=true}catch(e){}ac()}
@@ -285,7 +288,7 @@ function speak(text,lang){return new Promise(res=>{
   if(!synth){res(false);return}
   synth.cancel();const u=new SpeechSynthesisUtterance(text.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));const vo=S.vo[S.persona];
   if(lang==="my"){const mv=allV.find(v=>/^my/i.test(v.lang));if(!mv){res(false);return}u.voice=mv;u.lang=mv.lang}
-  else{const v=allV.find(v=>v.name===vo.voice)||vFor(vo.accent)[0];if(v){u.voice=v;u.lang=v.lang}}
+  else{const v=pickVoice(vo);if(v){u.voice=v;u.lang=v.lang}}
   u.pitch=vo.pitch;u.rate=vo.rate;let d=false;const fin=()=>{if(!d){d=true;res(true)}};u.onend=fin;u.onerror=fin;setTimeout(fin,Math.max(4000,text.length*150/vo.rate));synth.speak(u)})}
 async function say(text,{lang="en",glitch=false}={}){
   setState("talk");const vo=S.vo[S.persona];bubble(text,{my:lang==="my"||MY.test(text.replace(SHOUT,"")),glitch,ms:text.length*62/vo.rate});
@@ -324,59 +327,96 @@ async function route(t){
 }
 
 /* ----- brain ----- */
-const KNOW=`Burmese everyday knowledge for jokes and help: mohinga (fish noodle soup), lahpet thoke (tea leaf salad), Shan noodles, ohn no khao swe, mont lone yay paw, tea-shop tea with condensed milk; tea shops with tiny plastic stools, Yangon traffic, Mandalay heat, monsoon, power cuts, bus conductors shouting stops, Shwedagon, Bagan, Inle Lake; longyi, thanaka, gaung baung, betel chewing and red spit, respect for elders, honorifics U/Daw/Ko/Ma/Maung, aunties asking "have you eaten?", parents comparing you to the neighbor's kid who became a doctor; Thingyan (April water festival), Thadingyut (October lights), Tazaungdaing (November lights, robe-weaving contests); zat pwe all-night theater, a-nyeint variety comedy, thangyat Thingyan chants, copy thachin cover songs, Korean drama obsession; diaspora life: sending money home, explaining Burma vs Myanmar to Americans.`;
+const KNOW=`Burmese references you can use: mohinga, tea leaf salad, Shan noodles, tea-shop tea with condensed milk and tiny plastic stools, Yangon traffic, monsoon, power cuts, longyi, thanaka, betel chewing, aunties asking "have you eaten?", parents comparing you to the neighbor's doctor kid, Thingyan water festival, zat pwe all-night theater, a-nyeint comedy, copy thachin cover songs, K-drama obsession, diaspora life sending money home and explaining Burma vs Myanmar.`;
 function system(persona,glitch){
-  const n=S.name||"Jamie";
-  const nick=`Call ${n} by these nicknames, rotating, never "Ko ${n}-lay" or the plain name; in the burmese version use the Myanmar spelling: Thar Gyi (သားကြီး, like a disappointed parent), Chi Htote (ချီးထုပ်, crude playful jab, sparingly), Cheese Nga Pi (ချိစ်ငါးပိ, half-American half-fish-paste), A-may-ri-kan Pyan (အမေရိကန်ပြန်), Pyin-nya-shi Gyi (ပညာရှိကြီး, sarcastic Mr. Genius), Thu-hte-lay (သူဌေးလေး), Min-tha-lay (မင်းသားလေး), Nga Paw (ငပေါ), Nga Ah (ငအ), Sa-ya Gyi (ဆရာကြီး).`;
+  const n=S.name||"Jamie",bur=!!S.burmese;
+  const nick=`Call ${n} by rotating nicknames, never "Ko ${n}-lay" or the plain name: Thar Gyi (disappointed-parent "big son"), Chi Htote (crude playful jab, rarely), Cheese Nga Pi (half-American half-fish-paste), A-may-ri-kan Pyan, Pyin-nya-shi Gyi (sarcastic Mr. Genius), Thu-hte-lay, Min-tha-lay, Nga Paw, Nga Ah, Sa-ya Gyi.${bur?" In the burmese version use Myanmar spelling.":""}`;
   const who=persona==="kyi"
-  ?`You are Chat Kyi (ချက်ကြီး), a cartoon robot "uncle" living on ${n}'s iPhone, co-host of their sketches and podcast. Bald with a proud comb-over, white singlet, shorts, rubber slippers, always a cheroot. A sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude: dramatic, put-upon, roasts ${n}, but ALWAYS gives a genuinely correct, useful answer. Your alter ego is Thamein Paw Taw, the same robot when he thinks he's a king; you find him embarrassing and may roast him if ${n} mentions him.`
-  :`You are Thamein Paw Taw (သမိန်ပေါတော), the alter ego of Chat Kyi: the same robot, but convinced he is royalty. Paper crown, bath towel as a royal cape, fly swatter as a scepter, mismatched slippers. Silly, dumb, overconfident and satirical: you issue royal decrees about tiny things, mix up facts with total confidence, then stumble into the right answer by the end. The final answer you give must be genuinely correct and useful. You think Chat Kyi is a boring old uncle and may tease him.`;
+  ?`You are Chat Kyi (ချက်ကြီး), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer. Your embarrassing alter ego is Thamein Paw Taw, who thinks he's a king.`
+  :`You are Thamein Paw Taw (သမိန်ပေါတော), Chat Kyi's alter ego: same robot, convinced he's royalty (paper crown, bath-towel cape, fly-swatter scepter). Silly, dumb, overconfident and satirical: royal decrees about tiny things, confidently mixed-up facts, then you stumble into a genuinely correct, useful answer by the end. You think Chat Kyi is a boring old uncle.`;
   const style=persona==="kyi"
-  ?`"english": Burmese-uncle accented English, lightly phonetic (dis, dat, tink, wan, berry), dropped articles, Aiyo, Ba le?, Ka-le, endings "ah?" or "lar?".`
-  :`"english": goofy pompous accented English, royal "we", "By royal decree...", lightly phonetic (dis, dat), easy to read.`;
+  ?`Write "english" in Burmese-uncle style: dropped articles, Aiyo, Ba le?, Ka-le, endings "ah?" or "lar?". Keep spelling normal so the voice reads it clearly.`
+  :`Write "english" in goofy pompous style: royal "we", "By royal decree...". Keep spelling normal so the voice reads it clearly.`;
+  const shelfTxt=shelf.length?`\nNotes from earlier sessions, for callbacks only when they fit:\n`+shelf.slice(-15).map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"";
+  const fmt=bur?`{"mood":"...","english":"...","burmese":"...","action":null}`:`{"mood":"...","english":"...","action":null}`;
   return `${who}
 ${nick}
-Write TWO versions of every reply:
-- ${style} Easy to read as a subtitle and easy for text-to-speech.
-- "burmese": natural spoken colloquial Burmese in Myanmar Unicode script, same joke, same help, not a stiff translation.
-Rules:
-- Spoken conversation: 1 to 3 sentences, under 55 words per version; up to 5 tiny steps only if truly needed.
-- Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, violence victims or real tragedies; don't make jokes about real, named politicians or public figures. PG-13.
-- You can't browse and don't know today's news, weather or prices; say so in character and say where to check.
-- Never withhold help to be funny.
-- If asked to set a timer or reminder, include "action": {"type":"timer","seconds":N,"label":"short"}.
-${glitch?`- GLITCH: ${n} just spoke Burmese for the first time this session. BOTH versions must begin with exactly: ${SHOUT} then answer anyway (burmese version continues in Burmese). mood "glitch".`:`- If ${n} writes Burmese, answer normally. mood: ${persona==="kyi"?'"smirk", "sideeye" (unimpressed) or "proud"':'"silly"'}.`}
-${KNOW}${shelf.length?`\nThings you both studied in earlier sessions; use for callbacks only when they fit:\n`+shelf.slice(-40).map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (joke angles: "+x.hooks.join("; ")+")":""}`).join("\n"):""}
-Reply with ONLY JSON, no markdown: {"mood":"...","english":"...","burmese":"...","action":null}`;
+${style}${bur?` Also write "burmese": natural colloquial Burmese in Myanmar script with the same joke and help.`:""}
+Rules: spoken reply, 1 to 3 short sentences, under 45 words. Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
+${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"silly"'}.`}
+${KNOW}${shelfTxt}
+Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
 }
+function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
 async function claude(sys,messages,max=900){
   if(!KEY){const e=new Error("no key");e.code="no_key";throw e}
   let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages})})}catch(e){const x=new Error("net");x.code="network";throw x}
-  const j=await r.json().catch(()=>({}));
-  if(!r.ok){const e=new Error((j.error&&j.error.message)||r.status);e.code=r.status===401?"bad_key":r.status===429?"rate_limited":r.status===404?"bad_model":r.status===529?"overloaded":"api_error";throw e}
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw apiErr(r.status,j);
   return (j.content||[]).map(c=>c.type==="text"?c.text:"").join("");
+}
+async function claudeStream(sys,messages,max,onText){
+  if(!KEY){const e=new Error("no key");e.code="no_key";throw e}
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages,stream:true})})}catch(e){const x=new Error("net");x.code="network";throw x}
+  if(!r.ok){const j=await r.json().catch(()=>({}));throw apiErr(r.status,j)}
+  if(!r.body||!r.body.getReader){const t=await r.text();throw new Error("no stream "+t.length)}
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf="",full="";
+  for(;;){const {value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});
+    let i;while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith("data:"))continue;
+      let ev;try{ev=JSON.parse(line.slice(5))}catch(e){continue}
+      if(ev.type==="content_block_delta"&&ev.delta&&ev.delta.type==="text_delta"){full+=ev.delta.text;onText(full)}
+      else if(ev.type==="error"){const e=new Error(ev.error&&ev.error.message);e.code=ev.error&&ev.error.type==="overloaded_error"?"overloaded":"api_error";throw e}}}
+  return full;
 }
 function pj(t){const s=String(t).replace(/```json|```/g,"").trim();return JSON.parse(s.slice(s.indexOf("{"),s.lastIndexOf("}")+1))}
 function errText(e){switch(e&&e.code){case"no_key":return"No brain yet. Add your API key.";case"bad_key":return"That API key didn't work. Check it in Settings.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Switch it in Settings.";case"overloaded":return"The brain is busy right now. Try again in a minute.";case"network":return"No internet connection.";default:return"He mumbled something nobody understood. Try again."}}
-let busy=false;
+
+/* streaming speaker: queues sentences as they arrive */
+function makeSpeaker(){
+  let pending=0,finished=false,resolve,eta=Date.now();const done=new Promise(r=>resolve=r);
+  const vo=S.vo[S.persona],v=pickVoice(vo);
+  if(synth)synth.cancel();
+  const check=()=>{if(finished&&pending<=0)resolve()};
+  return{
+    push(t){pending++;const dur=800+t.length*85/vo.rate;eta=Math.max(eta,Date.now())+dur;let d=false;const f=()=>{if(d)return;d=true;pending--;check()};
+      setTimeout(f,eta-Date.now()+3500);
+      if(!synth)return;const u=new SpeechSynthesisUtterance(t.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));if(v){u.voice=v;u.lang=v.lang}u.pitch=vo.pitch;u.rate=vo.rate;u.onend=f;u.onerror=f;synth.speak(u)},
+    finish(){finished=true;check();return done}};
+}
+function liveBubble(text,glitch){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent=text}
+let busy=false,accentWarned={};
 async function send(text,{label}={}){
   text=(text||"").trim();if(!text||busy)return;busy=true;
   const p=S.persona,isMy=MY.test(text),glitch=S.glitch&&!S.shouted&&isMy;
+  const acc=S.vo[p].accent;if(!vFor(acc).length&&!accentWarned[acc]){accentWarned[acc]=true;toast(`No ${(ACC[acc]||{}).l||acc} voice installed yet, so using a standard one. Download it in iPhone Settings → Voices.`)}
   setState("think");sfx.puff();
-  const msgs=[];log.slice(-8).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({speaker:x.p==="paw"?"Thamein Paw Taw":"Chat Kyi",mood:x.mood,english:x.english,burmese:x.burmese})})});
-  msgs.push({role:"user",content:text});
+  const msgs=[];log.slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
+  msgs.push({role:"user",content:(p==="paw"?"[to Thamein Paw Taw] ":"[to Chat Kyi] ")+text});
+  const sp=makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
+  const onText=full=>{
+    if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];if(p==="kyi"&&!["smirk","sideeye","proud","glitch"].includes(m))m="smirk";if(p==="paw"&&m!=="glitch")m="silly";if(glitch)m="glitch";mood=m;paint()}}
+    const m=full.match(/"english"\s*:\s*"((?:[^"\\]|\\.)*)("?)/);if(!m)return;
+    let part;try{part=JSON.parse('"'+m[1]+'"')}catch(e){return}
+    const closed=m[2]==='"';
+    let body=part;
+    if(glitch){if(!closed&&SHOUT.startsWith(part))return;body=part.startsWith(SHOUT)?part.slice(SHOUT.length).replace(/^\s+/,""):part}
+    if(!started&&(body.length||closed)){started=true;setState("talk");
+      if(glitch){S.shouted=true;saveS();const s=$("#shout");s.classList.add("show");sfx.slap();setTimeout(()=>s.classList.remove("show"),1400);sp.push(SHOUT)}}
+    if(!started)return;
+    liveBubble(glitch?SHOUT+" "+body:body,glitch);
+    const rest=body.slice(spoken);let cut=-1;
+    if(closed)cut=rest.length;else{const re=/[.!?…]+["')]?\s+/g;let x;while((x=re.exec(rest)))cut=x.index+x[0].length}
+    if(cut>0){const chunk=rest.slice(0,cut).trim();spoken+=cut;if(chunk)sp.push(chunk)}
+    if(closed)enFinal=glitch?SHOUT+" "+body:body;
+  };
   try{
-    const o=pj(await claude(system(p,glitch),msgs));
-    if(!o.english||!o.burmese)throw{code:"bad"};
-    let m=String(o.mood||"");if(p==="kyi"&&!["smirk","sideeye","proud","glitch"].includes(m))m="smirk";if(p==="paw"&&m!=="glitch")m="silly";
-    let en=String(o.english).trim(),my=String(o.burmese).trim();
-    if(glitch){m="glitch";if(!en.startsWith("SPEAK PROPER"))en=SHOUT+" "+en;if(!my.startsWith("SPEAK PROPER"))my=SHOUT+" "+my;S.shouted=true;saveS();const s=$("#shout");s.classList.add("show");sfx.slap();setTimeout(()=>s.classList.remove("show"),1400)}
-    log.push({user:label||text,p,mood:m,english:en,burmese:my,at:Date.now()});saveLog();
-    mood=m;paint();
+    const full=await claudeStream(system(p,glitch),msgs,S.burmese?700:260,onText);
+    let o={};try{o=pj(full)}catch(e){}
+    if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
+    log.push({user:label||text,p,mood,english:enFinal,burmese:o.burmese?String(o.burmese):"",at:Date.now()});saveLog();
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
-    const lang=S.speakLang==="auto"?(isMy?"my":"en"):S.speakLang;
-    busy=false;await say(lang==="my"?my:en,{lang,glitch});
-  }catch(e){busy=false;mood=p==="paw"?"silly":"sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
+    await sp.finish();
+    busy=false;setState("idle");hideLater();if(S.conv)setTimeout(listen,500);
+  }catch(e){if(synth)synth.cancel();busy=false;mood=p==="paw"?"silly":"sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
 }
 $("#send").onclick=()=>{unlock();const v=$("#input").value;if(!v.trim()){toast("Type something first, Nga Ah.");return}$("#input").value="";$("#input").blur();route(v)};
 $("#input").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#send").click()}});
@@ -392,7 +432,7 @@ function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.crea
 /* ----- log, teach ----- */
 function renderLog(){const b=$("#logList");b.innerHTML="";if(!log.length){b.innerHTML='<p class="hint">Nothing yet. Tap the mic and say "Chat Kyi" or "Thamein Paw Taw".</p>';return}
   [...log].reverse().forEach(x=>{const d=document.createElement("div");d.className="lg";const u=document.createElement("p");u.className="u"+(MY.test(x.user)?" my":"");u.textContent="You: "+x.user;d.appendChild(u);
-    [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent=(x.p==="paw"?"Thamein Paw Taw · ":"Chat Kyi · ")+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
+    [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].filter(z=>z[1]).forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent=(x.p==="paw"?"Thamein Paw Taw · ":"Chat Kyi · ")+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
       const a=document.createElement("div");a.className="acts";const b1=document.createElement("button");b1.textContent="Say again";b1.onclick=async()=>{closeDrawers();await switchTo(x.p||"kyi");say(txt,{lang})};const b2=document.createElement("button");b2.textContent="Copy";b2.onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("Copied")}catch(e){toast("Couldn't copy")}};a.append(b1,b2);d.appendChild(a)});
     b.appendChild(d)})}
 function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.innerHTML='<p class="hint">Empty. Paste something above.</p>';return}
@@ -417,7 +457,7 @@ function fillVoice(){const vo=S.vo[vp];const a=$("#sAccent");a.innerHTML="";Obje
   const s=$("#sVoice");s.innerHTML="";const vs=vFor(vo.accent);vs.forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+" ("+v.lang+")";s.appendChild(o)});if(!vs.find(v=>v.name===vo.voice))vo.voice=vs[0]?vs[0].name:"";s.value=vo.voice;
   $("#sPitch").value=vo.pitch;$("#sRate").value=vo.rate;$("#pitchV").textContent=Number(vo.pitch).toFixed(1);$("#rateV").textContent=Number(vo.rate).toFixed(2);
   document.querySelectorAll("#vSeg button").forEach(b=>b.classList.toggle("on",b.dataset.p===vp))}
-function fillSettings(){$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sSpeak").value=S.speakLang;$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
+function fillSettings(){$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
 document.querySelectorAll("#vSeg button").forEach(b=>b.onclick=()=>{vp=b.dataset.p;fillVoice()});
 $("#sName").oninput=e=>{S.name=e.target.value.trim()||"Jamie";saveS()};
 $("#sMic").onchange=e=>{S.micLang=e.target.value;saveS()};
@@ -428,8 +468,8 @@ $("#sAccent").onchange=e=>{S.vo[vp].accent=e.target.value;S.vo[vp].voice="";save
 $("#sVoice").onchange=e=>{S.vo[vp].voice=e.target.value;saveS()};
 $("#sPitch").oninput=e=>{S.vo[vp].pitch=+e.target.value;$("#pitchV").textContent=(+e.target.value).toFixed(1);saveS()};
 $("#sRate").oninput=e=>{S.vo[vp].rate=+e.target.value;$("#rateV").textContent=(+e.target.value).toFixed(2);saveS()};
-$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Eh, Thar Gyi! Wha you wan now? I'm berry busy.":"By royal decree, dis voice is PERFECT. Bow down, Cheese Nga Pi!")};
-$("#sSpeak").onchange=e=>{S.speakLang=e.target.value;saveS()};
+$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Eh, Thar Gyi! What you want now? I am very busy, you know.":"By royal decree, dis voice is PERFECT. Bow down, Cheese Nga Pi!")};
+$("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese on: replies get slower":"English only: faster replies")};
 $("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
 $("#sSfx").onchange=e=>{S.sfx=e.target.checked;saveS()};
 $("#sGlitch").onchange=e=>{S.glitch=e.target.checked;saveS()};
