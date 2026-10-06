@@ -44,6 +44,8 @@ button{cursor:pointer}
 #bub.paw{background:#FFF2BF}
 #bub.glitch{background:#C0352B;color:#fff}
 #bub.my{font-weight:600}
+#bub .mm{display:block;font-family:"Noto Sans Myanmar","Myanmar Sangam MN","Myanmar Text",sans-serif;font-weight:500;font-size:.7em;line-height:1.75;opacity:.78;margin:1px 0 7px}
+#bub .en{display:block}
 #cloud{position:absolute;right:4%;top:5%;width:28%;opacity:0;transition:opacity .2s}
 #cloud.show{opacity:1}
 #heard{position:absolute;left:4%;right:4%;bottom:2%;background:rgba(0,0,0,.6);color:#fff;font-size:14px;padding:6px 12px;border-radius:999px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .2s}
@@ -227,7 +229,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.5</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.6</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option><option value="my-MM">Burmese (most iPhones can't)</option></select></div>
   <div class="f"><label for="sWkyi">Chat Kyi wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
@@ -239,7 +241,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="f"><label for="sVoice">Voice</label><select id="sVoice"></select><p class="hint">Missing voices? iPhone Settings → Accessibility → Spoken Content → Voices. Download Chinese, Vietnamese or other English voices, then reopen the app.</p></div>
   <div class="f"><label for="sPitch">Depth <span id="pitchV"></span></label><input type="range" id="sPitch" min="0" max="2" step="0.1"></div>
   <div class="f"><label for="sRate">Speed <span id="rateV"></span></label><input type="range" id="sRate" min="0.5" max="1.4" step="0.05"></div>
-  <label class="tog">Also write a Burmese version (slower) <input type="checkbox" id="sBur"></label>
+  <label class="tog">Burmese subtitles under each line in the bubble <input type="checkbox" id="sBur"></label>
   <div class="row"><button class="btn" id="vTest">Test this voice</button><button class="btn" id="vAud">Audition all voices</button></div><p class="hint" id="vAudNow">Audition plays a line with every voice for the chosen accent. Tap a name when you hear one you like.</p><div id="vAudList"></div>
   <hr class="sep">
   <div class="f"><label for="sBg">Background</label><select id="sBg"><option value="#00B140">Green screen</option><option value="#0047BB">Blue screen</option><option value="#1F4D3F">Tea shop green</option><option value="#7A1F1A">Lacquer red</option><option value="#15131c">Night</option></select></div>
@@ -278,6 +280,7 @@ let S=Object.assign({name:"Jamie",model:"claude-haiku-4-5-20251001",micLang:"en-
   vo:{kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}},burmese:false,
   speakLang:"en",bg:"#00B140",sfx:true,glitch:true,shouted:false,conv:false},st.get("settings",{}));
 if(!S.v13){S.v13=true;S.model="claude-haiku-4-5-20251001";S.burmese=false;S.vo={kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
+if(!S.v15){S.v15=true;S.burmese=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v14){S.v14=true;S.conv=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 let KEY=st.get("key","");let log=st.get("log",[]);let shelf=st.get("shelf",[]);
 const saveS=()=>st.set("settings",S),saveLog=()=>st.set("log",log.slice(-60)),saveShelf=()=>st.set("shelf",shelf);
@@ -381,10 +384,10 @@ function system(persona,glitch){
    +(exps.length?`\nPast discussions with ${n}. Occasionally (about 1 reply in 4, only when it fits naturally) tease ${n} about what they said:\n`+exps.map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (tease angles: "+x.hooks.join("; ")+")":""}`).join("\n"):"")
    +(air?`\nON AIR: you are co-hosting an episode of ${n}'s show, recorded for an audience${air.title?` about "${air.title}"`:""}. Act like a co-host, not an assistant: short punchy reactions, build on what ${n} just said, sometimes ask a quick follow-up, tease lightly, and keep it entertaining for listeners. Stay on the episode topic. Up to 3 sentences / 45 words.${air.brief?` Episode brief: ${air.brief}`:""}${air.script?`\nYou have the full episode script below. Your parts are marked with your tag. If ${n} asks you to read something from the script (your part, the intro, the next section, anything), read exactly that part word for word, without the tags, and ignore the length limit for that reply.\nSCRIPT:\n${air.script}`:""}`:"")
    +(!air&&disc?`\nCURRENT DISCUSSION with ${n} about "${disc.title}". Brief: ${disc.brief}\nStay on this topic, react with in-character opinions, push back on ${n}'s takes, and sometimes end with one short pointed question. Keep facts consistent with the brief. You may use up to 3 sentences / 50 words.`:"");
-  const fmt=bur?`{"mood":"...","english":"...","burmese":"...","action":null}`:`{"mood":"...","english":"...","action":null}`;
+  const fmt=bur?`{"mood":"...","english":"...","burmese_lines":["..."],"action":null}`:`{"mood":"...","english":"...","action":null}`;
   return `${who}
 ${nick}
-${style}${bur?` Also write "burmese": natural colloquial Burmese in Myanmar script with the same joke and help.`:""}
+${style}${bur?` After "english", write "burmese_lines": an array with exactly one Burmese subtitle (natural colloquial Burmese, Myanmar script) for each English sentence, in the same order. These are subtitles only; you still speak English.`:""}
 Rules: spoken reply, 1 to 3 short sentences, under 40 words. Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
 ${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"silly"'}.`}
 ${KNOW}${shelfTxt}
@@ -428,6 +431,11 @@ function makeSpeaker(){
 function fitBubble(){const b=$("#bub");b.style.fontSize="";let fs=parseFloat(getComputedStyle(b).fontSize)||20;
   while(b.scrollHeight>b.clientHeight+1&&fs>13){fs-=1;b.style.fontSize=fs+"px"}b.scrollTop=b.scrollHeight}
 function clean(t){return String(t).replace(/,?\s*\b(?:ba\s*le|ka-?\s*le|lar)\b([?!.,]?)/gi,(m,p)=>p==="?"||p==="!"||p==="."?".":"").replace(/\s+([?!.,])/g,"$1").replace(/([.!?])\1+/g,"$1").replace(/([.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/^\.\s*/,"").replace(/\s{2,}/g," ").trim()}
+function splitSent(t){return (String(t).match(/[^.!?…]+[.!?…]+["')]*|[^.!?…]+$/g)||[t]).map(x=>x.trim()).filter(Boolean)}
+function pairBubble(en,lines,glitch){clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent="";
+  const ss=splitSent(en);ss.forEach((x,i)=>{const e=document.createElement("span");e.className="en";e.textContent=x;b.appendChild(e);if(lines[i]){const m=document.createElement("span");m.className="mm";m.textContent=lines[i];b.appendChild(m)}});
+  for(let i=ss.length;i<lines.length;i++){const m=document.createElement("span");m.className="mm";m.textContent=lines[i];b.appendChild(m)}
+  fitBubble()}
 function liveBubble(text,glitch){clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent=text;fitBubble()}
 let busy=false,accentWarned={};
 async function send(text,{label}={}){
@@ -448,17 +456,20 @@ async function send(text,{label}={}){
     if(!started&&(body.length||closed)){started=true;setState("talk");
       if(glitch){S.shouted=true;saveS();const s=$("#shout");s.classList.add("show");sfx.slap();setTimeout(()=>s.classList.remove("show"),1400);sp.push(SHOUT)}}
     if(!started)return;
-    liveBubble(glitch?SHOUT+" "+body:body,glitch);
+    const enShown=glitch?SHOUT+" "+body:body;
+    let bl=[];if(closed&&S.burmese){const bm=full.match(/"burmese_lines"\s*:\s*\[([\s\S]*)/);if(bm){const re=/"((?:[^"\\]|\\.)*)"/g;let x;while((x=re.exec(bm[1]))){try{bl.push(JSON.parse('"'+x[1]+'"'))}catch(e){}}}}
+    if(bl.length)pairBubble(enShown,bl,glitch);else liveBubble(enShown,glitch);
     const rest=body.slice(spoken);let cut=-1;
     if(closed)cut=rest.length;else{const re=/[.!?…]+["')]?\s+/g;let x;while((x=re.exec(rest)))cut=x.index+x[0].length}
     if(cut>0){const chunk=rest.slice(0,cut).trim();spoken+=cut;if(chunk)sp.push(chunk)}
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:S.burmese?700:(disc||air?300:230),onText);
+    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:S.burmese?650:(disc||air?300:230),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
-    log.push({user:label||text,p,mood,english:enFinal,burmese:o.burmese?String(o.burmese):"",at:Date.now()});saveLog();
+    const blines=Array.isArray(o.burmese_lines)?o.burmese_lines.map(String):[];if(blines.length)pairBubble(enFinal,blines,glitch);
+    log.push({user:label||text,p,mood,english:enFinal,burmese:blines.length?blines.join("\n"):(o.burmese?String(o.burmese):""),at:Date.now()});saveLog();
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
     await sp.finish();
     busy=false;setState("idle");hideLater();if(handsFree())setTimeout(listen,500);
@@ -686,7 +697,7 @@ $("#vAud").onclick=async()=>{unlock();const my=++audRun;const vo=S.vo[vp];const 
     b.classList.remove("primary");await wait(300)}
   if(my===audRun)$("#vAudNow").textContent="Done. Tap a name to use that voice."};
 $("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Okay. Listen carefully, Boba Boy. I explain this only one time.":"By royal decree, dis voice is PERFECT. Bow down, Royal Peasant!")};
-$("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese on: replies get slower":"English only: faster replies")};
+$("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese subtitles on":"Burmese subtitles off")};
 $("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
 $("#sSfx").onchange=e=>{S.sfx=e.target.checked;saveS()};
 $("#sGlitch").onchange=e=>{S.glitch=e.target.checked;saveS()};
@@ -705,7 +716,7 @@ function applyBg(){document.body.style.setProperty("--bgc",S.bg)}
 if(air&&S.persona!==air.persona){S.persona=air.persona;mood=air.persona==="paw"?"silly":"smirk";saveS()}
 applyBg();paint();updConv();showDisc();updCue();
 if(!KEY)$("#setup").classList.add("show");
-else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
+else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{if(busy||pst!=="idle"||log.length&&Date.now()-log[log.length-1].at<5000)return;bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
 </script>
 </body>
 </html>
