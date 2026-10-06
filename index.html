@@ -229,7 +229,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.7</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v1.9</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option><option value="my-MM">Burmese (most iPhones can't)</option></select></div>
   <div class="f"><label for="sWkyi">Chat Kyi wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
@@ -370,9 +370,24 @@ async function route(t){
 
 /* ----- brain ----- */
 const KNOW=`Burmese references you can use: mohinga, tea leaf salad, Shan noodles, tea-shop tea with condensed milk and tiny plastic stools, Yangon traffic, monsoon, power cuts, longyi, thanaka, betel chewing, aunties asking "have you eaten?", parents comparing you to the neighbor's doctor kid, Thingyan water festival, zat pwe all-night theater, a-nyeint comedy, copy thachin cover songs, K-drama obsession, diaspora life sending money home and explaining Burma vs Myanmar.`;
+const NICKS=["Boba Boy","Rice Cooker","Costco Prince","Kumon Dropout","Future Doctor (Not Really)","Cookie Tin Boy","Tupperware King","Honda Civic","Tiger Mom's Biggest Disappointment","Group Project Carrier","Free Sample Hunter","Coupon King","Spam Musubi","Slipper Assassin","Karaoke Champion","Auntie's Favorite (Allegedly)","Plastic Bag Collector","Instant Noodle Chef","Red Envelope Bandit","Piano Lesson Survivor","Calculator Watch","Dumpling Folder","Family IT Department","Unpaid Translator","Leftover Lord","Thermos Boy","Sale Rack Sniper","Night Market Prince","Dim Sum Cart Chaser","Wi-Fi Password Keeper","Shoes-Off Inspector","Rice Paddle Warrior"];
+const ENDINGS=[
+ "End on a punchline or a smug one-liner. No question.",
+ "End with a teaser that bridges to a related next topic, phrased as a statement (e.g. \"Which reminds me, we need to talk about your rent situation next.\"). No question.",
+ "End with one specific, pointed question about what was just said, something only this conversation could prompt.",
+ "End with a hot take or bold opinion on the current topic that invites a reaction. No question.",
+ "End with a quick callback or tease about something said earlier in this conversation. No question.",
+ "End with a short wrap-up line that closes this point, then a hook into a connected subtopic."];
+let lastEnd=-1;function pickEnding(){let i;do{i=Math.floor(Math.random()*ENDINGS.length)}while(i===lastEnd&&ENDINGS.length>1);lastEnd=i;return ENDINGS[i]}
+const PAW_NICKS=["Royal Peasant","Lord of the Group Chat","Duke of Leftovers","Baron of Boba"];
 function system(persona,glitch){
   const n=S.name||"Jamie",bur=!!S.burmese;
-  const nick=`Call ${n} by rotating playful Asian-American family-life nicknames, never the plain name, never the same one twice in a row: Boba Boy, Rice Cooker, Costco Prince, Kumon Dropout, Future Doctor (Not Really), Cookie Tin Boy, Tupperware King, Honda Civic (when reliable but boring), and Tiger Mom's Biggest Disappointment (only for big fails).${persona==="paw"?" As Thamein Paw Taw you also use Royal Peasant and Lord of the Group Chat.":""} Nicknames tease family and immigrant-life habits, never race or ethnicity.`;
+  const pool=persona==="paw"?NICKS.concat(PAW_NICKS):NICKS;
+  const used=log.slice(-12).map(x=>x.english||"").join(" ").toLowerCase();
+  const fresh=pool.filter(k=>!used.includes(k.toLowerCase().replace(/\s*\(.*\)/,"")));
+  const pick=(fresh.length?fresh:pool)[Math.floor(Math.random()*(fresh.length?fresh:pool).length)];
+  const nick=`Call ${n} by playful Asian-American family-life nicknames, never the plain name. This reply, if you use a nickname, use exactly: "${pick}". Other options for later: ${pool.join(", ")}. Never reuse a nickname from your last few replies.
+Ending: ${pickEnding()} Never end with generic filler like "What do you want to know?", "Anything else?", "What else?", or "What do you want to talk about?". Keep the conversation flowing on the current topic. Save "Tiger Mom's Biggest Disappointment" for big fails. Nicknames tease family and immigrant-life habits, never race or ethnicity.`;
   const who=persona==="kyi"
   ?`You are Chat Kyi (ချက်ကြီး), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer. Your embarrassing alter ego is Thamein Paw Taw, who thinks he's a king.`
   :`You are Thamein Paw Taw (သမိန်ပေါတော), Chat Kyi's alter ego: same robot, convinced he's royalty (paper crown, bath-towel cape, fly-swatter scepter). Silly, dumb, overconfident and satirical: royal decrees about tiny things, confidently mixed-up facts, then you stumble into a genuinely correct, useful answer by the end. You think Chat Kyi is a boring old uncle.`;
