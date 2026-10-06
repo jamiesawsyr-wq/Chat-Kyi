@@ -34,11 +34,12 @@ button{cursor:pointer}
 .timer{font-size:11px;font-weight:800;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:3px 8px;background:var(--ui2)}
 
 #stage{flex:1;position:relative;overflow:hidden;min-height:0}
-#kw{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);height:62%;aspect-ratio:230/410}
+#kw{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);height:56%;aspect-ratio:230/410}
 #kw.swap{animation:flip .5s ease-in-out}
 @keyframes flip{0%{transform:translateX(-50%) scaleX(1)}50%{transform:translateX(-50%) scaleX(0)}100%{transform:translateX(-50%) scaleX(1)}}
 #kw svg{width:100%;height:100%;display:block}
-#bub{position:absolute;left:4%;top:4%;max-width:74%;background:#fff;color:#111;border:3px solid #111;border-radius:18px;padding:10px 14px;font-weight:800;font-size:clamp(16px,4.6vw,24px);line-height:1.35;opacity:0;transform:scale(.94);transform-origin:bottom right;transition:opacity .18s,transform .18s;max-height:44%;overflow:hidden}
+#bub{position:absolute;left:4%;top:4%;max-width:74%;background:#fff;color:#111;border:3px solid #111;border-radius:18px;padding:10px 14px;font-weight:800;font-size:clamp(16px,4.6vw,24px);line-height:1.35;opacity:0;transform:scale(.94);transform-origin:bottom right;transition:opacity .18s,transform .18s;max-height:33%;overflow-y:auto;scrollbar-width:none}
+#bub::-webkit-scrollbar{display:none}
 #bub.show{opacity:1;transform:none}
 #bub.paw{background:#FFF2BF}
 #bub.glitch{background:#C0352B;color:#fff}
@@ -108,7 +109,7 @@ button{cursor:pointer}
 #discBar{position:absolute;top:2%;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(20,14,12,.82);color:#fff;border-radius:999px;padding:5px 6px 5px 12px;font-size:13px;max-width:92%;z-index:2}
 #discBar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #discBar button{border:none;background:#C0352B;color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap}
-#stage.disc #bub{top:11%}#stage.disc #cloud{top:12%}
+#stage.disc #bub{top:11%;max-height:27%}#stage.disc #cloud{top:12%}
 body.clean #discBar{display:none}
 body.clean #top,body.clean #bottom{display:none}
 body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
@@ -226,7 +227,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="f"><label for="sPitch">Depth <span id="pitchV"></span></label><input type="range" id="sPitch" min="0" max="2" step="0.1"></div>
   <div class="f"><label for="sRate">Speed <span id="rateV"></span></label><input type="range" id="sRate" min="0.5" max="1.4" step="0.05"></div>
   <label class="tog">Also write a Burmese version (slower) <input type="checkbox" id="sBur"></label>
-  <button class="btn" id="vTest">Test this voice</button>
+  <div class="row"><button class="btn" id="vTest">Test this voice</button><button class="btn" id="vAud">Audition all voices</button></div><p class="hint" id="vAudNow">Audition plays a line with every voice for the chosen accent. Tap a name when you hear one you like.</p><div id="vAudList"></div>
   <hr class="sep">
   <div class="f"><label for="sBg">Background</label><select id="sBg"><option value="#00B140">Green screen</option><option value="#0047BB">Blue screen</option><option value="#1F4D3F">Tea shop green</option><option value="#7A1F1A">Lacquer red</option><option value="#15131c">Night</option></select></div>
   <label class="tog">Sound effects <input type="checkbox" id="sSfx"></label>
@@ -290,7 +291,7 @@ if(synth){loadV();synth.onvoiceschanged=loadV}
 function unlock(){if(unlocked||!synth)return;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;synth.speak(u);unlocked=true}catch(e){}ac()}
 document.addEventListener("touchend",unlock,{once:false,passive:true});document.addEventListener("click",unlock);
 let typeT=null;
-function bubble(text,{my=false,glitch=false,ms}={}){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(my?" my":"")+(glitch?" glitch":"");b.textContent="";const c=[...text];let i=0;const step=Math.max(14,Math.min(70,(ms||c.length*55)/Math.max(c.length,1)));typeT=setInterval(()=>{i++;b.textContent=c.slice(0,i).join("");if(i>=c.length)clearInterval(typeT)},step)}
+function bubble(text,{my=false,glitch=false,ms}={}){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(my?" my":"")+(glitch?" glitch":"");b.textContent="";const c=[...text];let i=0;const step=Math.max(14,Math.min(70,(ms||c.length*55)/Math.max(c.length,1)));typeT=setInterval(()=>{i++;b.textContent=c.slice(0,i).join("");fitBubble();if(i>=c.length)clearInterval(typeT)},step)}
 function hideLater(){clearTimeout(hideLater.t);hideLater.t=setTimeout(()=>$("#bub").classList.remove("show"),10000)}
 function speak(text,lang){return new Promise(res=>{
   if(!synth){res(false);return}
@@ -343,17 +344,17 @@ function system(persona,glitch){
   ?`You are Chat Kyi (ချက်ကြီး), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer. Your embarrassing alter ego is Thamein Paw Taw, who thinks he's a king.`
   :`You are Thamein Paw Taw (သမိန်ပေါတော), Chat Kyi's alter ego: same robot, convinced he's royalty (paper crown, bath-towel cape, fly-swatter scepter). Silly, dumb, overconfident and satirical: royal decrees about tiny things, confidently mixed-up facts, then you stumble into a genuinely correct, useful answer by the end. You think Chat Kyi is a boring old uncle.`;
   const style=persona==="kyi"
-  ?`Write "english" in Burmese-uncle style: dropped articles, Aiyo, Ba le?, Ka-le, endings "ah?" or "lar?". Keep spelling normal so the voice reads it clearly.`
-  :`Write "english" in goofy pompous style: royal "we", "By royal decree...". Keep spelling normal so the voice reads it clearly.`;
+  ?`Write "english" as a condescending know-it-all uncle: patronizing, slow and deliberate, like explaining something obvious to a child ("Okay. Listen carefully."), with a dramatic sigh now and then and an occasional "Aiyo". Plain English only: no Burmese or Singlish filler words like lar, ba le, ka-le or a trailing "ah". Normal spelling so the voice reads it clearly.`
+  :`Write "english" in goofy pompous style: royal "we", "By royal decree...". Plain English only, no Burmese or Singlish filler words. Normal spelling so the voice reads it clearly.`;
   const notes=shelf.filter(x=>x.kind!=="exp").slice(-12),exps=shelf.filter(x=>x.kind==="exp").slice(-10);
   const shelfTxt=(notes.length?`\nNotes from earlier sessions, for callbacks only when they fit:\n`+notes.map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"")
    +(exps.length?`\nPast discussions with ${n}. Occasionally (about 1 reply in 4, only when it fits naturally) tease ${n} about what they said:\n`+exps.map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (tease angles: "+x.hooks.join("; ")+")":""}`).join("\n"):"")
-   +(disc?`\nCURRENT DISCUSSION with ${n} about "${disc.title}". Brief: ${disc.brief}\nStay on this topic, react with in-character opinions, push back on ${n}'s takes, and sometimes end with one short pointed question. Keep facts consistent with the brief. You may use up to 4 sentences / 60 words.`:"");
+   +(disc?`\nCURRENT DISCUSSION with ${n} about "${disc.title}". Brief: ${disc.brief}\nStay on this topic, react with in-character opinions, push back on ${n}'s takes, and sometimes end with one short pointed question. Keep facts consistent with the brief. You may use up to 3 sentences / 50 words.`:"");
   const fmt=bur?`{"mood":"...","english":"...","burmese":"...","action":null}`:`{"mood":"...","english":"...","action":null}`;
   return `${who}
 ${nick}
 ${style}${bur?` Also write "burmese": natural colloquial Burmese in Myanmar script with the same joke and help.`:""}
-Rules: spoken reply, 1 to 3 short sentences, under 45 words. Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
+Rules: spoken reply, 1 to 3 short sentences, under 40 words. Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
 ${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"silly"'}.`}
 ${KNOW}${shelfTxt}
 Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
@@ -393,7 +394,10 @@ function makeSpeaker(){
       if(!synth)return;const u=new SpeechSynthesisUtterance(t.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));if(v){u.voice=v;u.lang=v.lang}u.pitch=vo.pitch;u.rate=vo.rate;u.onend=f;u.onerror=f;synth.speak(u)},
     finish(){finished=true;check();return done}};
 }
-function liveBubble(text,glitch){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent=text}
+function fitBubble(){const b=$("#bub");b.style.fontSize="";let fs=parseFloat(getComputedStyle(b).fontSize)||20;
+  while(b.scrollHeight>b.clientHeight+1&&fs>13){fs-=1;b.style.fontSize=fs+"px"}b.scrollTop=b.scrollHeight}
+function clean(t){return String(t).replace(/,?\s*\b(?:ba\s*le|ka-?\s*le|lar)\b([?!.,]?)/gi,(m,p)=>p==="?"||p==="!"||p==="."?".":"").replace(/\s+([?!.,])/g,"$1").replace(/([.!?])\1+/g,"$1").replace(/([.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/^\.\s*/,"").replace(/\s{2,}/g," ").trim()}
+function liveBubble(text,glitch){const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent=text;fitBubble()}
 let busy=false,accentWarned={};
 async function send(text,{label}={}){
   text=(text||"").trim();if(!text||busy)return;busy=true;
@@ -406,7 +410,7 @@ async function send(text,{label}={}){
   const onText=full=>{
     if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];if(p==="kyi"&&!["smirk","sideeye","proud","glitch"].includes(m))m="smirk";if(p==="paw"&&m!=="glitch")m="silly";if(glitch)m="glitch";mood=m;paint()}}
     const m=full.match(/"english"\s*:\s*"((?:[^"\\]|\\.)*)("?)/);if(!m)return;
-    let part;try{part=JSON.parse('"'+m[1]+'"')}catch(e){return}
+    let part;try{part=clean(JSON.parse('"'+m[1]+'"'))}catch(e){return}
     const closed=m[2]==='"';
     let body=part;
     if(glitch){if(!closed&&SHOUT.startsWith(part))return;body=part.startsWith(SHOUT)?part.slice(SHOUT.length).replace(/^\s+/,""):part}
@@ -420,7 +424,7 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const full=await claudeStream(system(p,glitch),msgs,S.burmese?750:(disc?340:260),onText);
+    const full=await claudeStream(system(p,glitch),msgs,S.burmese?700:(disc?300:230),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
     log.push({user:label||text,p,mood,english:enFinal,burmese:o.burmese?String(o.burmese):"",at:Date.now()});saveLog();
@@ -521,7 +525,16 @@ $("#sAccent").onchange=e=>{S.vo[vp].accent=e.target.value;S.vo[vp].voice="";save
 $("#sVoice").onchange=e=>{S.vo[vp].voice=e.target.value;saveS()};
 $("#sPitch").oninput=e=>{S.vo[vp].pitch=+e.target.value;$("#pitchV").textContent=(+e.target.value).toFixed(1);saveS()};
 $("#sRate").oninput=e=>{S.vo[vp].rate=+e.target.value;$("#rateV").textContent=(+e.target.value).toFixed(2);saveS()};
-$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Eh, Boba Boy! What you want now? I am very busy, you know.":"By royal decree, dis voice is PERFECT. Bow down, Royal Peasant!")};
+const AUD_LINE="Okay. Listen carefully. I will explain this slowly, because clearly you need it.";
+let audRun=0;
+$("#vAud").onclick=async()=>{unlock();const my=++audRun;const vo=S.vo[vp];const vs=vFor(vo.accent);const box=$("#vAudList");box.innerHTML="";
+  if(!vs.length){toast("No voices installed for that accent yet");return}
+  for(const v of vs){if(my!==audRun)return;const b=document.createElement("button");b.className="btn";b.style.margin="0 6px 6px 0";b.textContent=v.name;b.onclick=()=>{audRun++;synth.cancel();vo.voice=v.name;saveS();fillVoice();toast("Voice set: "+v.name)};box.appendChild(b);
+    $("#vAudNow").textContent="Now playing: "+v.name;b.classList.add("primary");
+    await new Promise(r=>{synth.cancel();const u=new SpeechSynthesisUtterance(AUD_LINE);u.voice=v;u.lang=v.lang;u.pitch=vo.pitch;u.rate=vo.rate;let d=false;const f=()=>{if(!d){d=true;r()}};u.onend=f;u.onerror=f;setTimeout(f,9000);synth.speak(u)});
+    b.classList.remove("primary");await wait(300)}
+  if(my===audRun)$("#vAudNow").textContent="Done. Tap a name to use that voice."};
+$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Okay. Listen carefully, Boba Boy. I explain this only one time.":"By royal decree, dis voice is PERFECT. Bow down, Royal Peasant!")};
 $("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese on: replies get slower":"English only: faster replies")};
 $("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
 $("#sSfx").onchange=e=>{S.sfx=e.target.checked;saveS()};
