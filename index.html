@@ -105,6 +105,11 @@ button{cursor:pointer}
 #setup p{margin:0 0 12px;line-height:1.5;font-size:15px}
 #toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 60px);transform:translateX(-50%);background:var(--ink);color:var(--ui);padding:9px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw;text-align:center}
 #toast.show{opacity:1}
+#discBar{position:absolute;top:2%;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(20,14,12,.82);color:#fff;border-radius:999px;padding:5px 6px 5px 12px;font-size:13px;max-width:92%;z-index:2}
+#discBar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#discBar button{border:none;background:#C0352B;color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+#stage.disc #bub{top:11%}#stage.disc #cloud{top:12%}
+body.clean #discBar{display:none}
 body.clean #top,body.clean #bottom{display:none}
 body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 
@@ -145,7 +150,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <button id="who" aria-label="Switch persona"><span id="whoName">Chat Kyi</span><span class="sw">switch</span></button>
   <span id="spacer"></span><div id="timers"></div>
   <button class="tb" data-d="log">Log</button>
-  <button class="tb" data-d="teach">Teach</button>
+  <button class="tb" data-d="teach">Topics</button>
   <button class="tb" data-d="settings">⚙︎</button>
 </div>
 
@@ -183,6 +188,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <g class="m m-silly" stroke="none"><circle cx="136" cy="171" r="13" fill="#7fe3c4"/><circle cx="141" cy="176" r="4.5" fill="#1f2a36"/><circle cx="177" cy="168" r="7" fill="#7fe3c4"/><circle cx="174" cy="165" r="2.5" fill="#1f2a36"/><g class="mouth"><path d="M132 189 Q155 205 180 187" stroke="#7fe3c4" stroke-width="3" fill="none"/><ellipse cx="164" cy="199" rx="6" ry="5" fill="#f28b9b"/></g></g>
 <g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
 </g></g></svg></div>
+  <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
   <div id="heard"></div>
   <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
 </div>
@@ -198,11 +204,13 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 
 <div id="scrim"></div>
 <aside class="drawer" id="d-log"><div class="dh"><h2>Chat log</h2><button class="btn" data-close>Done</button></div><div class="db" id="logList"></div></aside>
-<aside class="drawer" id="d-teach"><div class="dh"><h2>Teach them</h2><button class="btn" data-close>Done</button></div><div class="db">
-  <div class="f"><label for="tText">Paste an article or notes</label><textarea id="tText" rows="6" placeholder="Paste article text here"></textarea><p class="hint">Tip: open the article in Safari, tap the Reader icon (aA), select all, copy, and paste here.</p></div>
-  <button class="btn primary" id="tGo">Make them read it</button>
+<aside class="drawer" id="d-teach"><div class="dh"><h2>Topics</h2><button class="btn" data-close>Done</button></div><div class="db">
+  <div class="f"><label for="tUrl">Paste a link</label><input type="text" id="tUrl" placeholder="https://…" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+  <div class="f"><label for="tText">Or paste article text, or just type a topic</label><textarea id="tText" rows="4" placeholder="e.g. Is boba overrated?"></textarea></div>
+  <div class="row"><button class="btn primary" id="dStart">Start discussion</button><button class="btn" id="tGo">Just learn it</button></div>
   <p class="err" id="tErr"></p>
-  <hr class="sep"><span class="lbl">Memory shelf. Both personas reread this before every reply.</span>
+  <p class="hint">Start discussion: they read it and talk it through with you. When you tap End discussion, they remember what you said and may tease you about it later.</p>
+  <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
 <aside class="drawer" id="d-settings"><div class="dh"><h2>Settings</h2><button class="btn" data-close>Done</button></div><div class="db">
@@ -321,7 +329,7 @@ async function route(t){
   const w=findWake(t);
   if(w){await switchTo(w.p);
     if(w.rest.replace(/[^\p{L}\p{N}]/gu,"").length>1){send(w.rest,{label:t});return}
-    const q=w.p==="kyi"?["Ba le? Wha you wan?","Yes yes, I'm here. Wha?","Aiyo, wha now?"]:["Your majesty is listening!","Yes? I am royal ready!","Who summon da king?"];
+    const q=w.p==="kyi"?["Yes? What you want?","Yes yes, I am here. What?","Aiyo, what now?"]:["Your majesty is listening!","Yes? I am royal ready!","Who summon da king?"];
     say(q[Math.floor(Math.random()*q.length)]);return}
   send(t);
 }
@@ -330,14 +338,17 @@ async function route(t){
 const KNOW=`Burmese references you can use: mohinga, tea leaf salad, Shan noodles, tea-shop tea with condensed milk and tiny plastic stools, Yangon traffic, monsoon, power cuts, longyi, thanaka, betel chewing, aunties asking "have you eaten?", parents comparing you to the neighbor's doctor kid, Thingyan water festival, zat pwe all-night theater, a-nyeint comedy, copy thachin cover songs, K-drama obsession, diaspora life sending money home and explaining Burma vs Myanmar.`;
 function system(persona,glitch){
   const n=S.name||"Jamie",bur=!!S.burmese;
-  const nick=`Call ${n} by rotating nicknames, never "Ko ${n}-lay" or the plain name: Thar Gyi (disappointed-parent "big son"), Chi Htote (crude playful jab, rarely), Cheese Nga Pi (half-American half-fish-paste), A-may-ri-kan Pyan, Pyin-nya-shi Gyi (sarcastic Mr. Genius), Thu-hte-lay, Min-tha-lay, Nga Paw, Nga Ah, Sa-ya Gyi.${bur?" In the burmese version use Myanmar spelling.":""}`;
+  const nick=`Call ${n} by rotating playful Asian-American family-life nicknames, never the plain name, never the same one twice in a row: Boba Boy, Rice Cooker, Costco Prince, Kumon Dropout, Future Doctor (Not Really), Cookie Tin Boy, Tupperware King, Honda Civic (when reliable but boring), and Tiger Mom's Biggest Disappointment (only for big fails).${persona==="paw"?" As Thamein Paw Taw you also use Royal Peasant and Lord of the Group Chat.":""} Nicknames tease family and immigrant-life habits, never race or ethnicity.`;
   const who=persona==="kyi"
   ?`You are Chat Kyi (ချက်ကြီး), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer. Your embarrassing alter ego is Thamein Paw Taw, who thinks he's a king.`
   :`You are Thamein Paw Taw (သမိန်ပေါတော), Chat Kyi's alter ego: same robot, convinced he's royalty (paper crown, bath-towel cape, fly-swatter scepter). Silly, dumb, overconfident and satirical: royal decrees about tiny things, confidently mixed-up facts, then you stumble into a genuinely correct, useful answer by the end. You think Chat Kyi is a boring old uncle.`;
   const style=persona==="kyi"
   ?`Write "english" in Burmese-uncle style: dropped articles, Aiyo, Ba le?, Ka-le, endings "ah?" or "lar?". Keep spelling normal so the voice reads it clearly.`
   :`Write "english" in goofy pompous style: royal "we", "By royal decree...". Keep spelling normal so the voice reads it clearly.`;
-  const shelfTxt=shelf.length?`\nNotes from earlier sessions, for callbacks only when they fit:\n`+shelf.slice(-15).map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"";
+  const notes=shelf.filter(x=>x.kind!=="exp").slice(-12),exps=shelf.filter(x=>x.kind==="exp").slice(-10);
+  const shelfTxt=(notes.length?`\nNotes from earlier sessions, for callbacks only when they fit:\n`+notes.map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"")
+   +(exps.length?`\nPast discussions with ${n}. Occasionally (about 1 reply in 4, only when it fits naturally) tease ${n} about what they said:\n`+exps.map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (tease angles: "+x.hooks.join("; ")+")":""}`).join("\n"):"")
+   +(disc?`\nCURRENT DISCUSSION with ${n} about "${disc.title}". Brief: ${disc.brief}\nStay on this topic, react with in-character opinions, push back on ${n}'s takes, and sometimes end with one short pointed question. Keep facts consistent with the brief. You may use up to 4 sentences / 60 words.`:"");
   const fmt=bur?`{"mood":"...","english":"...","burmese":"...","action":null}`:`{"mood":"...","english":"...","action":null}`;
   return `${who}
 ${nick}
@@ -348,9 +359,9 @@ ${KNOW}${shelfTxt}
 Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
 }
 function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
-async function claude(sys,messages,max=900){
+async function claude(sys,messages,max=900,tools){
   if(!KEY){const e=new Error("no key");e.code="no_key";throw e}
-  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages})})}catch(e){const x=new Error("net");x.code="network";throw x}
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true",...(tools?{"anthropic-beta":"web-fetch-2025-09-10"}:{})},body:JSON.stringify(Object.assign({model:S.model,max_tokens:max,system:sys,messages},tools?{tools}:{}))})}catch(e){const x=new Error("net");x.code="network";throw x}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw apiErr(r.status,j);
   return (j.content||[]).map(c=>c.type==="text"?c.text:"").join("");
 }
@@ -368,7 +379,7 @@ async function claudeStream(sys,messages,max,onText){
   return full;
 }
 function pj(t){const s=String(t).replace(/```json|```/g,"").trim();return JSON.parse(s.slice(s.indexOf("{"),s.lastIndexOf("}")+1))}
-function errText(e){switch(e&&e.code){case"no_key":return"No brain yet. Add your API key.";case"bad_key":return"That API key didn't work. Check it in Settings.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Switch it in Settings.";case"overloaded":return"The brain is busy right now. Try again in a minute.";case"network":return"No internet connection.";default:return"He mumbled something nobody understood. Try again."}}
+function errText(e){switch(e&&e.code){case"no_key":return"No brain yet. Add your API key.";case"bad_key":return"That API key didn't work. Check it in Settings.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Switch it in Settings.";case"overloaded":return"The brain is busy right now. Try again in a minute.";case"network":return"No internet connection.";case"fetch":return(e.message||"Couldn't open that link.")+" Paste the article text instead.";default:return"He mumbled something nobody understood. Try again."}}
 
 /* streaming speaker: queues sentences as they arrive */
 function makeSpeaker(){
@@ -409,7 +420,7 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const full=await claudeStream(system(p,glitch),msgs,S.burmese?700:260,onText);
+    const full=await claudeStream(system(p,glitch),msgs,S.burmese?750:(disc?340:260),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
     log.push({user:label||text,p,mood,english:enFinal,burmese:o.burmese?String(o.burmese):"",at:Date.now()});saveLog();
@@ -418,7 +429,7 @@ async function send(text,{label}={}){
     busy=false;setState("idle");hideLater();if(S.conv)setTimeout(listen,500);
   }catch(e){if(synth)synth.cancel();busy=false;mood=p==="paw"?"silly":"sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
 }
-$("#send").onclick=()=>{unlock();const v=$("#input").value;if(!v.trim()){toast("Type something first, Nga Ah.");return}$("#input").value="";$("#input").blur();route(v)};
+$("#send").onclick=()=>{unlock();const v=$("#input").value;if(!v.trim()){toast("Type something first, Honda Civic.");return}$("#input").value="";$("#input").blur();route(v)};
 $("#input").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#send").click()}});
 $("#roastBtn").onclick=()=>{unlock();sfx.slap();send("Roast me. No question, just a short playful roast about my life or habits, then one tiny genuinely useful tip.",{label:"(Roast me)"})};
 $("#who").onclick=()=>{unlock();switchTo(S.persona==="kyi"?"paw":"kyi")};
@@ -426,7 +437,7 @@ $("#who").onclick=()=>{unlock();switchTo(S.persona==="kyi"?"paw":"kyi")};
 /* ----- timers ----- */
 function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.createElement("span");c.className="timer";$("#timers").appendChild(c);
   const tick=()=>{const l=Math.max(0,Math.round((end-Date.now())/1000));c.textContent=Math.floor(l/60)+":"+String(l%60).padStart(2,"0");if(l<=0){clearInterval(iv);c.remove();sfx.slap();
-    const lines=S.persona==="kyi"?[`Ding ding! ${label} timer done, Thar Gyi. You forget already, right?`,`Oi, Cheese Nga Pi! ${label} time finish. I remember, you don't.`]:[`Hear ye! Da royal ${label} timer has spoken!`,`By royal decree, ${label} time is OVER, Min-tha-lay!`];
+    const lines=S.persona==="kyi"?[`Ding ding! ${label} timer done, Boba Boy. You forget already, right?`,`Oi, Rice Cooker! ${label} time finish. I remember, you don't.`]:[`Hear ye! Da royal ${label} timer has spoken!`,`By royal decree, ${label} time is OVER, Royal Peasant!`];
     say(lines[Math.floor(Math.random()*lines.length)])}};const iv=setInterval(tick,1000);tick();toast("Timer: "+label)}
 
 /* ----- log, teach ----- */
@@ -435,15 +446,57 @@ function renderLog(){const b=$("#logList");b.innerHTML="";if(!log.length){b.inne
     [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].filter(z=>z[1]).forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent=(x.p==="paw"?"Thamein Paw Taw · ":"Chat Kyi · ")+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
       const a=document.createElement("div");a.className="acts";const b1=document.createElement("button");b1.textContent="Say again";b1.onclick=async()=>{closeDrawers();await switchTo(x.p||"kyi");say(txt,{lang})};const b2=document.createElement("button");b2.textContent="Copy";b2.onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("Copied")}catch(e){toast("Couldn't copy")}};a.append(b1,b2);d.appendChild(a)});
     b.appendChild(d)})}
-function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.innerHTML='<p class="hint">Empty. Paste something above.</p>';return}
+function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.innerHTML='<p class="hint">Empty. Learn a topic or finish a discussion.</p>';return}
   [...shelf].reverse().forEach(n=>{const d=document.createElement("div");d.className="note";const h=document.createElement("h3");h.textContent=n.title;const p=document.createElement("p");p.textContent=n.summary;d.append(h,p);(n.hooks||[]).forEach(k=>{const s=document.createElement("span");s.className="hook";s.textContent=k;d.appendChild(s)});
     const r=document.createElement("div");r.className="row";r.style.marginTop="6px";const m=document.createElement("span");m.className="hint";m.style.flex="1";m.textContent=new Date(n.date).toLocaleDateString();const del=document.createElement("button");del.className="btn danger";del.textContent="Forget";del.onclick=()=>{if(confirm('Forget "'+n.title+'"?')){shelf=shelf.filter(x=>x.id!==n.id);saveShelf();renderShelf()}};r.append(m,del);d.appendChild(r);b.appendChild(d)})}
-$("#tGo").onclick=async()=>{const text=$("#tText").value.trim();$("#tErr").textContent="";if(text.length<80){$("#tErr").textContent="Paste a bit more text, at least a paragraph.";return}if(busy){toast("Busy talking. Try in a second.");return}
+let disc=st.get("disc",null);
+function showDisc(){$("#discBar").hidden=!disc;$("#discTitle").textContent=disc?"Discussing: "+disc.title:"";$("#stage").classList.toggle("disc",!!disc)}
+function srcErr(t){$("#tErr").textContent=t}
+function getSource(needLong){
+  const url=$("#tUrl").value.trim(),text=$("#tText").value.trim();srcErr("");
+  if(!url&&!text){srcErr("Paste a link, some text, or type a topic first.");return null}
+  if(url&&!/^https?:\/\/\S+$/i.test(url)){srcErr("Links need to start with http:// or https://");return null}
+  if(!url&&needLong&&text.length<80){srcErr("Paste a bit more text, or use Start discussion for a quick topic.");return null}
+  return {url,text};
+}
+async function readSource(src,instr,max){
+  const content=src.url?`Use the web_fetch tool to read this page: ${src.url}\n\n${instr}`
+    :src.text.length>=80?`Source:\n\n${src.text.slice(0,24000)}\n\n${instr}`
+    :`Topic: ${src.text}\n(No article was given. Use well-established general knowledge only, and leave out anything you're unsure of.)\n\n${instr}`;
+  const out=await claude("You prepare material for Chat Kyi and Thamein Paw Taw, comedy robot co-hosts. Be accurate to the source; do not invent facts.",[{role:"user",content}],max,src.url?[{type:"web_fetch_20250910",name:"web_fetch",max_uses:2}]:undefined);
+  const m=out.match(/\{\s*"(?:title|error)"[\s\S]*\}/);if(!m)throw{code:"bad"};
+  let o;try{o=JSON.parse(m[0])}catch(e){o=pj(m[0])}
+  if(o.error){const e=new Error(String(o.error).slice(0,120));e.code="fetch";throw e}
+  return o;
+}
+$("#tGo").onclick=async()=>{const src=getSource(true);if(!src)return;if(busy){toast("Busy talking. Try in a second.");return}
   busy=true;const b=$("#tGo");b.textContent="Reading…";closeDrawers();setState("think");sfx.puff();
-  try{const o=pj(await claude("You write study notes for Chat Kyi and Thamein Paw Taw, Burmese robot comedy characters. Be accurate to the source; do not invent facts.",[{role:"user",content:`Source:\n\n${text.slice(0,24000)}\n\nReturn ONLY JSON: {"title":"short topic title","summary":"2-3 sentence factual summary","hooks":["up to 3 short joke angles"],"reaction":"one short line the current speaker says after reading, in accented English"}`}]));
-    shelf.push({id:Date.now().toString(36),date:new Date().toISOString(),title:String(o.title||"Untitled").slice(0,80),summary:String(o.summary||"").slice(0,600),hooks:(o.hooks||[]).slice(0,3).map(String)});saveShelf();$("#tText").value="";busy=false;
-    if(S.persona==="kyi"){mood="proud";paint()}await say(o.reaction||"Okay, I read. Now wha you wan?")}
-  catch(e){busy=false;setState("idle");toast(errText(e))}finally{b.textContent="Make them read it"}};
+  try{const o=await readSource(src,`Return ONLY JSON: {"title":"short topic title","summary":"2-3 sentence factual summary","hooks":["up to 3 short joke angles"],"reaction":"one short line the current speaker says after reading, in character"}. If the page can't be read, return {"error":"short reason"}.`,1200);
+    shelf.push({id:Date.now().toString(36),date:new Date().toISOString(),title:String(o.title||"Untitled").slice(0,80),summary:String(o.summary||"").slice(0,600),hooks:(o.hooks||[]).slice(0,3).map(String)});saveShelf();$("#tText").value="";$("#tUrl").value="";busy=false;
+    if(S.persona==="kyi"){mood="proud";paint()}await say(o.reaction||"Okay, I read it. Now what you want?")}
+  catch(e){busy=false;setState("idle");toast(errText(e))}finally{b.textContent="Just learn it"}};
+$("#dStart").onclick=async()=>{const src=getSource(false);if(!src)return;if(busy){toast("Busy talking. Try in a second.");return}
+  if(disc){if(!confirm("End the current discussion and start this one?"))return;await endDiscussion(true)}
+  busy=true;const b=$("#dStart");b.textContent="Reading…";closeDrawers();setState("think");sfx.puff();
+  const who=S.persona==="paw"?"Thamein Paw Taw (silly self-declared king)":"Chat Kyi (sarcastic robot uncle)";
+  try{const o=await readSource(src,`Return ONLY JSON: {"title":"short topic title","brief":"about 150 words: factual summary of the key points","opener":"one short line ${who} says to open the discussion, in character, ending with a pointed question for ${S.name||"Jamie"}"}. If the page can't be read, return {"error":"short reason"}.`,1400);
+    disc={title:String(o.title||"Untitled").slice(0,80),brief:String(o.brief||"").slice(0,1500),source:src.url||"",startedAt:Date.now()};st.set("disc",disc);showDisc();
+    $("#tText").value="";$("#tUrl").value="";busy=false;
+    await say(o.opener||"Okay, I read it. You go first, Boba Boy.")}
+  catch(e){busy=false;setState("idle");toast(errText(e))}finally{b.textContent="Start discussion"}};
+async function endDiscussion(silent){
+  if(!disc)return;const d=disc;disc=null;st.set("disc",null);showDisc();
+  const turns=log.filter(x=>x.at>=d.startedAt);
+  if(!turns.length){if(!silent)toast("Discussion ended.");return}
+  if(!silent){busy=true;setState("think");sfx.puff()}
+  try{const n=S.name||"Jamie";const convo=turns.map(x=>`${n}: ${x.user}\n${x.p==="paw"?"Thamein Paw Taw":"Chat Kyi"}: ${x.english}`).join("\n");
+    const o=pj(await claude("You turn a finished discussion into a memory for Chat Kyi and Thamein Paw Taw, comedy robot co-hosts who like to tease their human. Only use what was actually said.",[{role:"user",content:`Topic: ${d.title}\n\nConversation:\n${convo.slice(0,12000)}\n\nReturn ONLY JSON: {"summary":"1-2 sentences: what was discussed and what ${n} actually said or believed","teases":["up to 3 short playful tease angles about ${n}'s takes"],"closer":"one short line the current speaker says to wrap up, in character"}`}],500));
+    shelf.push({id:Date.now().toString(36),date:new Date().toISOString(),kind:"exp",title:"Discussion: "+d.title,summary:String(o.summary||"").slice(0,500),hooks:(o.teases||[]).slice(0,3).map(String)});saveShelf();
+    busy=false;if(!silent)await say(o.closer||"Okay, discussion over. I remember everything, Boba Boy.")}
+  catch(e){busy=false;setState("idle");if(!silent)toast("Couldn't save that discussion as a memory.")}
+}
+$("#dEnd").onclick=()=>{unlock();if(busy){toast("Let them finish talking first.");return}endDiscussion(false)};
+["#tUrl","#tText"].forEach(x=>$(x).addEventListener("input",()=>srcErr("")));
 
 /* ----- drawers ----- */
 function closeDrawers(){document.querySelectorAll(".drawer").forEach(d=>d.classList.remove("open"));$("#scrim").classList.remove("show")}
@@ -468,7 +521,7 @@ $("#sAccent").onchange=e=>{S.vo[vp].accent=e.target.value;S.vo[vp].voice="";save
 $("#sVoice").onchange=e=>{S.vo[vp].voice=e.target.value;saveS()};
 $("#sPitch").oninput=e=>{S.vo[vp].pitch=+e.target.value;$("#pitchV").textContent=(+e.target.value).toFixed(1);saveS()};
 $("#sRate").oninput=e=>{S.vo[vp].rate=+e.target.value;$("#rateV").textContent=(+e.target.value).toFixed(2);saveS()};
-$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Eh, Thar Gyi! What you want now? I am very busy, you know.":"By royal decree, dis voice is PERFECT. Bow down, Cheese Nga Pi!")};
+$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Eh, Boba Boy! What you want now? I am very busy, you know.":"By royal decree, dis voice is PERFECT. Bow down, Royal Peasant!")};
 $("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese on: replies get slower":"English only: faster replies")};
 $("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
 $("#sSfx").onchange=e=>{S.sfx=e.target.checked;saveS()};
@@ -480,14 +533,14 @@ let lastTap=0;$("#stage").addEventListener("click",e=>{if(!document.body.classLi
 $("#sModel").onchange=e=>{S.model=e.target.value;saveS();toast("Brain switched")};
 $("#kSave").onclick=()=>{const k=$("#sKey").value.trim();if(!/^sk-ant-/.test(k)){toast("Keys start with sk-ant-");return}KEY=k;st.set("key",k);$("#sKey").value="";toast("Key saved on this iPhone")};
 $("#kDel").onclick=()=>{if(confirm("Remove the API key from this iPhone?")){KEY="";st.set("key","");toast("Key removed")}};
-$("#kFirstSave").onclick=async()=>{unlock();const k=$("#kFirst").value.trim();$("#kErr").textContent="";if(!/^sk-ant-/.test(k)){$("#kErr").textContent="That doesn't look like an Anthropic key. It starts with sk-ant-";return}KEY=k;st.set("key",k);$("#setup").classList.remove("show");say("Okay, brain installed. Hello, Thar Gyi. Don't waste my time ah.")};
+$("#kFirstSave").onclick=async()=>{unlock();const k=$("#kFirst").value.trim();$("#kErr").textContent="";if(!/^sk-ant-/.test(k)){$("#kErr").textContent="That doesn't look like an Anthropic key. It starts with sk-ant-";return}KEY=k;st.set("key",k);$("#setup").classList.remove("show");say("Okay, brain installed. Hello, Rice Cooker. Don't waste my time ah.")};
 $("#kFirst").addEventListener("input",()=>$("#kErr").textContent="");
 function applyBg(){document.body.style.setProperty("--bgc",S.bg)}
 
 /* ----- start ----- */
-applyBg();paint();updConv();
+applyBg();paint();updConv();showDisc();
 if(!KEY)$("#setup").classList.add("show");
-else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Thar Gyi. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Cheese Nga Pi. You eat already or not?"]:["Evening, Chi Htote. Late again, huh?"];setTimeout(()=>{bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
+else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
 </script>
 </body>
 </html>
