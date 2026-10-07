@@ -256,7 +256,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.1</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.2</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option></select></div>
@@ -266,7 +266,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <span class="lbl">Voices</span>
   <div class="seg" id="vSeg"><button data-p="kyi" class="on">Uncle Paw Taw</button><button data-p="paw">Taw Thar</button></div>
   <div class="f"><label for="sAccent">Accent</label><select id="sAccent"></select></div>
-  <div class="f"><label for="sVoice">Voice</label><select id="sVoice"></select><p class="hint">Missing voices? iPhone Settings → Accessibility → Spoken Content → Voices. Download Chinese, Vietnamese or other English voices, then reopen the app.</p></div>
+  <div class="f"><label for="sVoice">Voice</label><select id="sVoice"></select><p class="hint" id="vNow"></p><p class="hint">Missing voices? iPhone Settings → Accessibility → Spoken Content → Voices. Download Chinese, Vietnamese or other English voices, then reopen the app.</p></div>
   <div class="f"><label for="sPitch">Depth <span id="pitchV"></span></label><input type="range" id="sPitch" min="0" max="2" step="0.1"></div>
   <div class="f"><label for="sRate">Speed <span id="rateV"></span></label><input type="range" id="sRate" min="0.5" max="1.4" step="0.05"></div>
   <label class="tog">Burmese subtitles under each line in the bubble <input type="checkbox" id="sBur"></label>
@@ -368,7 +368,11 @@ const synth=window.speechSynthesis;let allV=[];let unlocked=false;
 const MALE=/daniel|fred|aaron|arthur|alex|male|gordon|rishi|ralph|guy|david|mark|james|tom|george|lee|nam/i;
 const QV=v=>(/premium/i.test(v.name+" "+v.voiceURI)?4:/enhanced/i.test(v.name+" "+v.voiceURI)?3:0)+(MALE.test(v.name)?1:0);
 function vFor(acc){const re=(ACC[acc]||ACC.uncle).re;return allV.filter(v=>re.test(v.lang)).sort((a,b)=>QV(b)-QV(a))}
-function pickVoice(vo){return allV.find(v=>v.name===vo.voice)||vFor(vo.accent)[0]||vFor("uncle")[0]||null}
+function pickVoice(vo){if(!allV.length&&synth)allV=synth.getVoices();
+  const saved=vo.voice&&allV.find(v=>v.voiceURI===vo.voice||v.name===vo.voice);if(saved)return saved;
+  const acc=vFor(vo.accent);const idx=(vo===S.vo.paw)?1:0;
+  if(acc.length)return acc[Math.min(idx,acc.length-1)];
+  const en=vFor("uncle");return en.length?en[Math.min(idx,en.length-1)]:null}
 function loadV(){if(!synth)return;allV=synth.getVoices();if($("#d-settings").classList.contains("open"))fillVoice()}
 if(synth){loadV();synth.onvoiceschanged=loadV}
 function unlock(){if(unlocked||!synth)return;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;synth.speak(u);unlocked=true}catch(e){}ac()}
@@ -836,7 +840,9 @@ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeDrawers);$("
 /* ----- settings ----- */
 let vp="kyi";
 function fillVoice(){const vo=S.vo[vp];const a=$("#sAccent");a.innerHTML="";Object.entries(ACC).forEach(([k,x])=>{const o=document.createElement("option");o.value=k;o.textContent=x.l+(vFor(k).length?"":" (not installed)");a.appendChild(o)});a.value=vo.accent;
-  const s=$("#sVoice");s.innerHTML="";const vs=vFor(vo.accent);vs.forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+" ("+v.lang+")";s.appendChild(o)});if(!vs.find(v=>v.name===vo.voice))vo.voice=vs[0]?vs[0].name:"";s.value=vo.voice;
+  const s=$("#sVoice");s.innerHTML="";const vs=vFor(vo.accent);vs.forEach(v=>{const o=document.createElement("option");o.value=v.voiceURI;o.textContent=v.name+" ("+v.lang+")"+(v.localService===false?" · online":"");s.appendChild(o)});
+  const cur=pickVoice(vo);if(cur&&vs.includes(cur))s.value=cur.voiceURI;
+  const h=$("#vNow");if(h)h.textContent=cur?"Now using: "+cur.name+" ("+cur.lang+")":"No voices found yet. Reopen Settings in a moment.";
   $("#sPitch").value=vo.pitch;$("#sRate").value=vo.rate;$("#pitchV").textContent=Number(vo.pitch).toFixed(1);$("#rateV").textContent=Number(vo.rate).toFixed(2);
   document.querySelectorAll("#vSeg button").forEach(b=>b.classList.toggle("on",b.dataset.p===vp))}
 function fillSettings(){$("#sChar").value=S.persona;$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
@@ -847,15 +853,15 @@ $("#sMic").onchange=e=>{S.micLang=e.target.value;saveS()};
 function wakeList(v,def){const w=v.split("\n").map(x=>x.trim()).filter(x=>x&&norm(x).trim()!=="kyi");return w.length?w:def}
 $("#sWkyi").onchange=e=>{S.wakes.kyi=wakeList(e.target.value,WK.kyi);saveS()};
 $("#sWpaw").onchange=e=>{S.wakes.paw=wakeList(e.target.value,WK.paw);saveS()};
-$("#sAccent").onchange=e=>{S.vo[vp].accent=e.target.value;S.vo[vp].voice="";saveS();fillVoice();if(!vFor(e.target.value).length)toast("That accent isn't installed on this iPhone yet")};
-$("#sVoice").onchange=e=>{S.vo[vp].voice=e.target.value;saveS()};
+$("#sAccent").onchange=e=>{S.vo[vp].accent=e.target.value;S.vo[vp].voice="";saveS();fillVoice();if(!vFor(e.target.value).length)toast("That accent isn't installed on this device yet, so he uses a standard English voice")};
+$("#sVoice").onchange=e=>{S.vo[vp].voice=e.target.value;saveS();fillVoice()};
 $("#sPitch").oninput=e=>{S.vo[vp].pitch=+e.target.value;$("#pitchV").textContent=(+e.target.value).toFixed(1);saveS()};
 $("#sRate").oninput=e=>{S.vo[vp].rate=+e.target.value;$("#rateV").textContent=(+e.target.value).toFixed(2);saveS()};
 const AUD_LINE="Okay. Listen carefully. I will explain this slowly, because clearly you need it.";
 let audRun=0;
 $("#vAud").onclick=async()=>{unlock();const my=++audRun;const vo=S.vo[vp];const vs=vFor(vo.accent);const box=$("#vAudList");box.innerHTML="";
   if(!vs.length){toast("No voices installed for that accent yet");return}
-  for(const v of vs){if(my!==audRun)return;const b=document.createElement("button");b.className="btn";b.style.margin="0 6px 6px 0";b.textContent=v.name;b.onclick=()=>{audRun++;synth.cancel();vo.voice=v.name;saveS();fillVoice();toast("Voice set: "+v.name)};box.appendChild(b);
+  for(const v of vs){if(my!==audRun)return;const b=document.createElement("button");b.className="btn";b.style.margin="0 6px 6px 0";b.textContent=v.name;b.onclick=()=>{audRun++;synth.cancel();vo.voice=v.voiceURI;saveS();fillVoice();toast("Voice set: "+v.name)};box.appendChild(b);
     $("#vAudNow").textContent="Now playing: "+v.name;b.classList.add("primary");
     await new Promise(r=>{synth.cancel();const u=new SpeechSynthesisUtterance(AUD_LINE);u.voice=v;u.lang=v.lang;u.pitch=vo.pitch;u.rate=vo.rate;let d=false;const f=()=>{if(!d){d=true;r()}};u.onend=f;u.onerror=f;setTimeout(f,9000);synth.speak(u)});
     b.classList.remove("primary");await wait(300)}
