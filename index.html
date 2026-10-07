@@ -35,7 +35,8 @@ button{cursor:pointer}
 #timers{display:flex;gap:4px}
 .timer{font-size:11px;font-weight:800;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:3px 8px;background:var(--ui2)}
 
-#stage{flex:1;position:relative;overflow:hidden;min-height:0}
+#stage{flex:1;position:relative;overflow:hidden;min-height:0;container-type:size}
+#scene{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(100cqw,105cqh)}
 #kw{position:absolute;left:1%;bottom:3%;width:50%;max-height:74%;aspect-ratio:160/240}
 #kw.swap{animation:flip .5s ease-in-out}
 @keyframes flip{0%{transform:scaleX(1)}50%{transform:scaleX(0)}100%{transform:scaleX(1)}}
@@ -190,7 +191,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 
 <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
 <div id="stage">
-  <div id="bub"></div><div id="btail"></div>
+  <div id="scene"><div id="bub"></div><div id="btail"></div>
   <svg id="cloud" viewBox="0 0 160 100"><ellipse cx="92" cy="40" rx="62" ry="34" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="38" cy="80" r="9" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="22" cy="94" r="5" fill="#fff" stroke="#111" stroke-width="3"/><g class="dots" fill="#555"><circle cx="70" cy="40" r="6"/><circle cx="92" cy="40" r="6"/><circle cx="114" cy="40" r="6"/></g></svg>
   <div id="kw"><svg id="ck" class="p-kyi st-idle mood-smirk" viewBox="50 40 230 410" role="img" aria-label="Uncle Paw Taw"><g id="whole" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
 <ellipse cx="155" cy="432" rx="90" ry="10" fill="#000" opacity=".15" stroke="none"/>
@@ -222,7 +223,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <g class="m m-glitch" stroke="#ff5a4e" stroke-width="3.5"><path d="M128 163 L146 179M146 163 L128 179M164 163 L182 179M182 163 L164 179"/><path class="mouth" d="M134 195 L142 189 L150 195 L158 189 L166 195 L174 189" stroke-width="3"/></g>
 <g class="m m-silly" stroke="none"><circle cx="136" cy="171" r="13" fill="#7fe3c4"/><circle cx="141" cy="176" r="4.5" fill="#1f2a36"/><circle cx="177" cy="168" r="7" fill="#7fe3c4"/><circle cx="174" cy="165" r="2.5" fill="#1f2a36"/><g class="mouth"><path d="M132 189 Q155 205 180 187" stroke="#7fe3c4" stroke-width="3" fill="none"/><ellipse cx="164" cy="199" rx="6" ry="5" fill="#f28b9b"/></g></g>
 <g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
-</g></g></svg></div>
+</g></g></svg></div></div>
   <div id="heard"></div>
   <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
 </div>
@@ -255,7 +256,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.0</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.1</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option></select></div>
