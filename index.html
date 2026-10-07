@@ -238,7 +238,9 @@ body.clean #podBar{display:none}
 #room[hidden]{display:none}
 #roomStage{position:relative;width:min(100vw,calc(100dvh*9/16));aspect-ratio:9/16;container-type:inline-size;overflow:hidden}
 #roomCv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
-#roomZone{position:absolute;left:6.5%;right:12%;top:28%;height:36.5%;display:flex;flex-direction:column;justify-content:flex-end;gap:2.4cqw;pointer-events:none}
+#roomZone{position:absolute;left:6.5%;right:12%;top:28%;height:36.5%;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:5cqw;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 7cqw);mask-image:linear-gradient(to bottom,transparent 0,#000 7cqw)}#roomZone::-webkit-scrollbar{display:none}
+#roomList{min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2.4cqw}
+.rbub .mm{display:block;font:600 3.7cqw/1.6 "Noto Sans Myanmar","Myanmar Sangam MN",sans-serif;color:#3a2f2a;margin-top:1.2cqw;opacity:.9}.rbub.old .mm{font-size:3cqw}
 .rbub{position:relative;background:#fff;color:#141014;border:1.1cqw solid #111;border-radius:4.4cqw;padding:2.6cqw 3.6cqw 3cqw;font:900 5.1cqw/1.28 Nunito,system-ui,sans-serif;box-shadow:0 1.2cqw 0 rgba(0,0,0,.35);transition:opacity .3s,transform .3s}
 .rbub .who{display:inline-block;font:400 2.6cqw 'Press Start 2P',monospace;color:#fff;padding:1.2cqw 1.8cqw;border-radius:1.4cqw;margin-bottom:1.6cqw}
 .rbub.u .who{background:#b07a12}.rbub.t .who{background:#4f8a3c}.rbub.j .who{background:#c0392b}
@@ -267,7 +269,7 @@ body.clean #podBar{display:none}
 
 <div id="podBar" hidden><span id="podTitle"></span><button id="podEnd">End showdown</button></div>
 <div id="vBar" hidden><b id="vAsk">Pick a side. You can also say it out loud.</b><button data-v="kyi">Side with Uncle</button><button data-v="paw">Side with Taw Thar</button><button data-v="neutral">Stay neutral 🫣</button></div>
-<div id="room" hidden><div id="roomStage"><canvas id="roomCv" width="1080" height="1920"></canvas><div id="roomZone"></div>
+<div id="room" hidden><div id="roomStage"><canvas id="roomCv" width="1080" height="1920"></canvas><div id="roomZone"><div id="roomList"></div></div>
 <button class="rhot" id="roomExit" aria-label="Leave The Room">✕</button><button class="rhot" id="roomKb" aria-label="Type">⌨</button><button class="rhot" id="roomMic" aria-label="Talk">🎤</button><button class="rhot" id="roomNext" aria-label="Next cue card">▶</button>
 <div id="roomBar" hidden><input id="roomIn" type="text" placeholder="Type as Jamie…" enterkeyhint="send"><button id="roomGo">Send</button></div></div></div>
 <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
@@ -326,6 +328,7 @@ body.clean #podBar{display:none}
   <div id="rCampOpts"><div class="seg" id="rSeason"><button data-v="auto">Auto</button><button data-v="summer">Summer</button><button data-v="fall">Fall</button><button data-v="winter">Winter</button></div>
   <div class="seg" id="rTod"><button data-v="auto">Auto</button><button data-v="day">Day</button><button data-v="sunset">Sunset</button><button data-v="night">Night</button></div><p class="hint" style="margin-top:-6px">Auto matches today's date and time.</p></div>
   <label class="tog">Read my lines aloud (3rd voice) <input type="checkbox" id="rJv"></label>
+  <label class="tog">Burmese subtitles under every bubble <input type="checkbox" id="rMy"></label>
   <div class="f"><label for="rCues">Cue cards (one line each, typed before you record)</label><textarea id="rCues" rows="4" placeholder="Uncle, why do Americans think Burma is tiny?&#10;Taw Thar, what would you buy first in America?&#10;New topic: aunties at weddings"></textarea><p class="hint" id="rCueStat"></p></div>
   <div class="row"><button class="btn primary" id="rEnter">🎬 Enter The Room</button><button class="btn" id="rCueReset">Restart cues</button></div>
   <p class="hint">In the room: faint ▶ bottom-right sends the next cue card · ⌨ bottom-left types live · 🎤 next to it talks (glows while listening, tap again to stop) · ✕ top-left leaves. Voice commands and "Uncle… / Taw Thar…" still work.</p>
@@ -365,7 +368,7 @@ body.clean #podBar{display:none}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.7.2</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.7.3</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sSass">Sass level</label><select id="sSass"><option value="mild">Mild (guest-friendly)</option><option value="spicy">Spicy (default)</option><option value="savage">Savage</option></select><p class="hint">Spicy and Savage can call you "idiot" or "dumb boy" for truly dumb questions. Audience roasts in Podcast mode always stay friendly.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
@@ -583,7 +586,7 @@ function findWake(t){const n=norm(t);let best=null;
   return best?{p:best.p,rest:n.slice(best.i+best.k.length+1).trim()}:null}
 let awaitUntil=0;
 async function route(t){
-  if(roomOn&&!roomFromJamie&&String(t||"").trim()){roomLive("j",String(t).trim(),roomVoiceKey||("j"+Date.now()));roomVoiceKey=null;if(S.room.jv){roomSpeaker="j";await speakJamie(String(t).trim());roomSpeaker=null}}
+  if(roomOn&&!roomFromJamie&&String(t||"").trim()){roomLive("j",String(t).trim(),roomVoiceKey||("j"+Date.now()),null,true);roomVoiceKey=null;if(S.room.jv){roomSpeaker="j";await speakJamie(String(t).trim());roomSpeaker=null}}
   if(vPending&&!busy){const v=verdictFrom(t);if(v){podVerdict(v);return}}
   if(!busy&&showCommand(t))return;
   const w=findWake(t);
@@ -721,7 +724,7 @@ function fitBubble(){if(threadOn()){$("#bub").style.fontSize="";$("#scene").clas
   while(b.scrollHeight>b.clientHeight+1&&fs>13){fs-=1;b.style.fontSize=fs+"px"}b.scrollTop=b.scrollHeight}
 function clean(t){return String(t).replace(/,?\s*\b(?:ba\s*le|ka-?\s*le|lar)\b([?!.,]?)/gi,(m,p)=>p==="?"||p==="!"||p==="."?".":"").replace(/\s+([?!.,])/g,"$1").replace(/([.!?])\1+/g,"$1").replace(/([.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/^\.\s*/,"").replace(/\s{2,}/g," ").trim()}
 function splitSent(t){return (String(t).match(/[^.!?…]+[.!?…]+["')]*|[^.!?…]+$/g)||[t]).map(x=>x.trim()).filter(Boolean)}
-function pairBubble(en,lines,glitch){if(roomOn)roomLive(S.persona,en,curSendKey);clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent="";
+function pairBubble(en,lines,glitch){if(roomOn)roomLive(S.persona,en,curSendKey,lines);clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(glitch?" glitch":"");b.textContent="";
   const ss=splitSent(en);ss.forEach((x,i)=>{const e=document.createElement("span");e.className="en";e.textContent=x;b.appendChild(e);if(lines[i]){const m=document.createElement("span");m.className="mm";m.textContent=lines[i];b.appendChild(m)}});
   for(let i=ss.length;i<lines.length;i++){const m=document.createElement("span");m.className="mm";m.textContent=lines[i];b.appendChild(m)}
   fitBubble()}
@@ -775,6 +778,7 @@ async function send(text,{label}={}){
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
     await sp.finish();
     if(p==="paw"&&o.cameo){const c=String(o.cameo).trim();if(c){await wait(400);setState("talk");bubble("Uncle Paw Taw (from the future): "+c);await speakAs(c,"kyi");setState("idle")}}
+    if(roomOn&&S.burmese&&roomCur&&roomCur.key===curSendKey&&!roomCur.mm.textContent)roomTranslate(roomCur,enFinal);
     if(duo&&!glitch&&enFinal)await chimeIn(p,text,enFinal);
     busy=false;setState("idle");hideLater();if(handsFree())setTimeout(listen,500);
   }catch(e){if(synth)synth.cancel();busy=false;mood="sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
@@ -1142,7 +1146,7 @@ async function podPlay(lines,label){if(synth)synth.cancel();
   for(let i=0;i<lines.length;i++){const x=lines[i];
     if(duo)duo.speaker=x.who;const ok=x.who==="paw"?["smirk","sideeye","proud","shock"]:["smirk","sideeye","proud"];mood=ok.includes(x.mood)?x.mood:"smirk";
     if(x.who==="paw"&&/\bsister\b|ma phyu/i.test(x.text)){mood="shock";playVillage("gasp")}
-    setState("talk");if(roomOn)roomLive(x.who,x.text,"p"+Date.now()+"_"+i);log.push({user:i===0?label:"",p:x.who,english:x.text,mood,pod:true,at:Date.now()});saveLog();podRecent.push(NAMES[x.who]+": "+x.text);if(podRecent.length>30)podRecent=podRecent.slice(-30);
+    setState("talk");if(roomOn)roomLive(x.who,x.text,"p"+Date.now()+"_"+i,null,true);log.push({user:i===0?label:"",p:x.who,english:x.text,mood,pod:true,at:Date.now()});saveLog();podRecent.push(NAMES[x.who]+": "+x.text);if(podRecent.length>30)podRecent=podRecent.slice(-30);
     if(threadOn())renderHist();else bubble(x.text,{ms:x.text.length*62});
     const t0=Date.now();await speakAs(x.text,x.who);const minMs=Math.min(7000,700+x.text.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
     setState("idle");await wait(220)}}
@@ -1298,17 +1302,26 @@ return{open(){resolve();resetParts();draw();bars();try{document.fonts.load("60px
 })();
 const RNAME={kyi:"UNCLE PAW TAW",paw:"TAW THAR",j:"JAMIE"},RKEY={kyi:"u",paw:"t",j:"j"};
 const RTAIL={u:(200-70)/(1080*0.815-70)*100,j:(520-70)/(1080*0.815-70)*100,t:(836-70)/(1080*0.815-70)*100};
-function roomLive(who,text,key){if(!roomOn)return;const z=$("#roomZone");
-  if(!roomCur||roomCur.key!==key){[...z.children].forEach((b,i,a)=>{if(i<a.length-1)b.remove();else b.classList.add("old")});
-    const b=document.createElement("div"),k=RKEY[who]||"u";b.className="rbub "+k;b.style.setProperty("--tail",Math.max(8,Math.min(92,RTAIL[k]))+"%");
-    const w=document.createElement("span");w.className="who";w.textContent=RNAME[who]||"";const tx=document.createElement("div");b.appendChild(w);b.appendChild(tx);z.appendChild(b);roomCur={key,el:b,tx}}
-  roomCur.tx.textContent=text;const fill=()=>[...z.children].reduce((t,c)=>t+c.offsetHeight,0)+(z.children.length-1)*8;if(fill()>z.clientHeight&&z.children.length>1)z.firstElementChild.remove();if(fill()>z.clientHeight)roomCur.el.classList.add('long');if(who!=="j")roomSpeaker=RKEY[who]}
-function roomClear(){const z=$("#roomZone");if(z)z.innerHTML="";roomCur=null}
+function roomLive(who,text,key,lines,final){if(!roomOn)return;const z=$("#roomZone"),L=$("#roomList");
+  let ent=[...L.children].find(b=>b.dataset.key===key)||(lines?[...L.children].reverse().find(b=>b.dataset.en===text):null);
+  if(ent&&(!roomCur||roomCur.el!==ent))roomCur={key:ent.dataset.key,el:ent,tx:ent.querySelector(".tx"),mm:ent.querySelector(".mm")};
+  if(!ent){[...L.children].forEach(b=>b.classList.add("old"));while(L.children.length>40)L.firstElementChild.remove();
+    const b=document.createElement("div"),k=RKEY[who]||"u";b.className="rbub "+k;b.dataset.key=key;b.style.setProperty("--tail",Math.max(8,Math.min(92,RTAIL[k]))+"%");
+    const w=document.createElement("span");w.className="who";w.textContent=RNAME[who]||"";const tx=document.createElement("div");tx.className="tx";const mm=document.createElement("div");mm.className="mm";b.appendChild(w);b.appendChild(tx);b.appendChild(mm);L.appendChild(b);roomCur={key,el:b,tx,mm}}
+  const cur=roomCur;cur.tx.textContent=text;cur.el.dataset.en=text;
+  if(lines&&lines.length&&S.burmese)cur.mm.textContent=lines.join(" ");
+  else if(final&&S.burmese&&!cur.mm.textContent&&text!=="…")roomTranslate(cur,text);
+  cur.el.classList.toggle("long",cur.el.offsetHeight>z.clientHeight*0.9);
+  z.scrollTop=z.scrollHeight;if(who!=="j")roomSpeaker=RKEY[who]}
+function roomTranslate(cur,text){const sents=splitSent(text);
+  claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script). Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(sents)}],1500)
+   .then(t=>{const m=t.match(/\[[\s\S]*\]/);if(!m)return;const arr=JSON.parse(m[0]).filter(x=>typeof x==="string");if(arr.length&&cur.el.isConnected&&!cur.mm.textContent){cur.mm.textContent=arr.join(" ");const z=$("#roomZone");if(cur.el===z.querySelector(".rbub:last-child"))z.scrollTop=z.scrollHeight}}).catch(()=>{})}
+function roomClear(){const L=$("#roomList");if(L)L.innerHTML="";roomCur=null}
 function jamieVoice(){if(!allV.length&&synth)allV=synth.getVoices();const used=[pickVoice(S.vo.kyi),pickVoice(S.vo.paw)].filter(Boolean).map(v=>v.voiceURI);
   return allV.filter(v=>/^en/i.test(v.lang)&&!used.includes(v.voiceURI)).sort((a,b)=>QV(b)-QV(a))[0]||null}
 function speakJamie(text){return new Promise(res=>{if(!synth||!S.room.jv){res();return}const u=new SpeechSynthesisUtterance(text);const v=jamieVoice();if(v){u.voice=v;u.lang=v.lang}u.pitch=1;u.rate=1.02;let d=false;const f=()=>{if(!d){d=true;res()}};u.onend=f;u.onerror=f;setTimeout(f,Math.max(3000,text.length*110));synth.speak(u)})}
 async function roomSend(text){text=String(text||"").trim();if(!text)return;if(busy){toast("Let them finish talking first.");return}unlock();
-  roomLive("j",text,"j"+Date.now());roomSpeaker="j";await speakJamie(text);roomSpeaker=null;roomFromJamie=true;try{await route(text)}finally{roomFromJamie=false}}
+  roomLive("j",text,"j"+Date.now(),null,true);roomSpeaker="j";await speakJamie(text);roomSpeaker=null;roomFromJamie=true;try{await route(text)}finally{roomFromJamie=false}}
 function roomNextCue(){const c=S.room.cues||[];if(S.room.ci>=c.length){toast("No more cue cards.");return}const q=c[S.room.ci++];saveS();roomSend(q)}
 function enterRoom(){closeDrawers();unlock();roomOn=true;document.body.classList.add("inroom");$("#room").hidden=false;roomClear();ROOM.open();
   if(S.pod.guest!=="both"){S.pod.guest="both";saveS()}if(!duo)setDuo(true)}
@@ -1321,10 +1334,10 @@ $("#roomIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault
 function fillRoomUI(){const r=S.room;document.querySelectorAll("#rScene button").forEach(b=>b.classList.toggle("on",b.dataset.v===r.scene));
   document.querySelectorAll("#rSeason button").forEach(b=>b.classList.toggle("on",b.dataset.v===r.season));
   document.querySelectorAll("#rTod button").forEach(b=>b.classList.toggle("on",b.dataset.v===r.tod));
-  $("#rCampOpts").hidden=r.scene!=="camp";$("#rJv").checked=!!r.jv;$("#rCues").value=(r.cues||[]).join("\n");
+  $("#rCampOpts").hidden=r.scene!=="camp";$("#rJv").checked=!!r.jv;$("#rMy").checked=!!S.burmese;$("#rCues").value=(r.cues||[]).join("\n");
   $("#rCueStat").textContent=(r.cues||[]).length?`${Math.min(r.ci,r.cues.length)} of ${r.cues.length} sent. Tap the faint ▶ in the room's bottom-right corner to send the next one.`:"Optional: one line per cue card."}
 ["rScene","rSeason","rTod"].forEach(id=>document.querySelectorAll("#"+id+" button").forEach(b=>b.onclick=()=>{const k=id==="rScene"?"scene":id==="rSeason"?"season":"tod";S.room[k]=b.dataset.v;saveS();fillRoomUI()}));
-$("#rJv").onchange=e=>{S.room.jv=e.target.checked;saveS()};
+$("#rJv").onchange=e=>{S.room.jv=e.target.checked;saveS()};$("#rMy").onchange=e=>{S.burmese=e.target.checked;saveS()};
 $("#rCues").onchange=e=>{S.room.cues=e.target.value.split("\n").map(x=>x.trim()).filter(Boolean);S.room.ci=0;saveS();fillRoomUI()};
 $("#rCueReset").onclick=()=>{S.room.ci=0;saveS();fillRoomUI();toast("Cue cards back to #1")};
 $("#rEnter").onclick=enterRoom;
@@ -1341,7 +1354,7 @@ async function chimeIn(p,text,reply){const o=p==="kyi"?"paw":"kyi",n=S.name||"Ja
     const ok=o==="paw"?["smirk","sideeye","proud","shock"]:["smirk","sideeye","proud"];mood=ok.includes(ob.mood)?ob.mood:"smirk";
     if(o==="paw"&&/\bsister\b|ma phyu/i.test(en+" "+text)){mood="shock";playVillage("gasp")}
     log.push({user:"",p:o,english:en,mood,pod:true,at:Date.now()});saveLog();
-    setState("talk");if(roomOn)roomLive(o,en,"c"+Date.now());
+    setState("talk");if(roomOn)roomLive(o,en,"c"+Date.now(),null,true);
     if(threadOn())renderHist();else bubble(en,{ms:en.length*62});
     const t0=Date.now();await speakAs(en,o);const minMs=Math.min(6000,700+en.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
   }catch(e){}finally{if(duo)duo.speaker=null}}
