@@ -43,6 +43,24 @@ button{cursor:pointer}
 #kw svg{width:100%;height:100%;display:block}
 #bub{position:absolute;right:3%;top:3%;width:47%;box-sizing:border-box;background:#fff;color:#111;border:3px solid #111;border-radius:18px;padding:10px 14px;font-weight:800;font-size:clamp(16px,4.6vw,24px);line-height:1.35;opacity:0;transform:scale(.94);transform-origin:top left;transition:opacity .18s,transform .18s;max-height:94%;overflow-y:auto;scrollbar-width:none;font-size:clamp(14px,3.9vw,21px)}
 #btail{position:absolute;right:50%;top:calc(3% + 22px);width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-right:16px solid #111;opacity:0;transition:opacity .18s;pointer-events:none}
+#thread{position:absolute;right:3%;top:3%;bottom:3%;width:47%;display:flex;flex-direction:column;gap:8px;overflow-y:auto;scrollbar-width:none;padding-left:16px;box-sizing:border-box;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 26px);mask-image:linear-gradient(to bottom,transparent 0,#000 26px)}
+#thread::-webkit-scrollbar{display:none}
+#hist{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+#thread #bub{position:relative;right:auto;top:auto;width:auto;max-height:none;overflow:visible;flex:none;transform:none}
+#thread #bub:not(.show){display:none}
+#thread #bub::before,.hk::before{content:"";position:absolute;left:-15px;top:14px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:13px solid #111}
+#hist:empty + #bub{margin-top:auto}
+.hu{align-self:flex-end;max-width:92%;background:rgba(20,14,12,.78);color:#fff;font-size:13px;padding:6px 11px;border-radius:12px 12px 3px 12px;line-height:1.35;word-wrap:break-word}
+.hk{position:relative;background:#fff;color:#111;border:2.5px solid #111;border-radius:14px;padding:8px 11px;font-weight:700;font-size:clamp(13px,3.4vw,17px);line-height:1.35;opacity:.9}
+.hk.paw{background:#FFF2BF}
+.hk .en{display:block}.hk .mm{display:block;font-family:"Noto Sans Myanmar","Myanmar Sangam MN","Myanmar Text",sans-serif;font-weight:500;font-size:.72em;line-height:1.7;opacity:.78;margin:1px 0 5px}
+#thread.solo{padding-left:0;-webkit-mask-image:none;mask-image:none}
+#thread.solo #hist{display:none}
+#thread.solo #bub{margin-top:0}
+#thread.solo #bub::before{display:none}
+#jump{position:absolute;right:5%;bottom:4%;border:none;background:#111;color:#fff;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;z-index:2}
+#btail{display:none}#scene.solo #btail{display:block}#scene.solo.bubon #btail{opacity:1}
+#thread.solo #bub.show ~ *{}
 #bub.show + #btail{opacity:1}
 #bub::-webkit-scrollbar{display:none}
 #bub.show{opacity:1;transform:none}
@@ -191,7 +209,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 
 <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
 <div id="stage">
-  <div id="scene"><div id="bub"></div><div id="btail"></div>
+  <div id="scene"><div id="thread"><div id="hist"></div><div id="bub"></div></div><div id="btail"></div><button id="jump" hidden>↓ Latest</button>
   <svg id="cloud" viewBox="0 0 160 100"><ellipse cx="92" cy="40" rx="62" ry="34" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="38" cy="80" r="9" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="22" cy="94" r="5" fill="#fff" stroke="#111" stroke-width="3"/><g class="dots" fill="#555"><circle cx="70" cy="40" r="6"/><circle cx="92" cy="40" r="6"/><circle cx="114" cy="40" r="6"/></g></svg>
   <div id="kw"><svg id="ck" class="p-kyi st-idle mood-smirk" viewBox="50 40 230 410" role="img" aria-label="Uncle Paw Taw"><g id="whole" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
 <ellipse cx="155" cy="432" rx="90" ry="10" fill="#000" opacity=".15" stroke="none"/>
@@ -256,7 +274,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.2</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.3</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option></select></div>
@@ -273,6 +291,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <div class="row"><button class="btn" id="vTest">Test this voice</button><button class="btn" id="vAud">Audition all voices</button></div><p class="hint" id="vAudNow">Audition plays a line with every voice for the chosen accent. Tap a name when you hear one you like.</p><div id="vAudList"></div>
   <hr class="sep">
   <div class="f"><label for="sBg">Background</label><select id="sBg"><option value="#00B140">Green screen</option><option value="#0047BB">Blue screen</option><option value="#1F4D3F">Tea shop green</option><option value="#7A1F1A">Lacquer red</option><option value="#15131c">Night</option></select></div>
+  <label class="tog">Show chat history on screen <input type="checkbox" id="sThread"></label>
   <label class="tog">Sound effects <input type="checkbox" id="sSfx"></label>
   <label class="tog">"Speak proper English!" on my first Burmese line <input type="checkbox" id="sGlitch"></label>
   <div class="row"><button class="btn" id="gReset">Re-arm the shout</button><button class="btn" id="hideBtn">Hide controls</button><button class="btn danger" id="clearBtn">Clear chat</button></div>
@@ -345,7 +364,7 @@ function renderChar(){$("#kw").innerHTML=S.persona==="paw"?TAW_SVG:KYI_SVG}
 function paint(){$("#ck").setAttribute("class","px p-"+S.persona+" st-"+pst+" mood-"+mood);const wv=document.getElementById("waves");if(wv)wv.style.opacity=pst==="listen"?"1":"0";$("#cloud").classList.toggle("show",pst==="think");$("#whoName").textContent=NAMES[S.persona];const rb=$("#roastBtn");if(rb)rb.textContent=S.persona==="paw"?"Village":"Roast me";$("#who").classList.toggle("paw",S.persona==="paw")}
 function setState(s){pst=s;paint()}
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-async function switchTo(p){if(p!=="paw")p="kyi";if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood="smirk";saveS();renderChar();paint();await wait(300);k.classList.remove("swap")}
+async function switchTo(p){if(p!=="paw")p="kyi";if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood="smirk";saveS();renderChar();paint();$("#bub").classList.remove("show");renderHist();await wait(300);k.classList.remove("swap")}
 
 /* ----- helpers ----- */
 let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),3200)}
@@ -366,7 +385,7 @@ const sfx={puff(){noise(.7,"lowpass",900,300,.25)},slap(){noise(.07,"highpass",2
 const ACC={uncle:{l:"Deep English (default)",re:/^en/i},zh:{l:"Chinese accent",re:/^(zh|yue|cmn)/i},vi:{l:"Vietnamese accent",re:/^vi/i},sg:{l:"Singaporean English",re:/^en[-_]SG/i},in:{l:"Indian English",re:/^en[-_]IN/i},gb:{l:"British (butler)",re:/^en[-_]GB/i},au:{l:"Australian",re:/^en[-_]AU/i}};
 const synth=window.speechSynthesis;let allV=[];let unlocked=false;
 const MALE=/daniel|fred|aaron|arthur|alex|male|gordon|rishi|ralph|guy|david|mark|james|tom|george|lee|nam/i;
-const QV=v=>(/premium/i.test(v.name+" "+v.voiceURI)?4:/enhanced/i.test(v.name+" "+v.voiceURI)?3:0)+(MALE.test(v.name)?1:0);
+const QV=v=>(v.localService===false?-10:0)+(/premium/i.test(v.name+" "+v.voiceURI)?4:/enhanced/i.test(v.name+" "+v.voiceURI)?3:0)+(MALE.test(v.name)?1:0);
 function vFor(acc){const re=(ACC[acc]||ACC.uncle).re;return allV.filter(v=>re.test(v.lang)).sort((a,b)=>QV(b)-QV(a))}
 function pickVoice(vo){if(!allV.length&&synth)allV=synth.getVoices();
   const saved=vo.voice&&allV.find(v=>v.voiceURI===vo.voice||v.name===vo.voice);if(saved)return saved;
@@ -379,7 +398,7 @@ function unlock(){if(unlocked||!synth)return;try{const u=new SpeechSynthesisUtte
 document.addEventListener("touchend",unlock,{once:false,passive:true});document.addEventListener("click",unlock);
 let typeT=null;
 function bubble(text,{my=false,glitch=false,ms}={}){clearTimeout(hideLater.t);const b=$("#bub");clearInterval(typeT);b.className="show"+(S.persona==="paw"?" paw":"")+(my?" my":"")+(glitch?" glitch":"");b.textContent="";const c=[...text];let i=0;const step=Math.max(14,Math.min(70,(ms||c.length*55)/Math.max(c.length,1)));typeT=setInterval(()=>{i++;b.textContent=c.slice(0,i).join("");fitBubble();if(i>=c.length)clearInterval(typeT)},step)}
-function hideLater(){clearTimeout(hideLater.t);hideLater.t=setTimeout(function h(){if(busy||(synth&&synth.speaking)||pst==="talk"){hideLater.t=setTimeout(h,1500);return}$("#bub").classList.remove("show")},20000)}
+function hideLater(){clearTimeout(hideLater.t);hideLater.t=setTimeout(function h(){if(busy||(synth&&synth.speaking)||pst==="talk"){hideLater.t=setTimeout(h,1500);return}$("#bub").classList.remove("show");$("#scene").classList.remove("bubon");if(threadOn())renderHist()},threadOn()?6000:20000)}
 function speak(text,lang){return new Promise(res=>{
   if(!synth){res(false);return}
   synth.cancel();const u=new SpeechSynthesisUtterance(text.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));const vo=S.vo[S.persona];
@@ -576,7 +595,23 @@ function makeSpeaker(){
       if(!synth)return;const u=new SpeechSynthesisUtterance(t.replace(/SPEAK PROPER ENGLISH!/,"Speak proper English!"));if(v){u.voice=v;u.lang=v.lang}u.pitch=vo.pitch;u.rate=vo.rate;u.onend=f;u.onerror=f;synth.speak(u)},
     finish(){finished=true;check();return done.then(()=>new Promise(r=>{const t0=Date.now();(function poll(){if(!synth||!synth.speaking||Date.now()-t0>60000)return r();setTimeout(poll,250)})()}))}};
 }
-function fitBubble(){const b=$("#bub");b.style.fontSize="";let fs=parseFloat(getComputedStyle(b).fontSize)||20;
+function threadOn(){return S.thread!==false}
+function histItem(x,withReply){const f=document.createDocumentFragment();
+  const u=document.createElement("div");u.className="hu";u.textContent=x.user;if(MY.test(x.user))u.classList.add("my");f.appendChild(u);
+  if(withReply&&x.english){const k=document.createElement("div");k.className="hk"+((x.p||"kyi")==="paw"?" paw":"");const lines=x.burmese?String(x.burmese).split("\n"):[];
+    splitSent(x.english).forEach((t,i)=>{const e=document.createElement("span");e.className="en";e.textContent=t;k.appendChild(e);if(lines[i]&&S.burmese){const m=document.createElement("span");m.className="mm";m.textContent=lines[i];k.appendChild(m)}});f.appendChild(k)}
+  return f}
+function renderHist(opt){opt=opt||{};const h=$("#hist"),th=$("#thread");if(!h)return;
+  th.classList.toggle("solo",!threadOn());$("#scene").classList.toggle("solo",!threadOn());h.innerHTML="";
+  if(threadOn()){const mine=log.filter(x=>(x.p||"kyi")===S.persona).slice(-30);
+    mine.forEach((x,i)=>h.appendChild(histItem(x,!(opt.skipLastReply&&i===mine.length-1))));
+    if(opt.pending){const u=document.createElement("div");u.className="hu";u.textContent=opt.pending;h.appendChild(u)}}
+  toBottom(true)}
+let follow=true;
+function nearBottom(){const th=$("#thread");return th.scrollHeight-th.scrollTop-th.clientHeight<60}
+function toBottom(force){const th=$("#thread");if(!th)return;if(force)follow=true;if(follow)th.scrollTop=th.scrollHeight;updJump()}
+function updJump(){const j=$("#jump");if(j)j.hidden=!threadOn()||nearBottom()}
+function fitBubble(){if(threadOn()){$("#bub").style.fontSize="";$("#scene").classList.add("bubon");toBottom(false);return}$("#scene").classList.add("bubon");const b=$("#bub");b.style.fontSize="";let fs=parseFloat(getComputedStyle(b).fontSize)||20;
   while(b.scrollHeight>b.clientHeight+1&&fs>13){fs-=1;b.style.fontSize=fs+"px"}b.scrollTop=b.scrollHeight}
 function clean(t){return String(t).replace(/,?\s*\b(?:ba\s*le|ka-?\s*le|lar)\b([?!.,]?)/gi,(m,p)=>p==="?"||p==="!"||p==="."?".":"").replace(/\s+([?!.,])/g,"$1").replace(/([.!?])\1+/g,"$1").replace(/([.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/^\.\s*/,"").replace(/\s{2,}/g," ").trim()}
 function splitSent(t){return (String(t).match(/[^.!?…]+[.!?…]+["')]*|[^.!?…]+$/g)||[t]).map(x=>x.trim()).filter(Boolean)}
@@ -594,7 +629,8 @@ async function send(text,{label}={}){
   let sfxDone=false;
   const acc=S.vo[p].accent;if(!vFor(acc).length&&!accentWarned[acc]){accentWarned[acc]=true;toast(`No ${(ACC[acc]||{}).l||acc} voice installed yet, so using a standard one. Download it in iPhone Settings → Voices.`)}
   setState("think");sfx.puff();
-  const msgs=[];log.slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
+  clearTimeout(hideLater.t);$("#bub").classList.remove("show");renderHist({pending:label||text});
+  const msgs=[];log.filter(x=>(x.p||"kyi")===p).slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
   msgs.push({role:"user",content:(p==="paw"?"[to Thamein Paw Taw] ":"[to Uncle Paw Taw] ")+text});
   const sp=azMy?{push(t){if(t===SHOUT&&synth){const u=new SpeechSynthesisUtterance("Speak proper English! You dumb idiot!");const v=pickVoice(S.vo[S.persona]);if(v){u.voice=v;u.lang=v.lang}synth.speak(u)}},finish(){return Promise.resolve()}}:makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
   const onText=full=>{
@@ -629,7 +665,7 @@ async function send(text,{label}={}){
     if(azMy&&blines.length<splitSent(enFinal).length){try{const t=await claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script) in the voice of a condescending robot uncle. Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(splitSent(enFinal))}],2500);const mm=t.match(/\[[\s\S]*\]/);if(mm)blines=JSON.parse(mm[0]).map(String)}catch(e){}}
     if(blines.length)pairBubble(enFinal,blines,glitch);
     if(azMy&&blines.length){setState("talk");try{await azSpeak(blines,mood)}catch(e){toast(azErr(e))}}
-    log.push({user:label||text,p,mood,english:enFinal,burmese:blines.length?blines.join("\n"):(o.burmese?String(o.burmese):""),at:Date.now()});saveLog();
+    log.push({user:label||text,p,mood,english:enFinal,burmese:blines.length?blines.join("\n"):(o.burmese?String(o.burmese):""),at:Date.now()});saveLog();renderHist({skipLastReply:true});
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
     await sp.finish();
     if(p==="paw"&&o.cameo){const c=String(o.cameo).trim();if(c){await wait(400);setState("talk");bubble("Uncle Paw Taw (from the future): "+c);await speakAs(c,"kyi");setState("idle")}}
@@ -845,7 +881,7 @@ function fillVoice(){const vo=S.vo[vp];const a=$("#sAccent");a.innerHTML="";Obje
   const h=$("#vNow");if(h)h.textContent=cur?"Now using: "+cur.name+" ("+cur.lang+")":"No voices found yet. Reopen Settings in a moment.";
   $("#sPitch").value=vo.pitch;$("#sRate").value=vo.rate;$("#pitchV").textContent=Number(vo.pitch).toFixed(1);$("#rateV").textContent=Number(vo.rate).toFixed(2);
   document.querySelectorAll("#vSeg button").forEach(b=>b.classList.toggle("on",b.dataset.p===vp))}
-function fillSettings(){$("#sChar").value=S.persona;$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
+function fillSettings(){$("#sChar").value=S.persona;$("#sThread").checked=threadOn();$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
 document.querySelectorAll("#vSeg button").forEach(b=>b.onclick=()=>{vp=b.dataset.p;fillVoice()});
 $("#sChar").onchange=e=>{closeDrawers();switchTo(e.target.value)};
 $("#sName").oninput=e=>{S.name=e.target.value.trim()||"Jamie";saveS()};
@@ -871,9 +907,11 @@ function fillAzure(){}
 $("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese subtitles on":"Burmese subtitles off")};
 $("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
 $("#sSfx").onchange=e=>{S.sfx=e.target.checked;saveS()};
+$("#sThread").onchange=e=>{S.thread=e.target.checked;saveS();renderHist();toast(S.thread?"Chat history on screen":"Only the latest reply (good for recording)")};
+$("#thread").addEventListener("scroll",()=>{follow=nearBottom();updJump()});$("#jump").onclick=()=>{follow=true;const th=$("#thread");th.scrollTo({top:th.scrollHeight,behavior:"smooth"})};
 $("#sGlitch").onchange=e=>{S.glitch=e.target.checked;saveS()};
 $("#gReset").onclick=()=>{S.shouted=false;saveS();toast("Armed. Your next Burmese line gets the shout.")};
-$("#clearBtn").onclick=()=>{if(confirm("Clear the chat log? The memory shelf stays.")){log=[];saveLog();renderLog();toast("Cleared")}};
+$("#clearBtn").onclick=()=>{if(confirm("Clear the chat log? The memory shelf stays.")){log=[];saveLog();renderLog();renderHist();toast("Cleared")}};
 $("#hideBtn").onclick=()=>{closeDrawers();document.body.classList.add("clean");toast("Double-tap the top of the screen to bring controls back")};
 let lastTap=0;$("#stage").addEventListener("click",e=>{if(!document.body.classList.contains("clean"))return;const r=$("#stage").getBoundingClientRect();if(e.clientY-r.top>r.height*0.2)return;const n=Date.now();if(n-lastTap<400)document.body.classList.remove("clean");lastTap=n});
 $("#sModel").onchange=e=>{S.model=e.target.value;saveS();toast("Brain switched")};
@@ -885,7 +923,7 @@ function applyBg(){document.body.style.setProperty("--bgc",S.bg)}
 
 /* ----- start ----- */
 if(air&&S.persona!==air.persona){S.persona=air.persona;mood="smirk";saveS()}
-applyBg();renderChar();paint();updConv();showDisc();updCue();
+applyBg();renderChar();paint();renderHist();updConv();showDisc();updCue();
 if(!KEY)$("#setup").classList.add("show");
 else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{if(busy||pst!=="idle"||log.length&&Date.now()-log[log.length-1].at<5000)return;bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
 </script>
