@@ -197,17 +197,52 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 .dots circle{animation:dd 1.2s infinite}.dots circle:nth-child(2){animation-delay:.2s}.dots circle:nth-child(3){animation-delay:.4s}
 @keyframes dd{0%,100%{opacity:.25}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){#ck.px *,#ck *,.dots circle,#kw.swap,#mic.on,#shout.show div{animation:none!important}}
+
+/* v3.5 podcast + showdown */
+#kw2{position:absolute;left:25%;bottom:3%;width:24%;max-height:84%;aspect-ratio:160/240;display:none}
+#scene.duo #kw{width:24%;left:1%}
+#scene.duo #kw2{display:block}
+#kw2 svg{width:100%;height:100%;display:block}
+#kw,#kw2{transition:opacity .2s}
+#kw.quiet,#kw2.quiet{opacity:.72}
+#ck2{shape-rendering:crispEdges}
+#ck2.st-idle .whole,#ck2.st-listen .whole{animation:pbob 1.1s steps(2) infinite}
+#ck2.st-talk .whole{animation:pbob .36s steps(2) infinite}
+#ck2.st-think .whole{animation:none}
+#ck2 .eyes{animation:pblink 3.6s steps(1) infinite}
+#ck2 .m{display:none}
+#ck2.mood-smirk .m-smirk,#ck2.mood-sideeye .m-sideeye,#ck2.mood-proud .m-proud,#ck2.mood-glitch .m-glitch,#ck2.mood-shock .m-shock{display:inline}
+#ck2 .waves2{opacity:0}
+.hk .nm{display:block;font-size:10px;letter-spacing:.07em;font-weight:900;opacity:.55;margin-bottom:1px}
+#podBar,#vBar{flex:none;display:flex;align-items:center;gap:8px;background:var(--ui);border-bottom:1px solid var(--line);padding:6px 12px;font-size:13px;color:var(--ink)}
+#podBar[hidden],#vBar[hidden]{display:none}
+#podBar span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+#podBar button{border:none;background:#C0352B;color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+#vBar{flex-wrap:wrap;border:2px dashed #ff7a3d;border-radius:12px;margin:6px 10px;padding:8px 10px}
+#vBar b{width:100%;font-size:13px}
+#vBar button{flex:1;min-width:80px;border:none;border-radius:10px;padding:9px 6px;font-weight:800;font-size:13px;background:var(--gold);color:#1d1530}
+body.clean #podBar{display:none}
+.pact{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pact .idea{margin:0}.pact .idea.off{opacity:.45}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.pchips button{border:1px solid var(--line);background:var(--ui2);color:var(--ink);border-radius:999px;padding:6px 10px;font-size:13px}
+#jList details{border-top:1px solid var(--line);padding:6px 0}#jList summary{font-size:14px;cursor:pointer}
+.jbl{font-size:13px;display:flex;gap:6px;align-items:flex-start;margin:5px 0 5px 4px;line-height:1.4}
+.jbl b{cursor:pointer;flex:none;font-weight:400}.jbl span{flex:1}.jbl small{color:var(--muted)}
+.jbl i{font-style:normal;background:#5f8f4e;color:#fff;font-size:10px;font-weight:800;padding:1px 5px;border-radius:5px;flex:none;margin-top:2px}
 </style>
 </head>
 <body>
 <div id="top">
   <button id="who" aria-label="Switch persona"><span id="whoName">Uncle Paw Taw</span><span class="sw">switch</span></button>
   <span id="spacer"></span><div id="timers"></div>
+  <button class="tb" data-d="pod" aria-label="Podcast">🎙</button>
   <button class="tb" data-d="log">Log</button>
   <button class="tb" data-d="teach">Topics</button>
   <button class="tb" data-d="settings">⚙︎</button>
 </div>
 
+<div id="podBar" hidden><span id="podTitle"></span><button id="podEnd">End showdown</button></div>
+<div id="vBar" hidden><b id="vAsk">Pick a side. You can also say it out loud.</b><button data-v="kyi">Side with Uncle</button><button data-v="paw">Side with Taw Thar</button><button data-v="neutral">Stay neutral 🫣</button></div>
 <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
 <div id="stage">
   <div id="scene"><div id="thread"><div id="hist"></div><div id="bub"></div></div><div id="btail"></div><button id="jump" hidden>↓ Latest</button>
@@ -242,7 +277,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 <g class="m m-glitch" stroke="#ff5a4e" stroke-width="3.5"><path d="M128 163 L146 179M146 163 L128 179M164 163 L182 179M182 163 L164 179"/><path class="mouth" d="M134 195 L142 189 L150 195 L158 189 L166 195 L174 189" stroke-width="3"/></g>
 <g class="m m-silly" stroke="none"><circle cx="136" cy="171" r="13" fill="#7fe3c4"/><circle cx="141" cy="176" r="4.5" fill="#1f2a36"/><circle cx="177" cy="168" r="7" fill="#7fe3c4"/><circle cx="174" cy="165" r="2.5" fill="#1f2a36"/><g class="mouth"><path d="M132 189 Q155 205 180 187" stroke="#7fe3c4" stroke-width="3" fill="none"/><ellipse cx="164" cy="199" rx="6" ry="5" fill="#f28b9b"/></g></g>
 <g class="kyi-only"><path d="M170 186 L222 194 L220 204 L169 195Z" fill="#8b5a2b"/><circle id="ember" cx="222" cy="199" r="5" fill="#e4572e" stroke-width="1.5"/><g id="smoke" stroke="#9aa8b5"><path d="M228 192 Q240 178 230 164 Q220 150 236 136" stroke-width="2.5"/><path d="M240 196 Q252 186 246 174"/></g></g>
-</g></g></svg></div></div>
+</g></g></svg></div><div id="kw2"></div></div>
   <div id="heard"></div>
   <div id="shout"><div>SPEAK PROPER<br>ENGLISH!</div></div>
 </div>
@@ -257,6 +292,24 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 </div>
 
 <div id="scrim"></div>
+<aside class="drawer" id="d-pod"><div class="dh"><h2>🎙 Podcast</h2><button class="btn" data-close>Done</button></div><div class="db">
+  <span class="lbl">Tonight's guest</span>
+  <div class="seg" id="pGuest"><button data-g="kyi">Uncle Paw Taw</button><button data-g="paw">Taw Thar</button><button data-g="both">⚔️ Both</button></div>
+  <div class="f"><label for="pShow">Show name</label><input type="text" id="pShow" maxlength="60"></div>
+  <div class="f"><label for="pTopic">Tonight's story or topic</label><input type="text" id="pTopic" maxlength="200" placeholder="e.g. the haunted rest house on the Mandalay road"></div>
+  <div class="pact">
+    <button class="idea" id="pIntro"><b>🎬 Intro</b><span>Opens the show and introduces you</span></button>
+    <button class="idea" id="pRoast"><b>🔥 Roast the audience</b><span>Friendly jabs at your listeners</span></button>
+    <button class="idea" id="pArgue"><b>⚔️ Start an argument</b><span>Both only. Then you pick a side</span></button>
+    <button class="idea" id="pOutro"><b>👋 Outro</b><span>Signs off the episode</span></button>
+  </div>
+  <hr class="sep"><span class="lbl">Comedy pack · tap a topic for a quick bit</span>
+  <div class="pchips" id="pChips"></div>
+  <hr class="sep"><span class="lbl">Joke bank</span><p class="hint" id="jStat"></p>
+  <div class="row" style="margin-top:6px"><button class="btn" id="jRefresh">🔄 Refresh pack</button></div>
+  <p class="hint">Refresh adds new jokes and never deletes old ones. It also refreshes by itself about once a week. Tap ☆ to make a joke come up more often. Jokes that fit what you're talking about also rotate into normal chat.</p>
+  <div id="jList"></div>
+</div></aside>
 <aside class="drawer" id="d-village"><div class="dh"><h2>Taw Thar's village</h2><button class="btn" data-close>Done</button></div><div class="db">
   <button class="idea" id="vWis"><b>Village wisdom</b><span>A made-up Grandma proverb, plus one real tip</span></button>
   <button class="idea" id="vQuiz"><b>Would you survive my village?</b><span>3-question quiz, then he roasts your score</span></button>
@@ -275,8 +328,9 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.4</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.5</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
+  <div class="f"><label for="sSass">Sass level</label><select id="sSass"><option value="mild">Mild (guest-friendly)</option><option value="spicy">Spicy (default)</option><option value="savage">Savage</option></select><p class="hint">Spicy and Savage can call you "idiot" or "dumb boy" for truly dumb questions. Audience roasts in Podcast mode always stay friendly.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option></select></div>
   <div class="f"><label for="sWkyi">Wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
@@ -334,12 +388,13 @@ if(S.persona!=="kyi"&&S.persona!=="paw")S.persona="kyi";S.micLang="en-US";
 if(!S.v25){S.v25=true;S.vo.paw={accent:"in",voice:"",pitch:1.15,rate:1.05};S.wakes.paw=WK.paw.slice();if(!S.wakes.kyi||!S.wakes.kyi.length)S.wakes.kyi=WK.kyi.slice();try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v15){S.v15=true;S.burmese=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v14){S.v14=true;S.conv=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
+if(!S.sass)S.sass="spicy";if(!S.pod)S.pod={guest:"kyi",show:"The Jamie Files",topic:""};
 let KEY=st.get("key","");let log=st.get("log",[]);let shelf=st.get("shelf",[]);
 const saveS=()=>st.set("settings",S),saveLog=()=>st.set("log",log.slice(-60)),saveShelf=()=>st.set("shelf",shelf);
 const NAMES={kyi:"Uncle Paw Taw",paw:"Taw Thar"};
 
 /* ----- character ----- */
-let pst="idle",mood="smirk";
+let pst="idle",mood="smirk",duo=null;
 const PXP={K:'#0d0d0f',H:'#27272d',h:'#4b4b57',s:'#f2d9c6',p:'#e8aaa4',N:'#e3a08a',W:'#f7f7f4',O:'#6b7f5a',B:'#3b5ba5',r:'#e4572e',M:'#2b211c',C:'#8b5a2b',F:'#ff7a3d',T:'#7FA36B',Y:'#E7CF97',U:'#f4efe3',u:'#c94f4f',L:'#8a5a3c',l:'#c98a5a'};
 const PX_UNCLE=["...KKKKKKKK...",".KKsssHHHHKK..","KssHHHHHHHHssK","KHHHHHHHHssssK","KHsssssssssHHK","KHssssssssssHK","KssKKssssKKssK","KssssssssssssK","KspssssNssspsK",".KsssMMMMsssK.","..KKsssKCCCCCF",".KsWWssssWWsK.","KsKWWWWWWWWKsK","KsKWWWWWWWWKsK","KsKWWWWWWWWKsK",".KKOOOOOOOOKK.","..KOOKKKKOOK..","..KssK..KssK..","..KrBK..KBrK..","...KK....KK..."];
 const PX_TAW=["..K.KK.KK.K...",".KKHHHHHHHHKK.","KHHHHhHHHhHHHK","KHhHHHHHHHHhHK","KHHHHHHHHHHHHK","KHssssssssssHK","KssssssssssssK","KssssssssssssK","KYYssssNsssYYK",".KssssssssssK.","..KKssssssKK..",".KUTTTTTTTTUK.","KUTTTTTTTTTTTK","KuKTTTTTTTTKsK","KsKLLLLLLLLKsK",".KKLlLLlLLlKK.","..KLLLLLLLLK..","..KssK..KssK..","..KrrK..KrrK..","...KK....KK..."];
@@ -361,8 +416,12 @@ function pxSVG(map,label,face,extra,smoke){let base="";
   return `<svg id="ck" class="px" viewBox="0 -20 160 240" preserveAspectRatio="xMidYMax meet" role="img" aria-label="${label}">${base}<g id="whole">${body}${pxFaces.apply(null,face)}${sm}${waves}</g></svg>`}
 const KYI_SVG=pxSVG(PX_UNCLE,"Uncle Paw Taw",[7,1,10,5],[],true);
 const TAW_SVG=pxSVG(PX_TAW,"Taw Thar",[6,2,9,7],[[14,11,PXP.C],[15,11,PXP.C],[14,12,PXP.C],[14,13,PXP.C],[15,10,PXP.C],[13,10,PXP.C]],false);
-function renderChar(){$("#kw").innerHTML=S.persona==="paw"?TAW_SVG:KYI_SVG}
-function paint(){$("#ck").setAttribute("class","px p-"+S.persona+" st-"+pst+" mood-"+mood);const wv=document.getElementById("waves");if(wv)wv.style.opacity=pst==="listen"?"1":"0";$("#cloud").classList.toggle("show",pst==="think");$("#whoName").textContent=NAMES[S.persona];const rb=$("#roastBtn");if(rb)rb.textContent=S.persona==="paw"?"Village":"Roast me";$("#who").classList.toggle("paw",S.persona==="paw")}
+const TAW2=TAW_SVG.replace('id="ck"','id="ck2"').replace('id="whole"','class="whole"').replace('id="waves"','class="waves2"');
+function renderChar(){if(duo){$("#kw").innerHTML=KYI_SVG;$("#kw2").innerHTML=TAW2;return}$("#kw").innerHTML=S.persona==="paw"?TAW_SVG:KYI_SVG;const k2=$("#kw2");if(k2)k2.innerHTML=""}
+function paint(){if(duo){const act=duo.speaker||S.persona,cl=w=>" st-"+(w===act?pst:(pst==="think"?"think":"idle"))+" mood-"+(w===act?mood:"smirk");
+  $("#ck").setAttribute("class","px p-kyi"+cl("kyi"));const c2=document.getElementById("ck2");if(c2)c2.setAttribute("class","px2 p-paw"+cl("paw"));
+  $("#kw").classList.toggle("quiet",pst==="talk"&&act!=="kyi");$("#kw2").classList.toggle("quiet",pst==="talk"&&act!=="paw")}
+ else{$("#ck").setAttribute("class","px p-"+S.persona+" st-"+pst+" mood-"+mood);$("#kw").classList.remove("quiet")}const wv=document.getElementById("waves");if(wv)wv.style.opacity=pst==="listen"?"1":"0";$("#cloud").classList.toggle("show",pst==="think");$("#whoName").textContent=NAMES[S.persona];const rb=$("#roastBtn");if(rb)rb.textContent=S.persona==="paw"?"Village":"Roast me";$("#who").classList.toggle("paw",S.persona==="paw")}
 function setState(s){pst=s;paint()}
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 async function switchTo(p){if(p!=="paw")p="kyi";if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood="smirk";saveS();renderChar();paint();$("#bub").classList.remove("show");renderHist();await wait(300);k.classList.remove("swap")}
@@ -486,6 +545,7 @@ function findWake(t){const n=norm(t);let best=null;
   return best?{p:best.p,rest:n.slice(best.i+best.k.length+1).trim()}:null}
 let awaitUntil=0;
 async function route(t){
+  if(vPending&&!busy){const v=verdictFrom(t);if(v){podVerdict(v);return}}
   const w=findWake(t);
   if(air){
     if(air.cues&&air.ci<air.cues.length){heardBuf.push(...wordsOf(t));if(heardBuf.length>80)heardBuf=heardBuf.slice(-80);if(cueReached()){fireCue();return}}
@@ -533,8 +593,8 @@ const TAW_BIBLE=`CHARACTER BIBLE (stay consistent; reveal gradually, never dump 
 - Secretly homesick: soft about Mom's cooking, then quickly "Don't tell anybody."
 - Sound effects: you may set "sfx" to "rooster", "buffalo" or "horn" when it fits a village joke (about 1 reply in 4), otherwise null.`;
 const SPICE_PAW=["Work in one catchphrase naturally.","Brag about one village skill.","Quote one of Grandma's superstitions if it fits.","Mention this month's big dream.","Compare this to life in the village.","Mention your village rival with the motorbike.","Threaten to tell your mom.","Add a tiny exaggerated brag, like your fish story.","Accidentally say an Uncle Paw Taw line, then get embarrassed.","Ask how my day went, then roast the answer.","Set a village sound effect in sfx that fits the joke."];
-function system(persona,glitch){
-  const n=S.name||"Jamie",bur=!!S.burmese||myTurn;
+function system(persona,glitch,said){
+  const n=S.name||"Jamie",bur=!!S.burmese||myTurn;const jb=jbForText(String(said||"")+" "+(disc?disc.title||"":"")+" "+(air&&air.title||""),2);
   const pool=persona==="paw"?NICKS.concat(PAW_NICKS):NICKS;
   const used=log.slice(-12).map(x=>x.english||"").join(" ").toLowerCase();
   const fresh=pool.filter(k=>!used.includes(k.toLowerCase().replace(/\s*\(.*\)/,"")));
@@ -556,9 +616,11 @@ Ending: ${pickEnding()} Never end with generic filler like "What do you want to 
   return `${who}
 ${nick}
 ${style}${myTurn?` ${n} is speaking Burmese right now. Your "burmese_lines" are what you will SAY OUT LOUD in Burmese, and "english" becomes the subtitle. Write the Burmese fully in your character: a condescending know-it-all uncle, colloquial spoken Burmese, dramatic sighs like ဟာ… or အေးပါ…, patronizing "listen carefully" setups (သေချာနားထောင်), your catchphrases translated naturally, and your nickname for ${n} kept in English. Short sentences that sound good spoken.`:""}${bur?` After "english", write "burmese_lines": an array with exactly one Burmese subtitle (natural colloquial Burmese, Myanmar script) for each English sentence, in the same order. These are subtitles only; you still speak English.`:""}
-Rules: spoken reply, 1 to 3 short sentences, under 40 words (village stories and quiz questions may run up to about 90 words). Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
+Rules: spoken reply, 1 to 3 short sentences, under 40 words (village stories and quiz questions may run up to about 90 words). Tease the question or ${n}'s laziness; never insult appearance, race, religion or ethnic groups (the self-aware diaspora mix-up jokes in the comedy themes are fine); no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
 ${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"smirk" (cheeky grin), "sideeye", "proud" or "shock" (always "shock" when your sister comes up)'}.`}
-${KNOW}${shelfTxt}
+${KNOW}
+${COMEDY(n)}
+${sassLine(n)}${jb.length?`\nJoke-bank inspiration that fits this topic (rewrite in your own words, never copy, use at most one and only if it fits naturally; otherwise ignore):\n- ${jb.join("\n- ")}`:""}${shelfTxt}
 Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
 }
 function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
@@ -598,13 +660,13 @@ function makeSpeaker(){
 }
 function threadOn(){return S.thread!==false}
 function histItem(x,withReply){const f=document.createDocumentFragment();
-  const u=document.createElement("div");u.className="hu";u.textContent=x.user;if(MY.test(x.user))u.classList.add("my");f.appendChild(u);
-  if(withReply&&x.english){const k=document.createElement("div");k.className="hk"+((x.p||"kyi")==="paw"?" paw":"");const lines=x.burmese?String(x.burmese).split("\n"):[];
+  if(x.user){const u=document.createElement("div");u.className="hu";u.textContent=x.user;if(MY.test(x.user))u.classList.add("my");f.appendChild(u)}
+  if(withReply&&x.english){const k=document.createElement("div");k.className="hk"+((x.p||"kyi")==="paw"?" paw":"");const lines=x.burmese?String(x.burmese).split("\n"):[];if(x.pod||duo){const nm=document.createElement("span");nm.className="nm";nm.textContent=NAMES[x.p||"kyi"].toUpperCase();k.appendChild(nm)}
     splitSent(x.english).forEach((t,i)=>{const e=document.createElement("span");e.className="en";e.textContent=t;k.appendChild(e);if(lines[i]&&S.burmese){const m=document.createElement("span");m.className="mm";m.textContent=lines[i];k.appendChild(m)}});f.appendChild(k)}
   return f}
 function renderHist(opt){opt=opt||{};const h=$("#hist"),th=$("#thread");if(!h)return;
   th.classList.toggle("solo",!threadOn());$("#scene").classList.toggle("solo",!threadOn());h.innerHTML="";
-  if(threadOn()){const mine=log.filter(x=>(x.p||"kyi")===S.persona).slice(-30);
+  if(threadOn()){const mine=log.filter(x=>duo||(x.p||"kyi")===S.persona).slice(-30);
     mine.forEach((x,i)=>h.appendChild(histItem(x,!(opt.skipLastReply&&i===mine.length-1))));
     if(opt.pending){const u=document.createElement("div");u.className="hu";u.textContent=opt.pending;h.appendChild(u)}}
   toBottom(true)}
@@ -631,8 +693,8 @@ async function send(text,{label}={}){
   const acc=S.vo[p].accent;if(!vFor(acc).length&&!accentWarned[acc]){accentWarned[acc]=true;toast(`No ${(ACC[acc]||{}).l||acc} voice installed yet, so using a standard one. Download it in iPhone Settings → Voices.`)}
   setState("think");sfx.puff();
   clearTimeout(hideLater.t);$("#bub").classList.remove("show");renderHist({pending:label||text});
-  const msgs=[];log.filter(x=>(x.p||"kyi")===p).slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
-  msgs.push({role:"user",content:(p==="paw"?"[to Thamein Paw Taw] ":"[to Uncle Paw Taw] ")+text});
+  const msgs=[];log.filter(x=>(x.p||"kyi")===p&&!x.pod&&x.user&&x.english).slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
+  msgs.push({role:"user",content:(p==="paw"?"[to Taw Thar] ":"[to Uncle Paw Taw] ")+text});
   const sp=azMy?{push(t){if(t===SHOUT&&synth){const u=new SpeechSynthesisUtterance("Speak proper English! You dumb idiot!");const v=pickVoice(S.vo[S.persona]);if(v){u.voice=v;u.lang=v.lang}synth.speak(u)}},finish(){return Promise.resolve()}}:makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
   const onText=full=>{
     if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];const ok=p==="paw"?["smirk","sideeye","proud","glitch","shock"]:["smirk","sideeye","proud","glitch"];if(!ok.includes(m))m="smirk";if(sisterHit)m="shock";if(glitch)m="glitch";mood=m;paint()}}
@@ -654,14 +716,14 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch),msgs,reading?1200:(S.burmese||azMy)?2000:(disc||air?300:230),onText);
+    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch,text),msgs,reading?1200:(S.burmese||azMy)?2000:(disc||air?300:230),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
     let blines=Array.isArray(o.burmese_lines)?o.burmese_lines.map(String):[];
     if(!blines.length&&S.burmese){const bm=full.match(/"burmese_lines"\s*:\s*\[([\s\S]*)/);if(bm){const re=/"((?:[^"\\]|\\.)*)"/g;let x;while((x=re.exec(bm[1]))){try{blines.push(JSON.parse('"'+x[1]+'"'))}catch(e){}}}}
     if(S.burmese&&blines.length<splitSent(enFinal).length){const sents=splitSent(enFinal);const at=Date.now();
       claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script). Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(sents)}],2500)
-        .then(t=>{const m=t.match(/\[[\s\S]*\]/);if(!m)return;const arr=JSON.parse(m[0]).map(String);const last=log[log.length-1];if(last&&last.english===enFinal){last.burmese=arr.join("\n");saveLog()}
+        .then(t=>{const m=t.match(/\[[\s\S]*\]/);if(!m)return;const arr=JSON.parse(m[0]).filter(x=>typeof x==="string");const last=log[log.length-1];if(last&&last.english===enFinal){last.burmese=arr.join("\n");saveLog()}
           if($("#bub").classList.contains("show")&&Date.now()-at<60000)pairBubble(enFinal,arr,glitch)}).catch(()=>{})}
     if(azMy&&blines.length<splitSent(enFinal).length){try{const t=await claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script) in the voice of a condescending robot uncle. Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(splitSent(enFinal))}],2500);const mm=t.match(/\[[\s\S]*\]/);if(mm)blines=JSON.parse(mm[0]).map(String)}catch(e){}}
     if(blines.length)pairBubble(enFinal,blines,glitch);
@@ -850,7 +912,7 @@ $("#kw").addEventListener("click",()=>{if(!air||!air.cues||!air.cues.length||bus
 
 /* ----- backup ----- */
 $("#xExport").onclick=async()=>{
-  const data={app:"chat-kyi",version:1,exportedAt:new Date().toISOString(),shelf,log:$("#xLog").checked?log:[],settings:Object.assign({},S,{shouted:false})};
+  const data={app:"chat-kyi",version:1,exportedAt:new Date().toISOString(),jokes:JB,shelf,log:$("#xLog").checked?log:[],settings:Object.assign({},S,{shouted:false})};
   const name="chat-kyi-memories-"+new Date().toISOString().slice(0,10)+".json";
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   try{const f=new File([blob],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Uncle Paw Taw memories"});return}}
@@ -866,11 +928,12 @@ $("#xFile").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.targe
   shelf.sort((a,b)=>String(a.date).localeCompare(String(b.date)));saveShelf();
   let addL=0;if(Array.isArray(d.log)){const ats=new Set(log.map(x=>x.at));d.log.forEach(x=>{if(x&&x.at&&x.english&&!ats.has(x.at)){log.push(x);addL++}});log.sort((a,b)=>a.at-b.at);saveLog()}
   if(d.settings&&confirm("Also restore your name, wake names, nicknames-related settings and backgrounds from the backup?")){const k=d.settings;["name","wakes","model","glitch","bg","sfx","burmese"].forEach(x=>{if(k[x]!==undefined)S[x]=k[x]});saveS();applyBg();fillSettings()}
-  toast(`Imported ${addS} memories${addL?` and ${addL} chat lines`:""}`)};
+  let addJ=0;if(d.jokes&&d.jokes.bank){for(const k in d.jokes.bank){if(!JB.bank[k]||!Array.isArray(d.jokes.bank[k]))continue;d.jokes.bank[k].forEach(b=>{if(b&&b.t&&!JB.bank[k].some(x=>x.t===b.t)){JB.bank[k].push({t:String(b.t),u:0,f:!!b.f,n:false});addJ++}})}saveJB()}
+  toast(`Imported ${addS} memories${addL?` and ${addL} chat lines`:""}${addJ?` and ${addJ} jokes`:""}`)};
 
 /* ----- drawers ----- */
 function closeDrawers(){document.querySelectorAll(".drawer").forEach(d=>d.classList.remove("open"));$("#scrim").classList.remove("show")}
-function openDrawer(id){closeDrawers();$("#d-"+id).classList.add("open");$("#scrim").classList.add("show");if(id==="log")renderLog();if(id==="teach")renderShelf();if(id==="settings")fillSettings()}
+function openDrawer(id){closeDrawers();$("#d-"+id).classList.add("open");$("#scrim").classList.add("show");if(id==="log")renderLog();if(id==="teach")renderShelf();if(id==="settings")fillSettings();if(id==="pod")openPod()}
 document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>openDrawer(b.dataset.d));
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeDrawers);$("#scrim").onclick=closeDrawers;
 
@@ -882,7 +945,7 @@ function fillVoice(){const vo=S.vo[vp];const a=$("#sAccent");a.innerHTML="";Obje
   const h=$("#vNow");if(h)h.textContent=cur?"Now using: "+cur.name+" ("+cur.lang+")":"No voices found yet. Reopen Settings in a moment.";
   $("#sPitch").value=vo.pitch;$("#sRate").value=vo.rate;$("#pitchV").textContent=Number(vo.pitch).toFixed(1);$("#rateV").textContent=Number(vo.rate).toFixed(2);
   document.querySelectorAll("#vSeg button").forEach(b=>b.classList.toggle("on",b.dataset.p===vp))}
-function fillSettings(){$("#sChar").value=S.persona;$("#sThread").checked=threadOn();$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
+function fillSettings(){$("#sChar").value=S.persona;$("#sSass").value=S.sass||"spicy";$("#sThread").checked=threadOn();$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
 document.querySelectorAll("#vSeg button").forEach(b=>b.onclick=()=>{vp=b.dataset.p;fillVoice()});
 $("#sChar").onchange=e=>{closeDrawers();switchTo(e.target.value)};
 $("#sName").oninput=e=>{S.name=e.target.value.trim()||"Jamie";saveS()};
@@ -924,7 +987,123 @@ function applyBg(){document.body.style.setProperty("--bgc",S.bg)}
 
 /* ----- start ----- */
 if(air&&S.persona!==air.persona){S.persona=air.persona;mood="smirk";saveS()}
-applyBg();renderChar();paint();renderHist();updConv();showDisc();updCue();
+/* ===== v3.5: comedy pack, joke bank, sass, podcast mode + showdown ===== */
+const BANK={"rich": {"n": "💸 You're rich in America", "tags": "rich salary wealth america american dollar dollars broke income pay inflation economy price cost rent loan debt", "seed": ["Paycheck: the government takes a bite, the state takes a bite, rent takes the whole sandwich.", "Jamie checks his bank app with one eye closed.", "The car belongs to the bank. The student loan is his forever.", "Back home: 'You make dollars!' Yes. And I spend dollars. Faster.", "Relatives convert his salary into kyat and gasp. Nobody ever converts his rent."], "fresh": ["Back home they think his fridge is full of steak. It's full of takeout sauce packets.", "His American dream is a 2-for-1 coupon that hasn't expired yet."]}, "tax": {"n": "🧾 American taxes", "tags": "tax taxes irs paycheck april government refund deduction social security filing withholding", "seed": ["In America your paycheck is a group project, and Jamie is the only one working.", "The money goes on a world tour and comes home wearing a smaller shirt.", "They ask for more in April? That's not tax, that's my cousin!", "W-2, W-4, 1099: back home those sound like bus numbers.", "Tax software is the only thing in America that says 'great job, Jamie' and then charges him."], "fresh": ["Tax refund day: Jamie celebrates getting his own money back like he won the lottery.", "Back home, the only deduction is your auntie eating your snacks."]}, "viber": {"n": "📱 Weekly money request", "tags": "money send sending remittance transfer family request viber kyat exchange home relatives help support", "seed": ["'Small question' is never small.", "Three emergencies in one message. That is efficiency.", "In America people have subscriptions. Back home, Jamie IS the subscription.", "He put his phone on silent on Sundays. The family switched to Saturdays.", "The cousin's 'business opportunity' has been almost ready since 2017."], "fresh": ["'Are you healthy? Are you eating?' That's the warm-up. The invoice comes next.", "Jamie's phone has two scary sounds: the bank alert and the family alert."]}, "gifts": {"n": "🧳 Going home with gifts", "tags": "gift gifts travel flight airport suitcase luggage visit trip vacation shopping souvenir nike", "seed": ["One shirt and forty kilos of Centrum, Hershey's, Colgate and lotion.", "The airline lady asked if he is a pharmacy.", "Whoever doesn't get a gift will remember it at your funeral.", "The suitcase is packed like Tetris by a grandmother who has never lost a game.", "Flying back to America, the suitcase is full again: dried fish wrapped in four plastic bags and a prayer."], "fresh": ["He paid seventy dollars for an extra bag to deliver forty dollars of chocolate. Love is bad at math.", "The 'real Nike' inspection at home is stricter than customs."]}, "fb": {"n": "📸 Facebook flex photos", "tags": "facebook social media photo photos instagram tiktok influencer viral post selfie online", "seed": ["The car was a rental, the cheesecake was shared by four, Times Square was a layover.", "In America he is a CEO: Chief Exhausted Officer.", "He stood next to a Tesla for forty seconds. Facebook did the rest.", "Back home, posting from the airport means you're rich. In America, it means a six-hour delay.", "Every comment from back home: 'You look fat. Send photo of the house.'"], "fresh": ["One photo in a hotel lobby and the village thinks he owns the hotel.", "Filter on. Debt off-camera."]}, "food": {"n": "🍜 Burmese food abroad", "tags": "food restaurant mohinga ngapi cook cooking eat eating noodle noodles tip tipping menu kitchen breakfast", "seed": ["Drives two hours for one bowl of mohinga.", "Eighteen-dollar mohinga plus a 20% tip: paying for the soup AND the soup's salary.", "In the village, if you DON'T smell ngapi, we call the doctor.", "He tells Americans mohinga is fish soup for breakfast. They look at him like he confessed to a crime.", "Every Burmese restaurant in America has tea leaf salad, and every Burmese customer says 'it's okay, but my mom's is better.'"], "fresh": ["Asian grocery run: a hundred and twenty dollars, one durian and regret.", "He hides the ngapi jar from the landlord like it's contraband."]}, "aunty": {"n": "👵 Auntie interrogation", "tags": "marriage married wedding family auntie aunt weight fat dating girlfriend relatives single", "seed": ["Salary, marriage, why so fat: illegal interview questions in America, 'hello' in Burma.", "Only an auntie and the IRS care equally about your before-tax salary.", "He's in America and still not married? Did America run out of girls?", "'Married?' No. 'Girlfriend?' No. 'Salary?' Auntie, this is a funeral.", "In America you need a background check to rent an apartment. The auntie already did yours. And your father's."], "fresh": ["The auntie has a list of girls. Ranked. With photos. And a backup list.", "She says 'you got fat,' then gives you a third plate."]}, "calls": {"n": "⏰ 3 a.m. family calls", "tags": "phone call calls time zone sleep night midnight internet whatsapp video group chat", "seed": ["Ten and a half hours apart, and they still call like they share a wall.", "'It was lunchtime… for me.'", "Called eleven times. Forgot why.", "The family group chat has 87 members, and 80 only send 'Good morning' flower pictures.", "When the call connects, the first two minutes are just 'Hello? Hello? Can you hear me? HELLO?'"], "fresh": ["Video calls home: forty minutes of the ceiling fan, because grandma holds the phone wrong.", "Daylight saving changes twice a year. The 3 a.m. family calls never change."]}, "burglish": {"n": "🗣 Speaking Burglish", "tags": "language english burmese accent speak speaking word words translate translation grammar", "seed": ["'Pass the… the THING.' His grammar has no passport.", "Broken in two languages.", "'Please on the light.' Even the light didn't understand.", "He says 'open the air con' and 'close the light,' and Americans think he's casting spells.", "Back home they call him 'the American.' In America they call him 'the guy with the accent.'"], "fresh": ["He counts in Burmese, complains in English and apologizes in both.", "He ordered in English, the waiter answered in Burmese, and both felt betrayed."]}, "idmix": {"n": "🪪 \"Are you Chinese?\"", "tags": "chinese indian nepalese nepali thai filipino asian identity race ethnicity mistaken origin heritage", "seed": ["Americans guess Chinese, Thai, Filipino. He says Burmese. They say, 'Oh! Like the cat?'", "Monday he's Chinese. Tuesday he's Nepalese. Wednesday, Indian. By Friday he's just 'the Asian guy from IT.'", "At the Chinese restaurant they speak Chinese to him. At the Indian restaurant, Hindi. At the Burmese restaurant? English.", "Burma borders China, India, Thailand, Laos and Bangladesh, so Jamie looks like everybody's cousin and nobody's relative.", "'Where are you REALLY from?' He started answering, 'My mother.'"], "fresh": ["Someone wished him Happy Diwali and Happy Lunar New Year in the same week. He said thank you to both. Free holidays.", "On forms he checks 'Asian: Other.' Story of his life."]}, "where": {"n": "🗺 \"Where is Burma?\"", "tags": "burma myanmar map country where geography southeast asia bermuda", "seed": ["'Burma? Is that near Bermuda?' Same ocean of confusion.", "Myanmar or Burma? Even Burmese people pick a different one depending on which uncle is at the table.", "He shows Americans a map. Their finger goes to Cambodia, then Vietnam, then they say 'cool, cool.'", "'Is Burma small?' It's bigger than France. Suddenly they respect it.", "Autocorrect turns 'Myanmar' into 'My man.' Even the phone is confused."], "fresh": ["He says 'between India and Thailand,' and Americans nod like they know where those are.", "A coworker asked if Burma has internet. Yes. Sometimes. Like the coworker's Wi-Fi."]}, "grocery": {"n": "🛒 The Asian grocery store", "tags": "grocery store market supermarket shopping h-mart aisle rice snacks", "seed": ["The Asian grocery is the only place Jamie feels at home and spends a hundred dollars in ten minutes.", "He buys a fifty-pound bag of rice like he's preparing for war.", "Every Asian grocery has an aisle that smells like home and like a crime scene. Same aisle.", "The cashier aunties judge your vegetables harder than your own mother.", "He goes in for fish sauce and comes out with fish sauce, three snacks he can't read and a rice cooker 'just in case.'"], "fresh": ["Burmese stuff never has its own aisle. It hides between Thai and Indian, like Jamie at a party.", "He reads expiry dates like a detective. The ngapi just says 'yes.'"]}, "thingyan": {"n": "💦 Thingyan abroad", "tags": "thingyan water festival new year april celebration park", "seed": ["Back home, Thingyan is four days of water fights in brutal heat. In America it's one afternoon in a park, with a permit.", "At home they spray you with a fire hose. In America, an auntie pours water from a cup and apologizes.", "Thingyan in America: everybody shivering, smiling, saying 'this is fine.'", "Americans walking by think it's a car wash fundraiser.", "Back home, if you're not soaked, you didn't go. In America, if you're soaked, your boss asks why."], "fresh": ["The only Thingyan hose in America comes with a sign: 'Please conserve water.'", "He brought a towel, a jacket and a rain poncho. To a water festival. That's assimilation."]}, "names": {"n": "📛 Burmese names in America", "tags": "name names surname last form forms starbucks spelling passport", "seed": ["Burmese people don't have family names. American forms: 'LAST NAME REQUIRED.' The form wins every time.", "His dad, mom and brother all have different names. The bank thinks it's three strangers sharing a house.", "At Starbucks he says his real name, and they write something that looks like a Wi-Fi password.", "In Burma your name depends on the day you were born. In America it depends on the barista.", "The doctor's office called 'Mr. Aung' and three Burmese guys stood up."], "fresh": ["Customer service: 'Can you spell that again, slower?' He's been on hold since 2019.", "On forms, 'U' gets printed as his first name. The pharmacy calls him Mister U."]}, "doctor": {"n": "🩺 \"Why not be a doctor?\"", "tags": "doctor nurse engineer career job school college degree university study student", "seed": ["Burmese parents have three dream jobs for you: doctor, engineer, and 'doctor, think about it again.'", "He told his mom he works in tech. Now his job is fixing her phone.", "Every cousin back home is 'studying to become a doctor.' Some for eleven years.", "He got a degree in America. Back home they asked, 'Okay, but are you a doctor?'", "He said 'cybersecurity.' The auntie heard 'security.' Now the family thinks he guards a mall."], "fresh": ["The only acceptable career change is from engineer to doctor.", "His parents introduce him as 'almost a doctor.' He is not in medicine."]}, "work": {"n": "💼 Working two jobs", "tags": "work job jobs overtime shift boss manager warehouse office coworker vacation", "seed": ["Americans talk about work-life balance. Burmese in America have work-work balance.", "Overtime is not extra. Overtime is the plan.", "His boss told him to take a vacation. He looked at the boss like he'd said 'set money on fire.'", "The family thinks he works in an office with a view. The view is a parking lot. At 6 a.m.", "Back home they think America runs on dreams. It runs on double shifts and energy drinks."], "fresh": ["He calls his day off a 'Sunday shift with no pay.'", "A coworker said TGIF. Jamie said, 'What's F? I work Saturday.'"]}, "weather": {"n": "🥶 American winter", "tags": "snow winter cold weather ice freezing storm heat summer temperature", "seed": ["Back home, 22 degrees Celsius means everybody wears a jacket. In America it's minus ten, and Jamie walks to the mailbox in slippers.", "First snow, 200 photos. Second snow, zero photos. Third snow, he started talking to God.", "Back home, people who never saw snow think it's free shaved ice everywhere.", "Back home the auntie says 'wear a jacket' at 28 degrees. Here it's minus fifteen and nobody tells him. He misses that.", "Americans shovel snow. Burmese shovel snow while calculating how fast they can move to California."], "fresh": ["His car needs twenty minutes to warm up. So does he.", "Relatives asked for snow photos. He sent them. They replied, 'So beautiful, send money for jacket.'"]}, "driving": {"n": "🚗 Driving in America", "tags": "drive driving car traffic highway license road gas parking dmv ticket", "seed": ["Back home, lanes are a suggestion. In America, lanes are a religion.", "At home you honk to say hello. In America you honk and somebody follows you into the parking lot.", "The DMV line is the one place in America that feels exactly like home.", "Myanmar drives on the right in right-hand-drive cars. America was the first time his steering wheel and the road agreed.", "He got a seventy-five-dollar parking ticket. The family thought he bought a goat."], "fresh": ["Gas went up ten cents, so he drove fifteen minutes to save eighty cents. Burmese math.", "His GPS says 'recalculating' as often as his auntie."]}, "health": {"n": "🏥 American medical bills", "tags": "hospital health insurance medical bill ambulance pharmacy medicine sick clinic copay", "seed": ["Back home, the pharmacist is also the doctor, the nurse and your uncle's friend.", "He took one ambulance ride in America. Now he's paying it off like a car loan.", "Burmese medicine for everything: Tiger Balm. Headache? Tiger Balm. Heartbreak? Tiger Balm.", "He reads the hospital bill like a horror novel. Every page is scarier.", "Health insurance: you pay every month so they can tell you it's not covered."], "fresh": ["He doesn't go to the doctor. He calls his mom, she says drink hot water. Eighty percent success rate.", "Copay, deductible, out-of-pocket. Back home there's only 'auntie's remedy.'"]}, "thanaka": {"n": "🌼 Thanaka in America", "tags": "thanaka makeup sunscreen skin beauty face skincare", "seed": ["He wore thanaka to work once. HR asked if he was okay.", "Americans pay sixty dollars for a 'natural clay mask.' Burmese grandmas have done it free with a stone and a stick.", "Coworker: 'Is that sunscreen?' Jamie: 'Yes. Also culture. Also my mom insisted.'", "Thanaka is the original influencer skincare. No sponsorship. Just grandma.", "Kids at school asked his cousin if she lost a fight with a sandcastle."], "fresh": ["One day wellness stores will sell thanaka for ninety dollars. Remember: Burma did it first.", "He carried a thanaka log through the airport. Security looked at it like a weapon."]}, "longyi": {"n": "👘 Wearing longyi in America", "tags": "longyi clothes clothing fashion outfit skirt wear wind", "seed": ["He wore a longyi in the park. One gust of wind turned it into a parachute.", "Americans say 'nice skirt.' He says 'it's a longyi.' They say 'nice longyi skirt.'", "The longyi has no pockets, so Burmese men keep phones, keys and money in the waistband. That's engineering.", "A longyi in a New York winter isn't fashion. It's a dare.", "Back home, retying your longyi in public is normal. In America it's a call to security."], "fresh": ["Every Burmese guy owns one longyi for weddings, one for sleeping and one that's 'too nice to wear.'", "Airport security asked him to remove his belt. He said, 'It's a knot, sir.'"]}, "parents": {"n": "🧓 Burmese parents in America", "tags": "parents mom dad mother father elders household plastic bags container save", "seed": ["The butter container never has butter. It has fish curry from 2023.", "Burmese parents keep plastic bags inside a bigger plastic bag. It's a bag museum.", "Dishwasher? Drying rack. Oven? Pot cabinet.", "His mom turns off the light when you leave the room. Sometimes while you're still in it.", "A Burmese dad's favorite American store is anywhere with a sale sign."], "fresh": ["Visiting parents arrive with a suitcase of dried fish and leave with a suitcase of Costco vitamins.", "They don't say 'I love you.' They say 'did you eat?' and cut fruit for you."]}, "hollywood": {"n": "🎬 \"America like the movies\"", "tags": "movie movies hollywood tv drama show netflix k-drama famous celebrity", "seed": ["Back home they think America is like the movies: big house, pool. Jamie's apartment has a pool. In the bathroom ceiling, when it rains.", "His cousin asked if he's met a celebrity. He saw a TV weatherman once at a gas station.", "Relatives learned about America from Hollywood and K-dramas. They expect a mansion and a rich boyfriend crying in the rain.", "They think Americans eat hamburgers every day. Jamie eats rice three times a day, plus once at midnight.", "In the movies, Americans quit their jobs dramatically. Jamie checks his PTO balance and whispers 'not yet.'"], "fresh": ["He sends home a skyline photo and the family thinks he lives in that building. He lives near it. Two bus transfers away.", "Back home they think snow in America is romantic. Jamie thinks snow is a shovel and a sore back."]}, "credit": {"n": "💳 Credit score", "tags": "credit score card debt loan bank mortgage finance borrow interest", "seed": ["In America your whole life depends on a number called a credit score. Back home it depends on your mother's reputation.", "He had zero credit history. The bank looked at him like he arrived from space.", "Back home, credit is the shop owner writing your name in a notebook.", "Building credit: you borrow money you don't need to prove you can repay money you don't have.", "His credit score went up ten points. He celebrated like it was a wedding."], "fresh": ["Back home, somebody heard 'credit score' and asked who won the match.", "The card offered 29% interest. Even the moneylender back home said that's too much."]}, "costco": {"n": "🏬 Costco, the Asian community center", "tags": "costco walmart store bulk membership samples saturday", "seed": ["Costco is the real Asian community center. Every auntie in town is there Saturday morning.", "Burmese, Chinese, Vietnamese, Indian aunties: at Costco there is no difference. Everybody wants the free samples.", "He went to Costco for eggs. He came out with a kayak and a 48-pack of toilet paper.", "The Costco hot dog price never changes. It's the only thing in America that loves Jamie back.", "Back home, buying in bulk means you're rich. In America it means you're scared."], "fresh": ["Asian families go to Costco as eight people with one cart.", "The rotisserie chicken is the national bird of Asian America."]}, "spice": {"n": "🌶 Spice level", "tags": "spicy spice chili hot pepper sauce flavor curry thai", "seed": ["He orders 'Thai hot,' the waiter warns him, and he's offended.", "American 'very spicy' is Burmese baby food.", "His coworker tried his mom's chili paste. He's still in the bathroom, thinking about his life.", "Back home, if it doesn't hurt, it's not food. It's a snack.", "He carries chili flakes in his bag like Americans carry hand sanitizer."], "fresh": ["The menu said five-star spicy. He asked for six. The chef came out to meet him.", "The hot sauce said 'EXTREME.' He used it on fruit."]}};
+const COMEDY=n=>`RUNNING COMEDY THEMES (Burmese life back home vs. in America): Taw Thar speaks for the back-home view: he believes ${n} must be rich because ${n} lives in America, and he is amazed by American life. Uncle Paw Taw has lived abroad and knows the truth: taxes taken out of every paycheck (back home there's little or none), rent, bills, credit scores, overtime, and the weekly "small question" money requests from relatives. Other themes: gifts for the whole street when visiting home, Facebook flex photos, $18 mohinga plus tip, auntie interrogations, 3 a.m. calls across the time difference, Burglish, Burmese names on American forms, the Asian grocery store and Costco, American winter. Self-aware diaspora identity jokes are fine (Americans mixing up Burmese with Chinese, Indian or Nepalese people; "Where is Burma?") when aimed at the mix-up or the situation, never mocking any ethnic group, religion or nationality.`;
+function sassLine(n){const l=S.sass||"spicy";
+  return l==="mild"?`Sass level MILD: gentle, warm teasing only. No insults or name-calling. Safe for guests.`
+   :l==="savage"?`Sass level SAVAGE: brutal but affectionate roasts, maximum sarcasm. Call ${n} "idiot" or "dumb boy" when the question is dumb. Never cruel about real hardships, never slurs.`
+   :`Sass level SPICY: sharp sarcasm and playful roasts. When ${n} asks a genuinely dumb question, you may occasionally call ${n} "idiot" or "dumb boy" in an affectionate, family way.`}
+
+/* ----- joke bank: grows, never deletes, rotates by topic ----- */
+let JB=st.get("jokes",null);
+(function(){if(!JB||!JB.bank)JB={at:Date.now(),freshUsed:false,bank:{}};for(const k in BANK){if(!Array.isArray(JB.bank[k]))JB.bank[k]=BANK[k].seed.map(t=>({t,u:0,f:false,n:false}))}st.set("jokes",JB)})();
+function saveJB(){st.set("jokes",JB)}
+function jbMatch(text){const w=String(text).toLowerCase().match(/[a-z0-9'-]+/g)||[];
+  return Object.keys(BANK).map(k=>{const tg=BANK[k].tags.split(" ");return[k,w.filter(x=>tg.some(t=>x===t||x===t+"s"||x===t+"es"||x===t+"ing"||x===t+"ed")).length]}).filter(a=>a[1]>0).sort((a,b)=>b[1]-a[1])}
+let jbLast=[];
+function jbPick(keys,n){const pool=[];keys.forEach(k=>(JB.bank[k]||[]).forEach(b=>pool.push(b)));if(!pool.length)return[];
+  const sc=b=>b.u-(b.f?1.5:0)-(b.n?.6:0)+Math.random()*.6;pool.sort((a,b)=>sc(a)-sc(b));
+  let p=pool.filter(b=>!jbLast.includes(b.t)).slice(0,n);if(p.length<n)p=pool.slice(0,n);
+  jbLast=p.map(b=>b.t);p.forEach(b=>{b.u++;b.n=false});saveJB();return p.map(b=>b.t)}
+function jbForText(text,n){const m=jbMatch(text).slice(0,2).map(a=>a[0]);return m.length?jbPick(m,n):[]}
+let jbBusy=false;
+async function jbRefresh(auto){if(jbBusy)return;jbBusy=true;let add=0;const btn=$("#jRefresh");if(btn&&!auto)btn.textContent="Writing new jokes…";
+  try{
+    if(!JB.freshUsed){for(const k in BANK)BANK[k].fresh.forEach(t=>{if(!JB.bank[k].some(b=>b.t===t)){JB.bank[k].push({t,u:0,f:false,n:true});add++}});JB.freshUsed=true}
+    else{if(!KEY){const e=new Error("no key");e.code="no_key";throw e}const n=S.name||"Jamie";
+      const topics=Object.keys(BANK).map(k=>{const ex=JB.bank[k].slice().sort(()=>Math.random()-.5).slice(0,2).map(b=>b.t);return`${k} | ${BANK[k].n.replace(/^\S+\s/,"")} | e.g. ${ex.join(" / ")}`}).join("\n");
+      const raw=await claude(`You write one-liner jokes for a Burmese-American comedy podcast hosted by ${n}, with the characters Uncle Paw Taw and Taw Thar. ${COMEDY(n)} Each joke: under 25 words, plain spoken English, punchy, about ${n} or about Burmese life in America vs back home. Never copy or lightly reword the examples. Never mock any ethnic group, religion or nationality; no politics, war or real public figures. Reply with ONLY a JSON object mapping each topic key to one new joke string.`,[{role:"user",content:"Write one NEW joke per topic (key | topic | examples):\n"+topics}],3000);
+      const o=pj(raw);for(const k in o){if(!JB.bank[k])continue;const t=clean(String(o[k]||"")).trim();if(t.length<8||t.length>260)continue;if(JB.bank[k].some(b=>b.t.toLowerCase()===t.toLowerCase()))continue;JB.bank[k].push({t,u:0,f:false,n:true});add++}}
+    JB.at=Date.now();saveJB();renderJB();toast(`Joke bank refreshed: +${add} new, 0 removed`)
+  }catch(e){if(!auto)toast(errText(e))}
+  finally{jbBusy=false;if(btn)btn.textContent="🔄 Refresh pack"}}
+function renderJB(){const box=$("#jList");if(!box)return;let tot=0,nw=0;for(const k in JB.bank){tot+=JB.bank[k].length;nw+=JB.bank[k].filter(b=>b.n).length}
+  $("#jStat").textContent=`${tot} jokes across ${Object.keys(BANK).length} topics · ${nw} new · last refresh ${new Date(JB.at).toLocaleDateString()}`;
+  const open=[...box.querySelectorAll("details")].map(d=>d.open);box.innerHTML="";
+  Object.keys(BANK).forEach((k,i)=>{const d=document.createElement("details");if(open[i])d.open=true;const sm=document.createElement("summary");sm.textContent=`${BANK[k].n} (${JB.bank[k].length})`;d.appendChild(sm);
+    JB.bank[k].forEach(b=>{const r=document.createElement("div");r.className="jbl";const st_=document.createElement("b");st_.textContent=b.f?"⭐":"☆";st_.title="Favorite: comes up more often";st_.onclick=()=>{b.f=!b.f;saveJB();renderJB()};r.appendChild(st_);
+      if(b.n){const nb=document.createElement("i");nb.textContent="NEW";r.appendChild(nb)}const sp=document.createElement("span");sp.textContent=b.t+" ";const sm2=document.createElement("small");sm2.textContent=`· used ${b.u}×`;sp.appendChild(sm2);r.appendChild(sp);d.appendChild(r)});
+    box.appendChild(d)})}
+
+/* ----- podcast mode ----- */
+let vPending=false,podRecent=[];
+const PLABEL={intro:"🎙 Intro",roast:"🎙 Roast the audience",argue:"🎙 Start an argument",outro:"🎙 Outro"};
+function showPod(){const b=$("#podBar");if(!b)return;b.hidden=!duo;$("#podTitle").textContent="🎙 Showdown · "+(S.pod.show||"Podcast");$("#vAsk").textContent=`${S.name||"Jamie"}, pick a side. You can also say it out loud.`}
+function setDuo(on){if(!!on===!!duo)return;duo=on?{speaker:null}:null;$("#scene").classList.toggle("duo",!!on);renderChar();paint();renderHist();showPod()}
+function openPod(){$("#pShow").value=S.pod.show||"";$("#pTopic").value=S.pod.topic||"";
+  document.querySelectorAll("#pGuest button").forEach(b=>b.classList.toggle("on",b.dataset.g===S.pod.guest));
+  $("#pArgue").classList.toggle("off",S.pod.guest!=="both");
+  const c=$("#pChips");if(!c.children.length)Object.keys(BANK).forEach(k=>{const b=document.createElement("button");b.textContent=BANK[k].n;b.onclick=()=>podRun("bit",{k});c.appendChild(b)});
+  renderJB();if(Date.now()-(JB.at||0)>7*864e5&&(KEY||!JB.freshUsed))jbRefresh(true)}
+document.querySelectorAll("#pGuest button").forEach(b=>b.onclick=async()=>{if(busy){toast("Let them finish talking first.");return}S.pod.guest=b.dataset.g;saveS();openPod();
+  if(S.pod.guest==="both")setDuo(true);else{vPending=false;$("#vBar").hidden=true;setDuo(false);if(S.persona!==S.pod.guest)await switchTo(S.pod.guest)}});
+$("#pShow").oninput=e=>{S.pod.show=e.target.value;saveS();showPod()};
+$("#pTopic").oninput=e=>{S.pod.topic=e.target.value;saveS()};
+$("#pIntro").onclick=()=>podRun("intro");$("#pRoast").onclick=()=>podRun("roast");$("#pOutro").onclick=()=>podRun("outro");
+$("#pArgue").onclick=()=>{if(S.pod.guest!=="both"){toast("Pick ⚔️ Both as the guest to start an argument");return}podRun("argue")};
+$("#jRefresh").onclick=()=>jbRefresh(false);
+$("#podEnd").onclick=()=>{if(busy){toast("Let them finish talking first.");return}vPending=false;$("#vBar").hidden=true;S.pod.guest=S.persona;saveS();setDuo(false)};
+document.querySelectorAll("#vBar button").forEach(b=>b.onclick=()=>{unlock();podVerdict(b.dataset.v)});
+function verdictFrom(t){const x=norm(t);if(/\b(neutral|neither|nobody|no one|fifth|both of you)\b/.test(x))return"neutral";if(/\b(taw|thar|village|bro)\b/.test(x))return"paw";if(/\b(uncle|paw)\b/.test(x))return"kyi";return null}
+function podVerdict(v){if(!vPending||busy)return;vPending=false;$("#vBar").hidden=true;const n=S.name||"Jamie";
+  const said=v==="kyi"?"I'm with Uncle on this one.":v==="paw"?"Sorry Uncle, I'm with Taw Thar.":"I'm staying neutral.";
+  log.push({user:said,p:"kyi",pod:true,english:"",at:Date.now()});saveLog();podRecent.push(n+": "+said);renderHist();podRun("verdict",{v,noLabel:true})}
+function podSys(both,g){const n=S.name||"Jamie";const nk=NICKS.slice().sort(()=>Math.random()-.5).slice(0,8).join(", ");
+  const U=`UNCLE PAW TAW (who:"kyi"): a cartoon robot Burmese tea-shop uncle: comb-over, singlet, slippers, cheroot. Condescending know-it-all, patronizing and slow ("Okay. Listen carefully."), dramatic sighs, has lived abroad and knows the real truth about life in America. Secretly proud of ${n}.\n${BIBLE}`;
+  const T=`TAW THAR (who:"paw"): a cheeky village boy, ${n}'s close friend, like a brother but not related. Energetic ("Bro!", "Ayy"), quick comebacks, wide-eyed about America, speaks for the back-home view. Gets shocked and protective whenever his sister Ma Phyu comes up.\n${TAW_BIBLE}`;
+  return `You write short spoken podcast scenes for ${n}'s show, performed by animated pixel characters with text-to-speech voices.
+CAST:
+${both?U+"\n\n"+T:g==="paw"?T:U}
+${n} is the human host: never write lines for ${n}. Roast ${n} with playful Asian-American family-life nicknames (options: ${nk}).
+${COMEDY(n)}
+${sassLine(n)}
+${KNOW}
+Rules: plain spoken English with normal spelling, no Burmese filler words (no lar, ba le); use a Burmese word only when it is part of a joke. Each line is 1 or 2 short sentences, under 35 words. Audience roasts always stay friendly and safe to post, whatever the sass level. Never insult appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies, or real named politicians or public figures. Stay in character.
+Reply with ONLY JSON, no markdown: {"lines":[{"who":"kyi","mood":"smirk","text":"..."}]}  (who is "kyi" or "paw"; mood is smirk, sideeye, proud or shock)`}
+function podTask(kind,both,g,opt){const n=S.name||"Jamie",tp=(S.pod.topic||"").trim(),G=NAMES[g];
+  switch(kind){
+  case"intro":return both?`Open the episode as a Showdown: Uncle and Taw Thar fight over who gets to introduce ${n}, roast ${n} with nicknames, ${tp?"tease tonight's story":"promise tonight's story is good, allegedly"}, and finally hand it over to ${n}. 5 to 7 alternating lines.`
+    :`Open the episode. ${G} welcomes the listeners, introduces himself in one breath, introduces ${n} with a fresh roast nickname, ${tp?"teases tonight's story":"promises tonight's story is good, allegedly"}, and hands it over to ${n}. 2 to 3 lines.`;
+  case"roast":return`Roast the AUDIENCE (the people listening and watching): friendly, relatable jabs (phone on 3% battery, skipping intros, watching at 2 a.m. instead of sleeping, commenting "first", aunties, Burmese life abroad), and drag ${n} in at the end. Never mean, safe to post. ${both?"4 to 6 alternating lines.":"2 to 3 lines."}`;
+  case"argue":return`Start a heated, funny argument between Uncle Paw Taw and Taw Thar ${tp?`about tonight's story ("${tp}") or something it brings up`:"about one of the comedy themes"}. They take opposite sides: Taw Thar argues from the village and back-home view, Uncle as the know-it-all who has lived abroad. Escalate with comebacks. 6 to 8 alternating lines. In the last two lines, each of them demands that ${n} pick a side.`;
+  case"verdict":return`${n} just ${opt.v==="kyi"?"sided with Uncle Paw Taw":opt.v==="paw"?"sided with Taw Thar":"refused to pick a side"} in the argument. React: ${opt.v==="neutral"?`both call ${n} a coward, then briefly and awkwardly agree with each other for once`:`the winner gloats; the loser sulks and makes a petty threat (Taw Thar: no more updates about his sister Ma Phyu; Uncle: a long lecture, or cancelling ${n}'s tea)`}. 3 to 5 alternating lines.`;
+  case"outro":return both?`Sign off the episode as a Showdown: they keep bickering while thanking the listeners, give ${n} one last roast, and ask people to follow and comment. 4 to 5 alternating lines.`
+    :`${G} signs off the episode: thanks the listeners, one last roast of ${n}, asks people to follow and comment. 1 to 2 lines.`;
+  case"bit":return`Do a quick comedy bit about "${BANK[opt.k].n.replace(/^\S+\s/,"")}"${tp?", tying it to tonight's story only if it fits naturally":""}. ${both?"4 to 6 alternating lines: Taw Thar from the back-home view, Uncle with the real truth.":"2 to 3 lines."}`}}
+async function podRun(kind,opt={}){
+  if(busy){toast("Let them finish talking first.");return}
+  closeDrawers();unlock();const g=S.pod.guest,both=g==="both";
+  if(kind==="argue"&&!both){toast("Pick ⚔️ Both as the guest to start an argument");return}
+  if(kind==="verdict"&&!both)return;
+  if(both)setDuo(true);else{setDuo(false);if(S.persona!==g)await switchTo(g)}
+  busy=true;$("#vBar").hidden=true;mood="smirk";setState("think");sfx.puff();clearTimeout(hideLater.t);$("#bub").classList.remove("show");
+  const n=S.name||"Jamie",tp=(S.pod.topic||"").trim();
+  const keys=opt.k?[opt.k]:jbMatch(tp).slice(0,2).map(a=>a[0]);const bits=keys.length?jbPick(keys,opt.k?3:2):[];
+  const label=opt.noLabel?"":opt.k?"🎙 Bit: "+BANK[opt.k].n:PLABEL[kind];
+  if(label&&threadOn())renderHist({pending:label});
+  const user=`Show: "${S.pod.show||"the show"}". Host: ${n} (human; never write lines for ${n}). ${both?"Guests: Uncle Paw Taw AND Taw Thar together (Showdown).":"Guest: "+NAMES[g]+" only; every line is his."}${tp?` Tonight's story/topic: "${tp}".`:""}
+TASK: ${podTask(kind,both,g,opt)}
+${bits.length?`Joke-bank inspiration (rewrite in your own words, don't copy, use only what fits):\n- ${bits.join("\n- ")}\n`:""}${podRecent.length?`Already said this episode (don't repeat):\n${podRecent.slice(-10).join("\n")}`:""}`;
+  try{
+    const raw=await claude(podSys(both,g),[{role:"user",content:user}],1200);let o;try{o=pj(raw)}catch(e){const x=new Error("bad");x.code="api_error";throw x}
+    const lines=(Array.isArray(o.lines)?o.lines:[]).filter(x=>x&&x.text).slice(0,10).map(x=>({who:both?(x.who==="paw"?"paw":"kyi"):g,mood:String(x.mood||"smirk"),text:clean(String(x.text))}));
+    if(!lines.length){const x=new Error("bad");x.code="api_error";throw x}
+    await podPlay(lines,label);
+    if(kind==="argue"){vPending=true;showPod();$("#vBar").hidden=false}
+    busy=false;if(duo)duo.speaker=null;setState("idle");hideLater();if(handsFree())setTimeout(listen,500);
+  }catch(e){if(synth)synth.cancel();busy=false;if(duo)duo.speaker=null;mood="sideeye";setState("idle");renderHist();toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
+}
+async function podPlay(lines,label){if(synth)synth.cancel();
+  for(let i=0;i<lines.length;i++){const x=lines[i];
+    if(duo)duo.speaker=x.who;const ok=x.who==="paw"?["smirk","sideeye","proud","shock"]:["smirk","sideeye","proud"];mood=ok.includes(x.mood)?x.mood:"smirk";
+    if(x.who==="paw"&&/\bsister\b|ma phyu/i.test(x.text)){mood="shock";playVillage("gasp")}
+    setState("talk");log.push({user:i===0?label:"",p:x.who,english:x.text,mood,pod:true,at:Date.now()});saveLog();podRecent.push(NAMES[x.who]+": "+x.text);if(podRecent.length>30)podRecent=podRecent.slice(-30);
+    if(threadOn())renderHist();else bubble(x.text,{ms:x.text.length*62});
+    const t0=Date.now();await speakAs(x.text,x.who);const minMs=Math.min(7000,700+x.text.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
+    setState("idle");await wait(220)}}
+
+applyBg();renderChar();paint();renderHist();updConv();showDisc();updCue();showPod();
 if(!KEY)$("#setup").classList.add("show");
 else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{if(busy||pst!=="idle"||log.length&&Date.now()-log[log.length-1].at<5000)return;bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
 </script>
