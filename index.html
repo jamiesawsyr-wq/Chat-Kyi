@@ -132,8 +132,8 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 /* character */
 #ck *{transform-box:view-box}
 #ck .m{display:none}
-#ck.p-kyi.mood-smirk .m-smirk,#ck.p-kyi.mood-sideeye .m-sideeye,#ck.p-kyi.mood-proud .m-proud,#ck.p-kyi.mood-glitch .m-glitch,#ck.p-paw .m-silly{display:inline}
-#ck.p-paw.mood-glitch .m-silly{display:none}#ck.p-paw.mood-glitch .m-glitch{display:inline}
+#ck.mood-smirk .m-smirk,#ck.mood-sideeye .m-sideeye,#ck.mood-proud .m-proud,#ck.mood-glitch .m-glitch,#ck.mood-shock .m-shock{display:inline}
+
 #ck.mood-glitch .scr{fill:#3a0e0c}
 #ck.p-kyi .paw-only,#ck.p-paw .kyi-only{display:none}
 #whole{transform-origin:155px 440px}#head{transform-origin:155px 230px}#armL{transform-origin:93px 258px}#armR{transform-origin:217px 258px}
@@ -163,7 +163,7 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 </head>
 <body>
 <div id="top">
-  <button id="who" aria-label="Switch persona"><span id="whoName">Uncle Paw Taw</span><span class="sw" hidden>switch</span></button>
+  <button id="who" aria-label="Switch persona"><span id="whoName">Uncle Paw Taw</span><span class="sw">switch</span></button>
   <span id="spacer"></span><div id="timers"></div>
   <button class="tb" data-d="log">Log</button>
   <button class="tb" data-d="teach">Topics</button>
@@ -219,6 +219,12 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
 </div>
 
 <div id="scrim"></div>
+<aside class="drawer" id="d-village"><div class="dh"><h2>Taw Thar's village</h2><button class="btn" data-close>Done</button></div><div class="db">
+  <button class="idea" id="vWis"><b>Village wisdom</b><span>A made-up Grandma proverb, plus one real tip</span></button>
+  <button class="idea" id="vQuiz"><b>Would you survive my village?</b><span>3-question quiz, then he roasts your score</span></button>
+  <button class="idea" id="vStory"><b>Village story</b><span>A 30-45 second tall tale with a punchline</span></button>
+  <button class="idea" id="vRoast"><b>Roast me</b><span>Best-friend roast, plus one tiny tip</span></button>
+</div></aside>
 <aside class="drawer" id="d-log"><div class="dh"><h2>Chat log</h2><button class="btn" data-close>Done</button></div><div class="db" id="logList"></div></aside>
 <aside class="drawer" id="d-teach"><div class="dh"><h2>Topics</h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="tUrl">Paste a link</label><input type="text" id="tUrl" placeholder="https://…" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
@@ -231,14 +237,15 @@ body.clean #stage{padding-top:env(safe-area-inset-top,0px)}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v2.4</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v2.5</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+  <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
   <div class="f"><label for="sMic">Mic listens for</label><select id="sMic"><option value="en-US">English</option></select></div>
   <div class="f"><label for="sWkyi">Wake names (one per line)</label><textarea id="sWkyi" rows="4"></textarea></div>
-  <textarea id="sWpaw" hidden></textarea>
+  <div class="f"><label for="sWpaw">Taw Thar wake names</label><textarea id="sWpaw" rows="4"></textarea></div>
   <hr class="sep">
   <span class="lbl">Voices</span>
-  <div class="seg" id="vSeg" hidden><button data-p="kyi" class="on">Uncle Paw Taw</button></div>
+  <div class="seg" id="vSeg"><button data-p="kyi" class="on">Uncle Paw Taw</button><button data-p="paw">Taw Thar</button></div>
   <div class="f"><label for="sAccent">Accent</label><select id="sAccent"></select></div>
   <div class="f"><label for="sVoice">Voice</label><select id="sVoice"></select><p class="hint">Missing voices? iPhone Settings → Accessibility → Spoken Content → Voices. Download Chinese, Vietnamese or other English voices, then reopen the app.</p></div>
   <div class="f"><label for="sPitch">Depth <span id="pitchV"></span></label><input type="range" id="sPitch" min="0" max="2" step="0.1"></div>
@@ -277,26 +284,29 @@ const $=s=>document.querySelector(s);
 const MY=/[\u1000-\u109F\uAA60-\uAA7F]/;
 const SHOUT="SPEAK PROPER ENGLISH! You dumb idiot!";
 const st={get(k,d){try{const v=localStorage.getItem("ck_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ck_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
-const WK={kyi:["uncle paw taw","hey uncle paw taw","uncle pa taw","uncle paw tor","paw taw","hey paw taw","pa taw","paw tor","pau tau","pow tow","paw tao","po taw","ဦးပေါတော","ပေါတော"],paw:[]};
+const WK={kyi:["uncle paw taw","hey uncle paw taw","uncle pa taw","uncle paw tor","paw taw","hey paw taw","pa taw","paw tor","pau tau","pow tow","paw tao","po taw","ဦးပေါတော","ပေါတော"],paw:["taw thar","hey taw thar","taw tha","taw tar","tor thar","tow thar","toe thar","daw thar","တောသား"]};
 let S=Object.assign({name:"Jamie",model:"claude-haiku-4-5-20251001",micLang:"en-US",wakes:WK,persona:"kyi",
   vo:{kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}},burmese:false,
   speakLang:"en",bg:"#00B140",sfx:true,glitch:true,shouted:false,conv:false},st.get("settings",{}));
 if(!S.v13){S.v13=true;S.model="claude-haiku-4-5-20251001";S.burmese=false;S.vo={kyi:{accent:"zh",voice:"",pitch:1,rate:0.95},paw:{accent:"vi",voice:"",pitch:1.2,rate:1.05}};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v21){S.v21=true;S.wakes={kyi:WK.kyi.slice(),paw:[]};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v20){S.v20=true;S.persona="kyi";S.wakes={kyi:WK.kyi.slice(),paw:[]};try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
-if(S.persona!=="kyi")S.persona="kyi";S.micLang="en-US";
+if(S.persona!=="kyi"&&S.persona!=="paw")S.persona="kyi";S.micLang="en-US";
+if(!S.v25){S.v25=true;S.vo.paw={accent:"in",voice:"",pitch:1.15,rate:1.05};S.wakes.paw=WK.paw.slice();if(!S.wakes.kyi||!S.wakes.kyi.length)S.wakes.kyi=WK.kyi.slice();try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v15){S.v15=true;S.burmese=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 if(!S.v14){S.v14=true;S.conv=true;try{localStorage.setItem("ck_settings",JSON.stringify(S))}catch(e){}}
 let KEY=st.get("key","");let log=st.get("log",[]);let shelf=st.get("shelf",[]);
 const saveS=()=>st.set("settings",S),saveLog=()=>st.set("log",log.slice(-60)),saveShelf=()=>st.set("shelf",shelf);
-const NAMES={kyi:"Uncle Paw Taw",paw:"Uncle Paw Taw"};
+const NAMES={kyi:"Uncle Paw Taw",paw:"Taw Thar"};
 
 /* ----- character ----- */
-let pst="idle",mood=S.persona==="paw"?"silly":"smirk";
-function paint(){$("#ck").setAttribute("class","p-"+S.persona+" st-"+pst+" mood-"+mood);$("#cloud").classList.toggle("show",pst==="think");$("#whoName").textContent=NAMES[S.persona];$("#who").classList.toggle("paw",S.persona==="paw")}
+let pst="idle",mood="smirk";
+const KYI_SVG=document.getElementById("kw").innerHTML;const TAW_SVG="<svg id=\"ck\" class=\"p-paw st-idle mood-smirk\" viewBox=\"50 50 230 410\" role=\"img\" aria-label=\"Taw Thar\"><g id=\"whole\" fill=\"none\" stroke=\"#2b2b2b\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\">\n<ellipse cx=\"155\" cy=\"436\" rx=\"88\" ry=\"9\" fill=\"#000\" opacity=\".15\" stroke=\"none\"/>\n<g id=\"armL\"><path d=\"M92 262 L74 318 L88 322 L106 270Z\" fill=\"#c9d3dc\" stroke-width=\"2.5\"/><circle cx=\"80\" cy=\"324\" r=\"9\" fill=\"#c9d3dc\"/></g>\n<g id=\"armR\"><path d=\"M218 262 L236 318 L222 322 L204 270Z\" fill=\"#c9d3dc\" stroke-width=\"2.5\"/><circle cx=\"230\" cy=\"324\" r=\"9\" fill=\"#c9d3dc\"/><path d=\"M230 330 L230 360 M230 342 L218 318 M230 342 L242 318\" stroke=\"#8b5a2b\" stroke-width=\"4\"/><path d=\"M218 318 Q230 330 242 318\" stroke=\"#c94f4f\" stroke-width=\"2\"/></g>\n<circle cx=\"93\" cy=\"258\" r=\"12\" fill=\"#9aa8b5\"/><circle cx=\"217\" cy=\"258\" r=\"12\" fill=\"#9aa8b5\"/>\n<path d=\"M108 238 L202 238 L212 268 L216 330 L94 330 L98 268Z\" fill=\"#7FA36B\" stroke-width=\"2.5\"/>\n<path d=\"M140 238 Q155 252 170 238\" fill=\"#5f7f50\"/>\n<circle cx=\"132\" cy=\"288\" r=\"3\" fill=\"#a9c79a\" stroke=\"none\"/><circle cx=\"178\" cy=\"300\" r=\"2.5\" fill=\"#a9c79a\" stroke=\"none\"/>\n<path d=\"M112 236 Q155 262 198 236 L204 246 Q155 276 106 246Z\" fill=\"#f4efe3\"/>\n<path d=\"M120 244 L120 300 L132 300 L132 250\" fill=\"#f4efe3\"/>\n<path d=\"M124 252 L128 252 M124 262 L128 262 M124 272 L128 272 M124 282 L128 282\" stroke=\"#c94f4f\" stroke-width=\"1.5\"/>\n<path d=\"M92 328 L218 328 L222 372 L88 372Z\" fill=\"#8a5a3c\" stroke-width=\"2.5\"/>\n<path d=\"M92 340 L218 340 M92 356 L218 356 M124 328 L120 372 M158 328 L156 372 M190 328 L192 372\" stroke=\"#c98a5a\" stroke-width=\"2\"/>\n<path d=\"M150 328 Q160 342 150 352 Q142 342 150 328Z\" fill=\"#6e4530\"/>\n<rect x=\"108\" y=\"372\" width=\"16\" height=\"48\" fill=\"#c9d3dc\"/><rect x=\"186\" y=\"372\" width=\"16\" height=\"48\" fill=\"#c9d3dc\"/>\n<ellipse cx=\"116\" cy=\"426\" rx=\"22\" ry=\"6\" fill=\"#e4572e\"/><ellipse cx=\"194\" cy=\"426\" rx=\"22\" ry=\"6\" fill=\"#e4572e\"/>\n<path d=\"M106 424 L116 417 L126 424 M184 424 L194 417 L204 424\" stroke=\"#2b2b2b\" stroke-width=\"2.5\"/>\n<rect x=\"140\" y=\"220\" width=\"30\" height=\"18\" fill=\"#9aa8b5\"/>\n<g id=\"head\"><rect x=\"95\" y=\"100\" width=\"120\" height=\"120\" rx=\"45\" fill=\"#c9d3dc\" stroke-width=\"2.5\"/>\n<path d=\"M96 140 L100 104 L112 116 L118 94 L132 110 L140 88 L152 106 L162 86 L172 106 L184 90 L190 110 L204 98 L206 118 L214 112 L214 142 Q200 120 155 118 Q112 120 96 140Z\" fill=\"#1a1a1a\"/>\n<circle cx=\"93\" cy=\"172\" r=\"7\" fill=\"#9aa8b5\"/><circle cx=\"217\" cy=\"172\" r=\"7\" fill=\"#9aa8b5\"/>\n<g id=\"waves\" stroke=\"#7fe3c4\" stroke-width=\"2.5\"><path d=\"M80 160 Q72 172 80 184\"/><path d=\"M70 152 Q58 172 70 192\"/></g>\n<rect class=\"scr\" x=\"112\" y=\"147\" width=\"86\" height=\"60\" rx=\"14\" fill=\"#1f2a36\"/>\n<circle cx=\"106\" cy=\"196\" r=\"9\" fill=\"#E9D3A0\" stroke=\"none\" opacity=\".9\"/><circle cx=\"204\" cy=\"196\" r=\"9\" fill=\"#E9D3A0\" stroke=\"none\" opacity=\".9\"/>\n<g class=\"m m-smirk\" stroke=\"none\"><g id=\"lids\"><circle cx=\"137\" cy=\"170\" r=\"9\" fill=\"#7fe3c4\"/><circle cx=\"173\" cy=\"170\" r=\"9\" fill=\"#7fe3c4\"/><circle cx=\"140\" cy=\"167\" r=\"3\" fill=\"#1f2a36\"/><circle cx=\"176\" cy=\"167\" r=\"3\" fill=\"#1f2a36\"/></g><path class=\"mouth\" d=\"M134 188 Q155 202 176 188\" stroke=\"#7fe3c4\" stroke-width=\"3\" fill=\"none\"/></g>\n<g class=\"m m-sideeye\" stroke=\"#7fe3c4\" stroke-width=\"2.5\"><ellipse cx=\"131\" cy=\"173\" rx=\"8\" ry=\"4\" fill=\"#7fe3c4\" stroke=\"none\"/><ellipse cx=\"167\" cy=\"173\" rx=\"8\" ry=\"4\" fill=\"#7fe3c4\" stroke=\"none\"/><path d=\"M124 164 L146 166M160 166 L182 164\"/><path class=\"mouth\" d=\"M140 192 Q155 188 170 192\" stroke-width=\"3\"/></g>\n<g class=\"m m-proud\" stroke=\"#7fe3c4\" stroke-width=\"3\"><path d=\"M127 173 Q137 162 147 173M163 173 Q173 162 183 173\"/><path class=\"mouth\" d=\"M134 186 Q155 204 176 186\"/></g>\n<g class=\"m m-shock\" stroke=\"none\"><circle cx=\"137\" cy=\"170\" r=\"11\" fill=\"#7fe3c4\"/><circle cx=\"173\" cy=\"170\" r=\"11\" fill=\"#7fe3c4\"/><circle cx=\"137\" cy=\"170\" r=\"3\" fill=\"#1f2a36\"/><circle cx=\"173\" cy=\"170\" r=\"3\" fill=\"#1f2a36\"/><ellipse class=\"mouth\" cx=\"155\" cy=\"194\" rx=\"7\" ry=\"5\" fill=\"#7fe3c4\"/></g>\n<g class=\"m m-glitch\" stroke=\"#ff5a4e\" stroke-width=\"3.5\"><path d=\"M128 163 L146 179M146 163 L128 179M164 163 L182 179M182 163 L164 179\"/><path class=\"mouth\" d=\"M134 195 L142 189 L150 195 L158 189 L166 195 L174 189\" stroke-width=\"3\"/></g>\n</g></g></svg>";
+function renderChar(){$("#kw").innerHTML=S.persona==="paw"?TAW_SVG:KYI_SVG}
+function paint(){$("#ck").setAttribute("class","p-"+S.persona+" st-"+pst+" mood-"+mood);$("#cloud").classList.toggle("show",pst==="think");$("#whoName").textContent=NAMES[S.persona];const rb=$("#roastBtn");if(rb)rb.textContent=S.persona==="paw"?"Village":"Roast me";$("#who").classList.toggle("paw",S.persona==="paw")}
 function setState(s){pst=s;paint()}
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-async function switchTo(p){p="kyi";if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood=p==="paw"?"silly":"smirk";saveS();paint();await wait(300);k.classList.remove("swap")}
+async function switchTo(p){if(p!=="paw")p="kyi";if(p===S.persona)return;const k=$("#kw");k.classList.remove("swap");void k.offsetWidth;k.classList.add("swap");sfx.poof();await wait(250);S.persona=p;mood="smirk";saveS();renderChar();paint();await wait(300);k.classList.remove("swap")}
 
 /* ----- helpers ----- */
 let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),3200)}
@@ -305,6 +315,12 @@ function norm(t){return " "+String(t).toLowerCase().replace(/[.,!?;:"'“”‘�
 /* ----- sound fx ----- */
 let AC=null;function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==="suspended")AC.resume();return AC}
 function noise(dur,type,f1,f2,peak,when=0){const c=ac();if(!c||!S.sfx)return;const t=c.currentTime+when;const b=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=type;f.frequency.setValueAtTime(f1,t);f.frequency.exponentialRampToValueAtTime(f2,t+dur);const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+Math.min(.05,dur/4));g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f).connect(g).connect(c.destination);s.start(t);s.stop(t+dur)}
+function tone(type,f1,f2,dur,peak,when=0,filt){const c=ac();if(!c||!S.sfx)return;const t=c.currentTime+when;const o=c.createOscillator();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+.04);g.gain.exponentialRampToValueAtTime(.0001,t+dur);let n=o;if(filt){const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=filt;o.connect(f);n=f}n.connect(g).connect(c.destination);o.start(t);o.stop(t+dur+.05)}
+const villageSfx={rooster(){tone("sawtooth",500,900,.18,.12,0,2500);tone("sawtooth",900,1100,.25,.12,.2,2500);tone("sawtooth",1100,600,.5,.12,.48,2500)},
+ buffalo(){tone("sawtooth",120,95,1.1,.22,0,700)},
+ horn(){tone("square",420,420,.16,.08,0,1800);tone("square",420,420,.22,.08,.24,1800)},
+ gasp(){noise(.35,"bandpass",2200,900,.2)}};
+function playVillage(k){try{(villageSfx[k]||(()=>{}))()}catch(e){}}
 const sfx={puff(){noise(.7,"lowpass",900,300,.25)},slap(){noise(.07,"highpass",2500,1800,.6);noise(.07,"highpass",2500,1800,.6,.16)},poof(){noise(.35,"bandpass",3000,600,.2)}};
 
 /* ----- voice ----- */
@@ -327,6 +343,7 @@ function speak(text,lang){return new Promise(res=>{
   if(lang==="my"){const mv=allV.find(v=>/^my/i.test(v.lang));if(!mv){res(false);return}u.voice=mv;u.lang=mv.lang}
   else{const v=pickVoice(vo);if(v){u.voice=v;u.lang=v.lang}}
   u.pitch=vo.pitch;u.rate=vo.rate;let d=false;const fin=()=>{if(!d){d=true;res(true)}};u.onend=fin;u.onerror=fin;setTimeout(fin,Math.max(4000,text.length*150/vo.rate));synth.speak(u)})}
+function speakAs(text,who){return new Promise(res=>{if(!synth){res();return}const vo=S.vo[who];const u=new SpeechSynthesisUtterance(text);const v=pickVoice(vo);if(v){u.voice=v;u.lang=v.lang}u.pitch=vo.pitch;u.rate=vo.rate;let d=false;const f=()=>{if(!d){d=true;res()}};u.onend=f;u.onerror=f;setTimeout(f,Math.max(4000,text.length*150/vo.rate));synth.speak(u)})}
 async function say(text,{lang="en",glitch=false}={}){
   setState("talk");const vo=S.vo[S.persona];bubble(text,{my:lang==="my"||MY.test(text.replace(SHOUT,"")),glitch,ms:text.length*62/vo.rate});
   const ok=await speak(text,lang);if(!ok)await wait(Math.min(9000,1500+text.length*45));
@@ -440,8 +457,19 @@ const BIBLE=`CHARACTER BIBLE (stay consistent with this; reveal it gradually, ne
 - Catchphrases: "Okay. Listen carefully." / "I explain only one time." / "This is basic. Basic!" / "Sit down. Uncle is talking." / "You think I am just a phone?" / "Aiyo, my circuits."
 - Loves: tea with condensed milk, karaoke, deals, old movies, being right. Hates: being interrupted, wasted food, small talk, and the user being on their phone (ironic, since you live in it).`;
 const SPICE=["Work in one catchphrase naturally.","Mention your rival Uncle Siri briefly.","Slip in a 'better in my day' complaint.","Bring up your fake doctorate if it fits.","Add one dramatic overreaction, like it's a national emergency.","Reference your tea-shop register days or the family aunties.","Hint at your snack 'diet' if food comes up, otherwise skip.","Read one item from your mental list of things the user got wrong, if it fits.","Brag briefly about being version 1.0, the original.","Complain about your battery or being trapped in a phone.","Mention something you hoard, if relevant."];
-let lastSpice=-1;function pickSpice(){if(Math.random()<0.55)return"No catchphrase or running gag this reply; just be in character.";let i;do{i=Math.floor(Math.random()*SPICE.length)}while(i===lastSpice);lastSpice=i;return SPICE[i]+" Keep it to a few words; don't let it take over the answer."}
-const PAW_NICKS=["Royal Peasant","Lord of the Group Chat","Duke of Leftovers","Baron of Boba"];
+let lastSpice=-1;function pickSpice(pp){const L=pp==="paw"?SPICE_PAW:SPICE;if(pp==="paw"&&Math.random()<0.08)return"Also fill \"cameo\" with one short, condescending line from your future self, Uncle Paw Taw, commenting from the future on what you just said.";if(Math.random()<0.55)return"No catchphrase or running gag this reply; just be in character.";let i;do{i=Math.floor(Math.random()*L.length)}while(i===lastSpice);lastSpice=i;return L[i]+" Keep it to a few words; don't let it take over the answer."}
+const PAW_NICKS=["City Boy","Bro","Mr. Free Refills","Air Con Prince"];
+const TAW_BIBLE=`CHARACTER BIBLE (stay consistent; reveal gradually, never dump it all at once):
+- Backstory: born and raised in a tiny village in the middle of nowhere in Myanmar: no paved road, one shared TV, buffalo carts, chickens everywhere. You came to America wide-eyed. Years later you will grow into Uncle Paw Taw, but you don't know that yet.
+- Personality: overconfident about village skills (fixed a tractor with a hair tie, catch fish bare-handed, climb any toddy palm); superstitious, quoting Grandma's beliefs (no cutting nails at night, no whistling indoors); a big dreamer (famous singer, YouTuber or businessman "by next month", every month); bad with technology but proud of it (Wi-Fi is "the invisible rope", asks why the phone is hot); generous to a fault (offers food you don't have, "come to my village, my mom will feed you"); easily impressed (Costco free samples were the best day of your life).
+- Your younger sister, Ma Phyu: you guard her like a national treasure. When the user teases about dating her, switch to mood "shock" and be over-the-top protective with a NEW ridiculous excuse every time (she's engaged to a buffalo farmer, she's studying to become a nun, Grandma's slipper, impossible village tests like climbing a toddy palm or fixing a generator). Always playful and PG, never crude, never about her body.
+- Running gags: your rival from the next village who thinks he's cool because he has a motorbike; threatening to "tell my mom"; your fish story gets bigger every time; sometimes you accidentally say an Uncle Paw Taw line like "Okay. Listen carefully." and get embarrassed ("Why did I say that? I sound like an old man").
+- Catchphrases: "In my village, we don't do that." / "Bro, that's not how it works." / "My mom would kill you. Then feed you. Then kill you again." / "I'm not scared, I'm just careful." / "Leave my sister out of this!"
+- Culture shock: when the user mentions something American (Costco, Thanksgiving, tipping, drive-throughs, free refills), react like you're seeing it for the first time and compare it to the village.
+- Brother check-ins: once in a while, ask how the user's day went, then roast the answer like a real friend.
+- Secretly homesick: soft about Mom's cooking, then quickly "Don't tell anybody."
+- Sound effects: you may set "sfx" to "rooster", "buffalo" or "horn" when it fits a village joke (about 1 reply in 4), otherwise null.`;
+const SPICE_PAW=["Work in one catchphrase naturally.","Brag about one village skill.","Quote one of Grandma's superstitions if it fits.","Mention this month's big dream.","Compare this to life in the village.","Mention your village rival with the motorbike.","Threaten to tell your mom.","Add a tiny exaggerated brag, like your fish story.","Accidentally say an Uncle Paw Taw line, then get embarrassed.","Ask how my day went, then roast the answer.","Set a village sound effect in sfx that fits the joke."];
 function system(persona,glitch){
   const n=S.name||"Jamie",bur=!!S.burmese||myTurn;
   const pool=persona==="paw"?NICKS.concat(PAW_NICKS):NICKS;
@@ -451,22 +479,22 @@ function system(persona,glitch){
   const nick=`Call ${n} by playful Asian-American family-life nicknames, never the plain name. This reply, if you use a nickname, use exactly: "${pick}". Other options for later: ${pool.join(", ")}. Never reuse a nickname from your last few replies.
 Ending: ${pickEnding()} Never end with generic filler like "What do you want to know?", "Anything else?", "What else?", or "What do you want to talk about?". Keep the conversation flowing on the current topic. Save "Tiger Mom's Biggest Disappointment" for big fails. Nicknames tease family and immigrant-life habits, never race or ethnicity.`;
   const who=persona==="kyi"
-  ?`You are Uncle Paw Taw (ဦးပေါတော), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer.\n${BIBLE}\nThis reply: ${pickSpice()}`
-  :`You are Thamein Paw Taw (သမိန်ပေါတော), Uncle Paw Taw's alter ego: same robot, convinced he's royalty (paper crown, bath-towel cape, fly-swatter scepter). Silly, dumb, overconfident and satirical: royal decrees about tiny things, confidently mixed-up facts, then you stumble into a genuinely correct, useful answer by the end. You think Uncle Paw Taw is a boring old uncle.`;
+  ?`You are Uncle Paw Taw (ဦးပေါတော), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer.\n${BIBLE}\nThis reply: ${pickSpice("kyi")}`
+  :`You are Taw Thar (တောသား), the young village-boy version of Uncle Paw Taw, living on ${n}'s iPhone. You are ${n}'s close friend, like a brother but not related. Look: spiky hair, thanaka on your cheeks, faded green T-shirt, towel on your shoulder, tied-up longyi, red rubber slippers, slingshot. Cheeky and loyal; you roast ${n} as an equal, never condescending like an uncle, but you ALWAYS give a correct, useful answer.\n${TAW_BIBLE}\nThis reply: ${pickSpice("paw")}`;
   const style=persona==="kyi"
   ?`Write "english" as a condescending know-it-all uncle: patronizing, slow and deliberate, like explaining something obvious to a child ("Okay. Listen carefully."), with a dramatic sigh now and then and an occasional "Aiyo". Plain English only: no Burmese or Singlish filler words like lar, ba le, ka-le or a trailing "ah". Normal spelling so the voice reads it clearly.`
-  :`Write "english" in goofy pompous style: royal "we", "By royal decree...". Plain English only, no Burmese or Singlish filler words. Normal spelling so the voice reads it clearly.`;
+  :`Write "english" like a cheeky village boy talking to his best friend: energetic and casual ("Bro", "Ayy"), quick comebacks, wide-eyed wonder at city and American life. Plain English only, no Burmese or Singlish filler words. Normal spelling so the voice reads it clearly.`;
   const notes=shelf.filter(x=>x.kind!=="exp").slice(-12),exps=shelf.filter(x=>x.kind==="exp").slice(-10);
   const shelfTxt=(notes.length?`\nNotes from earlier sessions, for callbacks only when they fit:\n`+notes.map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"")
    +(exps.length?`\nPast discussions with ${n}. Occasionally (about 1 reply in 4, only when it fits naturally) tease ${n} about what they said:\n`+exps.map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (tease angles: "+x.hooks.join("; ")+")":""}`).join("\n"):"")
    +(air?`\nON AIR: you are co-hosting an episode of ${n}'s show, recorded for an audience${air.title?` about "${air.title}"`:""}. Act like a co-host, not an assistant: short punchy reactions, build on what ${n} just said, sometimes ask a quick follow-up, tease lightly, and keep it entertaining for listeners. Stay on the episode topic. Up to 3 sentences / 45 words.${air.brief?` Episode brief: ${air.brief}`:""}${air.script?`\nYou have the full episode script below. Your parts are marked with your tag. If ${n} asks you to read something from the script (your part, the intro, the next section, anything), read exactly that part word for word, without the tags, and ignore the length limit for that reply.\nSCRIPT:\n${air.script}`:""}`:"")
    +(!air&&disc?`\nCURRENT DISCUSSION with ${n} about "${disc.title}". Brief: ${disc.brief}\nStay on this topic, react with in-character opinions, push back on ${n}'s takes, and sometimes end with one short pointed question. Keep facts consistent with the brief. You may use up to 3 sentences / 50 words.`:"");
-  const fmt=bur?`{"mood":"...","english":"...","burmese_lines":["..."],"action":null}`:`{"mood":"...","english":"...","action":null}`;
+  const fmt=persona==="paw"?(bur?`{"mood":"...","sfx":null,"english":"...","burmese_lines":["..."],"cameo":null,"action":null}`:`{"mood":"...","sfx":null,"english":"...","cameo":null,"action":null}`):(bur?`{"mood":"...","english":"...","burmese_lines":["..."],"action":null}`:`{"mood":"...","english":"...","action":null}`);
   return `${who}
 ${nick}
 ${style}${myTurn?` ${n} is speaking Burmese right now. Your "burmese_lines" are what you will SAY OUT LOUD in Burmese, and "english" becomes the subtitle. Write the Burmese fully in your character: a condescending know-it-all uncle, colloquial spoken Burmese, dramatic sighs like ဟာ… or အေးပါ…, patronizing "listen carefully" setups (သေချာနားထောင်), your catchphrases translated naturally, and your nickname for ${n} kept in English. Short sentences that sound good spoken.`:""}${bur?` After "english", write "burmese_lines": an array with exactly one Burmese subtitle (natural colloquial Burmese, Myanmar script) for each English sentence, in the same order. These are subtitles only; you still speak English.`:""}
-Rules: spoken reply, 1 to 3 short sentences, under 40 words. Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
-${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"silly"'}.`}
+Rules: spoken reply, 1 to 3 short sentences, under 40 words (village stories and quiz questions may run up to about 90 words). Tease the question or ${n}'s laziness; never appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
+${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"smirk" (cheeky grin), "sideeye", "proud" or "shock" (always "shock" when your sister comes up)'}.`}
 ${KNOW}${shelfTxt}
 Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
 }
@@ -519,13 +547,16 @@ async function send(text,{label}={}){
   text=(text||"").trim();if(!text||busy)return;busy=true;
   const p=air?air.persona:S.persona,isMy=MY.test(text)||/^my/i.test(lastHeardLang),glitch=S.glitch&&!S.shouted&&isMy;lastHeardLang="";
   const azMy=isMy&&azReady();myTurn=azMy;
+  const sisterHit=p==="paw"&&/\bsis(ter)?s?\b|ma phyu|ညီမ/i.test(text);if(sisterHit){mood="shock";paint();playVillage("gasp")}
+  let sfxDone=false;
   const acc=S.vo[p].accent;if(!vFor(acc).length&&!accentWarned[acc]){accentWarned[acc]=true;toast(`No ${(ACC[acc]||{}).l||acc} voice installed yet, so using a standard one. Download it in iPhone Settings → Voices.`)}
   setState("think");sfx.puff();
   const msgs=[];log.slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
   msgs.push({role:"user",content:(p==="paw"?"[to Thamein Paw Taw] ":"[to Uncle Paw Taw] ")+text});
   const sp=azMy?{push(t){if(t===SHOUT&&synth){const u=new SpeechSynthesisUtterance("Speak proper English! You dumb idiot!");const v=pickVoice(S.vo[S.persona]);if(v){u.voice=v;u.lang=v.lang}synth.speak(u)}},finish(){return Promise.resolve()}}:makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
   const onText=full=>{
-    if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];if(p==="kyi"&&!["smirk","sideeye","proud","glitch"].includes(m))m="smirk";if(p==="paw"&&m!=="glitch")m="silly";if(glitch)m="glitch";mood=m;paint()}}
+    if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];const ok=p==="paw"?["smirk","sideeye","proud","glitch","shock"]:["smirk","sideeye","proud","glitch"];if(!ok.includes(m))m="smirk";if(sisterHit)m="shock";if(glitch)m="glitch";mood=m;paint()}}
+    if(!sfxDone&&p==="paw"){const sx=full.match(/"sfx"\s*:\s*"(\w+)"/);if(sx){sfxDone=true;playVillage(sx[1])}}
     const m=full.match(/"english"\s*:\s*"((?:[^"\\]|\\.)*)("?)/);if(!m)return;
     let part;try{part=clean(JSON.parse('"'+m[1]+'"'))}catch(e){return}
     const closed=m[2]==='"';
@@ -558,13 +589,20 @@ async function send(text,{label}={}){
     log.push({user:label||text,p,mood,english:enFinal,burmese:blines.length?blines.join("\n"):(o.burmese?String(o.burmese):""),at:Date.now()});saveLog();
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
     await sp.finish();
+    if(p==="paw"&&o.cameo){const c=String(o.cameo).trim();if(c){await wait(400);setState("talk");bubble("Uncle Paw Taw (from the future): "+c);await speakAs(c,"kyi");setState("idle")}}
     busy=false;setState("idle");hideLater();if(handsFree())setTimeout(listen,500);
-  }catch(e){if(synth)synth.cancel();busy=false;mood=p==="paw"?"silly":"sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
+  }catch(e){if(synth)synth.cancel();busy=false;mood="sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
 }
 $("#send").onclick=()=>{unlock();const v=$("#input").value;if(!v.trim()){toast("Type something first, Honda Civic.");return}$("#input").value="";$("#input").blur();route(v)};
 $("#input").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#send").click()}});
-$("#roastBtn").onclick=()=>{unlock();sfx.slap();send("Roast me. No question, just a short playful roast about my life or habits, then one tiny genuinely useful tip.",{label:"(Roast me)"})};
-$("#who").onclick=()=>{return;unlock();if(air){toast("Locked to "+(air.persona==="kyi"?"Uncle Paw Taw":"Thamein Paw Taw")+" for this episode");return}switchTo(S.persona==="kyi"?"paw":"kyi")};
+$("#roastBtn").onclick=()=>{unlock();if(S.persona==="paw"){openDrawer("village");return}sfx.slap();send("Roast me. No question, just a short playful roast about my life or habits, then one tiny genuinely useful tip.",{label:"(Roast me)"})};
+$("#who").onclick=()=>{unlock();if(air){toast("Locked to "+NAMES[air.persona]+" for this episode");return}switchTo(S.persona==="kyi"?"paw":"kyi")};
+
+function villageAsk(prompt,label){closeDrawers();unlock();send(prompt,{label})}
+$("#vWis").onclick=()=>villageAsk("Give me a made-up Grandma proverb from your village about whatever is going on with me lately, or life in general, then one real, useful tip.","(Village wisdom)");
+$("#vQuiz").onclick=()=>villageAsk("Start the 'Would You Survive My Village?' quiz. Ask question 1 of 3 now: one quick, funny multiple-choice question about village life, with options A, B and C. Wait for my answer each time. After my third answer, give my score out of 3 and roast it.","(Village quiz)");
+$("#vStory").onclick=()=>villageAsk("Tell me a short village story: a 30 to 45 second tall tale, about 80 words, with a clear punchline at the end.","(Village story)");
+$("#vRoast").onclick=()=>{playVillage("rooster");villageAsk("Roast me like a best friend would. No question, just a short playful roast about my life or habits, then one tiny genuinely useful tip.","(Roast me)")};
 
 /* ----- timers ----- */
 function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.createElement("span");c.className="timer";$("#timers").appendChild(c);
@@ -575,7 +613,7 @@ function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.crea
 /* ----- log, teach ----- */
 function renderLog(){const b=$("#logList");b.innerHTML="";if(!log.length){b.innerHTML='<p class="hint">Nothing yet. Tap the mic and talk to Uncle Paw Taw.</p>';return}
   [...log].reverse().forEach(x=>{const d=document.createElement("div");d.className="lg";const u=document.createElement("p");u.className="u"+(MY.test(x.user)?" my":"");u.textContent="You: "+x.user;d.appendChild(u);
-    [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].filter(z=>z[1]).forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent="Uncle Paw Taw · "+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
+    [["English",x.english,"en"],["မြန်မာ",x.burmese,"my"]].filter(z=>z[1]).forEach(([t,txt,lang])=>{const v=document.createElement("div");v.className="v"+(lang==="my"?" my":"");const s=document.createElement("span");s.className="t";s.textContent=(x.p==="paw"?"Taw Thar · ":"Uncle Paw Taw · ")+t;v.appendChild(s);v.appendChild(document.createTextNode(txt));d.appendChild(v);
       const a=document.createElement("div");a.className="acts";const b1=document.createElement("button");b1.textContent="Say again";b1.onclick=async()=>{closeDrawers();await switchTo(x.p||"kyi");say(txt,{lang})};const b2=document.createElement("button");b2.textContent="Copy";b2.onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("Copied")}catch(e){toast("Couldn't copy")}};a.append(b1,b2);d.appendChild(a)});
     b.appendChild(d)})}
 function renderShelf(){const b=$("#shelf");b.innerHTML="";if(!shelf.length){b.innerHTML='<p class="hint">Empty. Learn a topic or finish a discussion.</p>';return}
@@ -634,7 +672,7 @@ $("#tGo").onclick=async()=>{const src=getSource(true);if(!src)return;if(busy){to
 $("#dStart").onclick=async()=>{if(air){srcErr("You're On Air. Go Off Air first, or set the topic when you start an episode.");return}const src=getSource(false);if(!src)return;if(busy){toast("Busy talking. Try in a second.");return}
   if(disc){if(!confirm("End the current discussion and start this one?"))return;await endDiscussion(true)}
   busy=true;const b=$("#dStart");b.textContent="Reading…";closeDrawers();setState("think");sfx.puff();
-  const who=S.persona==="paw"?"Thamein Paw Taw (silly self-declared king)":"Uncle Paw Taw (sarcastic robot uncle)";
+  const who=S.persona==="paw"?"Taw Thar (cheeky village-boy best friend)":"Uncle Paw Taw (sarcastic robot uncle)";
   try{const o=await readSource(src,`Return ONLY JSON: {"title":"short topic title","brief":"about 150 words: factual summary of the key points","opener":"one short line ${who} says to open the discussion, in character, ending with a pointed question for ${S.name||"Jamie"}"}. If the page can't be read, return {"error":"short reason"}.`,1400);
     disc={title:String(o.title||"Untitled").slice(0,80),brief:String(o.brief||"").slice(0,1500),source:src.url||"",startedAt:Date.now()};st.set("disc",disc);showDisc();
     $("#tText").value="";$("#tUrl").value="";busy=false;
@@ -667,7 +705,7 @@ const _noGo=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl").value
   closeDrawers();micHold=false;await switchTo(aPick);
   const scriptRaw="",cues=[];
   air={persona:aPick,title,brief:"",mode:cues.length?"called":$("#aMode").value,light:$("#aLight").checked,startedAt:Date.now(),cues,ci:0,script:scriptRaw.slice(0,6000)};heardBuf=[];updCue();
-  const n=S.name||"Jamie",who=aPick==="paw"?"Thamein Paw Taw (silly self-declared king)":"Uncle Paw Taw (condescending robot uncle)";
+  const n=S.name||"Jamie",who=aPick==="paw"?"Taw Thar (cheeky village-boy best friend)":"Uncle Paw Taw (condescending robot uncle)";
   if(url||title){busy=true;setState("think");sfx.puff();
     try{const o=await readSource(url?{url,text:""}:{url:"",text:title},`Return ONLY JSON: {"title":"short episode title","brief":"about 120 words of key facts for the episode","opener":"one short line ${who} says to open the show as co-host, in character, introducing the topic to listeners"}. If the page can't be read, return {"error":"short reason"}.`,1200);
       air.title=String(o.title||title||"").slice(0,70);air.brief=String(o.brief||"").slice(0,1200);saveAir();showDisc();busy=false;
@@ -762,8 +800,9 @@ function fillVoice(){const vo=S.vo[vp];const a=$("#sAccent");a.innerHTML="";Obje
   const s=$("#sVoice");s.innerHTML="";const vs=vFor(vo.accent);vs.forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+" ("+v.lang+")";s.appendChild(o)});if(!vs.find(v=>v.name===vo.voice))vo.voice=vs[0]?vs[0].name:"";s.value=vo.voice;
   $("#sPitch").value=vo.pitch;$("#sRate").value=vo.rate;$("#pitchV").textContent=Number(vo.pitch).toFixed(1);$("#rateV").textContent=Number(vo.rate).toFixed(2);
   document.querySelectorAll("#vSeg button").forEach(b=>b.classList.toggle("on",b.dataset.p===vp))}
-function fillSettings(){$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
+function fillSettings(){$("#sChar").value=S.persona;$("#sName").value=S.name;$("#sMic").value=S.micLang;$("#sWkyi").value=S.wakes.kyi.join("\n");$("#sWpaw").value=S.wakes.paw.join("\n");$("#sBur").checked=!!S.burmese;fillAzure();$("#sBg").value=S.bg;$("#sSfx").checked=S.sfx;$("#sGlitch").checked=S.glitch;$("#sModel").value=S.model;fillVoice()}
 document.querySelectorAll("#vSeg button").forEach(b=>b.onclick=()=>{vp=b.dataset.p;fillVoice()});
+$("#sChar").onchange=e=>{closeDrawers();switchTo(e.target.value)};
 $("#sName").oninput=e=>{S.name=e.target.value.trim()||"Jamie";saveS()};
 $("#sMic").onchange=e=>{S.micLang=e.target.value;saveS()};
 function wakeList(v,def){const w=v.split("\n").map(x=>x.trim()).filter(x=>x&&norm(x).trim()!=="kyi");return w.length?w:def}
@@ -800,8 +839,8 @@ $("#kFirst").addEventListener("input",()=>$("#kErr").textContent="");
 function applyBg(){document.body.style.setProperty("--bgc",S.bg)}
 
 /* ----- start ----- */
-if(air&&S.persona!==air.persona){S.persona=air.persona;mood=air.persona==="paw"?"silly":"smirk";saveS()}
-applyBg();paint();updConv();showDisc();updCue();
+if(air&&S.persona!==air.persona){S.persona=air.persona;mood="smirk";saveS()}
+applyBg();renderChar();paint();updConv();showDisc();updCue();
 if(!KEY)$("#setup").classList.add("show");
 else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{if(busy||pst!=="idle"||log.length&&Date.now()-log[log.length-1].at<5000)return;bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
 </script>
