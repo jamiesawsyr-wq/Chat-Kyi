@@ -246,7 +246,7 @@ body.clean #podBar{display:none}
 .rbub::after{content:"";position:absolute;bottom:-4.4cqw;left:var(--tail,50%);border-left:3cqw solid transparent;border-right:3cqw solid transparent;border-top:4.4cqw solid #111;transform:translateX(-50%)}
 .rbub.long{font-size:4.1cqw}.rbub.old{opacity:.6;font-size:3.7cqw;padding:1.8cqw 3cqw 2cqw}.rbub.old .who{font-size:2.2cqw;margin-bottom:1cqw}.rbub.old::after{display:none}
 .rhot{position:absolute;width:12cqw;height:12cqw;border:0;background:transparent;color:rgba(255,255,255,.26);font:700 4.6cqw system-ui;z-index:2;padding:0}
-#roomExit{left:0;top:0}#roomNext{right:0;bottom:0}#roomKb{left:0;bottom:0}
+#roomExit{left:0;top:0}#roomNext{right:0;bottom:0}#roomKb{left:0;bottom:0}#roomMic{left:12cqw;bottom:0;filter:grayscale(1);opacity:.45}#roomMic.on{filter:none;opacity:1;animation:rpulse 1s infinite}@keyframes rpulse{50%{transform:scale(1.25)}}
 #roomBar{position:absolute;left:3%;right:3%;bottom:2%;display:flex;gap:2cqw;z-index:3;background:rgba(0,0,0,.8);padding:2cqw;border-radius:3cqw}
 #roomBar[hidden]{display:none}
 #roomBar input{flex:1;min-width:0;font-size:16px;border-radius:2cqw;border:0;padding:2.4cqw}
@@ -268,7 +268,7 @@ body.clean #podBar{display:none}
 <div id="podBar" hidden><span id="podTitle"></span><button id="podEnd">End showdown</button></div>
 <div id="vBar" hidden><b id="vAsk">Pick a side. You can also say it out loud.</b><button data-v="kyi">Side with Uncle</button><button data-v="paw">Side with Taw Thar</button><button data-v="neutral">Stay neutral 🫣</button></div>
 <div id="room" hidden><div id="roomStage"><canvas id="roomCv" width="1080" height="1920"></canvas><div id="roomZone"></div>
-<button class="rhot" id="roomExit" aria-label="Leave The Room">✕</button><button class="rhot" id="roomKb" aria-label="Type">⌨</button><button class="rhot" id="roomNext" aria-label="Next cue card">▶</button>
+<button class="rhot" id="roomExit" aria-label="Leave The Room">✕</button><button class="rhot" id="roomKb" aria-label="Type">⌨</button><button class="rhot" id="roomMic" aria-label="Talk">🎤</button><button class="rhot" id="roomNext" aria-label="Next cue card">▶</button>
 <div id="roomBar" hidden><input id="roomIn" type="text" placeholder="Type as Jamie…" enterkeyhint="send"><button id="roomGo">Send</button></div></div></div>
 <div id="discBar" hidden><span id="discTitle"></span><button id="dEnd">End discussion</button></div>
 <div id="stage">
@@ -328,7 +328,7 @@ body.clean #podBar{display:none}
   <label class="tog">Read my lines aloud (3rd voice) <input type="checkbox" id="rJv"></label>
   <div class="f"><label for="rCues">Cue cards (one line each, typed before you record)</label><textarea id="rCues" rows="4" placeholder="Uncle, why do Americans think Burma is tiny?&#10;Taw Thar, what would you buy first in America?&#10;New topic: aunties at weddings"></textarea><p class="hint" id="rCueStat"></p></div>
   <div class="row"><button class="btn primary" id="rEnter">🎬 Enter The Room</button><button class="btn" id="rCueReset">Restart cues</button></div>
-  <p class="hint">In the room: faint ▶ bottom-right sends the next cue card · ⌨ bottom-left types live · ✕ top-left leaves. Voice commands and "Uncle… / Taw Thar…" still work.</p>
+  <p class="hint">In the room: faint ▶ bottom-right sends the next cue card · ⌨ bottom-left types live · 🎤 next to it talks (glows while listening, tap again to stop) · ✕ top-left leaves. Voice commands and "Uncle… / Taw Thar…" still work.</p>
 </div>
   <span class="lbl">Tonight's guest</span>
   <div class="seg" id="pGuest"><button data-g="kyi">Uncle Paw Taw</button><button data-g="paw">Taw Thar</button><button data-g="both">⚔️ Both</button></div>
@@ -365,7 +365,7 @@ body.clean #podBar{display:none}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.7</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.7.2</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sSass">Sass level</label><select id="sSass"><option value="mild">Mild (guest-friendly)</option><option value="spicy">Spicy (default)</option><option value="savage">Savage</option></select><p class="hint">Spicy and Savage can call you "idiot" or "dumb boy" for truly dumb questions. Audience roasts in Podcast mode always stay friendly.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
@@ -565,11 +565,11 @@ function listen(){
   if(azReady()){if(synth)synth.cancel();listenAzure();return}
   if(!SR){toast("Speech recognition isn't available here. Type instead, or open in Safari.");return}
   if(synth)synth.cancel();
-  try{rec=new SR();rec.lang=S.micLang;rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1}catch(e){toast("Microphone isn't available. Type instead.");return}
+  try{rec=new SR();rec._k="jv"+Date.now();rec.lang=S.micLang;rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1}catch(e){toast("Microphone isn't available. Type instead.");return}
   let final="";
-  rec.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++){t+=e.results[i][0].transcript;if(e.results[i].isFinal)final=t}heard(t);if(!final)final="";rec._last=t};
+  rec.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++){t+=e.results[i][0].transcript;if(e.results[i].isFinal)final=t}heard(t);if(roomOn&&t.trim())roomLive("j",t.trim(),rec._k);if(!final)final="";rec._last=t};
   rec.onerror=e=>{if(S.micLang!=="en-US"&&(e.error==="language-not-supported"||e.error==="service-not-allowed")){micHold=true;toast("This iPhone can't recognize that language. Switch Mic back to English in Settings.")}else if(e.error==="not-allowed"||e.error==="service-not-allowed"){micHold=true;S.conv=false;saveS();updConv();toast("Microphone is blocked. Allow it in iPhone Settings for Safari.")}else if(e.error!=="no-speech"&&e.error!=="aborted")toast("Couldn't hear you. Try again.")};
-  rec.onend=()=>{listening=false;$("#mic").classList.remove("on");const t=(final||rec._last||"").trim();if(t)route(t);else{setState("idle");if(handsFree())setTimeout(listen,400)}};
+  rec.onend=()=>{listening=false;$("#mic").classList.remove("on");const t=(final||rec._last||"").trim();if(t){roomVoiceKey=rec._k;route(t)}else{setState("idle");if(handsFree())setTimeout(listen,400)}};
   try{rec.start();listening=true;$("#mic").classList.add("on");setState("listen")}catch(e){listening=false}
 }
 let micHold=false;function handsFree(){return (S.conv||!!air)&&!micHold&&!busy}
@@ -583,7 +583,7 @@ function findWake(t){const n=norm(t);let best=null;
   return best?{p:best.p,rest:n.slice(best.i+best.k.length+1).trim()}:null}
 let awaitUntil=0;
 async function route(t){
-  if(roomOn&&!roomFromJamie&&String(t||"").trim())roomLive("j",String(t).trim(),"j"+Date.now());
+  if(roomOn&&!roomFromJamie&&String(t||"").trim()){roomLive("j",String(t).trim(),roomVoiceKey||("j"+Date.now()));roomVoiceKey=null;if(S.room.jv){roomSpeaker="j";await speakJamie(String(t).trim());roomSpeaker=null}}
   if(vPending&&!busy){const v=verdictFrom(t);if(v){podVerdict(v);return}}
   if(!busy&&showCommand(t))return;
   const w=findWake(t);
@@ -661,7 +661,7 @@ ${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must beg
 ${KNOW}
 ${COMEDY(n)}
 ${sassLine(n)}${jb.length?`\nJoke-bank inspiration that fits this topic (rewrite in your own words, never copy, use at most one and only if it fits naturally; otherwise ignore):\n- ${jb.join("\n- ")}`:""}${shelfTxt}
-WHO IS TALKING: every user message comes from ${n}, the human host, typed or spoken.${duo?` A Showdown is on: ${persona==="kyi"?"Taw Thar":"Uncle Paw Taw"} is also on the show, but his lines only come from show scenes, never from user messages.`:""} Lines under "Just now on the show" are context, not messages to you.
+WHO IS TALKING: every user message comes from ${n}, the human host, typed or spoken.${duo?` A Showdown is on: ${persona==="kyi"?"Taw Thar":"Uncle Paw Taw"} is sitting right next to you and often jumps in after you. Never refuse to involve him: you may tease him, set him up, or toss the question his way, but never write his lines for him.${roomOn?" THE ROOM: this is a short vertical video, so keep every reply to 1 or 2 short sentences, under 30 words.":""}`:""} Lines under "Just now on the show" are context, not messages to you.
 TOP PRIORITY: answer what ${n} just said. The newest message always wins. Do not steer the talk back to earlier topics unless ${n} brings them up.
 Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
 }
@@ -775,6 +775,7 @@ async function send(text,{label}={}){
     if(o.action&&o.action.type==="timer"&&Number(o.action.seconds)>0)addTimer(Math.min(Number(o.action.seconds),86400),String(o.action.label||"timer").slice(0,30));
     await sp.finish();
     if(p==="paw"&&o.cameo){const c=String(o.cameo).trim();if(c){await wait(400);setState("talk");bubble("Uncle Paw Taw (from the future): "+c);await speakAs(c,"kyi");setState("idle")}}
+    if(duo&&!glitch&&enFinal)await chimeIn(p,text,enFinal);
     busy=false;setState("idle");hideLater();if(handsFree())setTimeout(listen,500);
   }catch(e){if(synth)synth.cancel();busy=false;mood="sideeye";setState("idle");toast(errText(e));if(e&&(e.code==="no_key"||e.code==="bad_key"))$("#setup").classList.add("show")}
 }
@@ -1180,7 +1181,7 @@ function showCommand(raw){let t=String(raw||"").trim();
 /* ===== v3.7: The Room (screen-record scene) ===== */
 if(!S.room)S.room={scene:"studio",season:"auto",tod:"auto",jv:false,cues:[],ci:0};
 if(!S.v37){S.v37=true;if(!S.pod.show||S.pod.show==="The Jamie Files")S.pod.show="Jamie & The Voices in My Phone";saveS()}
-let roomOn=false,roomSpeaker=null,roomCur=null,curSendKey=null,roomFromJamie=false;
+let roomVoiceKey=null,roomOn=false,roomSpeaker=null,roomCur=null,curSendKey=null,roomFromJamie=false;
 const ROOM=(function(){
 const W=1080,H=1920,c=document.getElementById('roomCv'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
 const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
@@ -1292,7 +1293,7 @@ function resolve(){const r=S.room,now=new Date(),m=now.getMonth(),h=now.getHours
   if(se!==SEASON){SEASON=se;resetParts()}TOD=td}
 function bars(){let top,bot;if(SCENE==='camp'){top=SKY[TOD][0];bot=SEASON==='winter'?(TOD==='night'?'#8d9dbd':'#dfe8f5'):SEASON==='fall'?(TOD==='night'?'#1a1410':'#5a3d22'):(TOD==='night'?'#1a1410':TOD==='sunset'?'#33402a':'#3f7f3a')}else{top='#1b1430';bot='#5c3822'}const el=document.getElementById('room');if(el)el.style.background=`linear-gradient(${top} 50%,${bot} 50%)`}
 let timer=null;
-function tick(){flick++;speaking=roomSpeaker;if(speaking)bob=!bob;else bob=0;if(SCENE==="camp")stepParts();draw()}
+function tick(){const rm=document.getElementById("roomMic");if(rm)rm.classList.toggle("on",!!listening);flick++;speaking=roomSpeaker;if(speaking)bob=!bob;else bob=0;if(SCENE==="camp")stepParts();draw()}
 return{open(){resolve();resetParts();draw();bars();try{document.fonts.load("60px 'Press Start 2P'").then(draw)}catch(e){}clearInterval(timer);timer=setInterval(tick,120)},close(){clearInterval(timer);timer=null},redraw(){resolve();draw();bars()}};
 })();
 const RNAME={kyi:"UNCLE PAW TAW",paw:"TAW THAR",j:"JAMIE"},RKEY={kyi:"u",paw:"t",j:"j"};
@@ -1312,7 +1313,8 @@ function roomNextCue(){const c=S.room.cues||[];if(S.room.ci>=c.length){toast("No
 function enterRoom(){closeDrawers();unlock();roomOn=true;document.body.classList.add("inroom");$("#room").hidden=false;roomClear();ROOM.open();
   if(S.pod.guest!=="both"){S.pod.guest="both";saveS()}if(!duo)setDuo(true)}
 function exitRoom(){roomOn=false;document.body.classList.remove("inroom");$("#room").hidden=true;ROOM.close();roomSpeaker=null;$("#roomBar").hidden=true}
-$("#roomExit").onclick=exitRoom;$("#roomNext").onclick=roomNextCue;
+$("#roomExit").onclick=exitRoom;
+$("#roomMic").onclick=()=>{unlock();$("#roomBar").hidden=true;if(listening){try{rec.stop()}catch(e){}return}if(busy){toast("Let them finish talking first.");return}listen()};$("#roomNext").onclick=roomNextCue;
 $("#roomKb").onclick=()=>{const b=$("#roomBar");b.hidden=!b.hidden;if(!b.hidden)$("#roomIn").focus()};
 $("#roomGo").onclick=()=>{const v=$("#roomIn").value;$("#roomIn").value="";$("#roomBar").hidden=true;$("#roomIn").blur();roomSend(v)};
 $("#roomIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#roomGo").click()}});
@@ -1326,6 +1328,23 @@ $("#rJv").onchange=e=>{S.room.jv=e.target.checked;saveS()};
 $("#rCues").onchange=e=>{S.room.cues=e.target.value.split("\n").map(x=>x.trim()).filter(Boolean);S.room.ci=0;saveS();fillRoomUI()};
 $("#rCueReset").onclick=()=>{S.room.ci=0;saveS();fillRoomUI();toast("Cue cards back to #1")};
 $("#rEnter").onclick=enterRoom;
+
+/* v3.7.2: the other co-host jumps in during a Showdown / The Room */
+async function chimeIn(p,text,reply){const o=p==="kyi"?"paw":"kyi",n=S.name||"Jamie";
+  const group=/\b(guys|you two|both of you|you both|everyone|everybody|y'?all)\b/i.test(text);
+  const named=(o==="paw"?/\btaw\s*thar\b|\bbro\b/i:/\buncle\b/i).test(text);
+  if(!group&&!named&&Math.random()>0.65)return;
+  const msg=`Just now on the show:\n${n}: ${text}\n${NAMES[p]}: ${reply}\n\n[Cue for ${NAMES[o]}] You are on the show too, sitting right there. Jump in with your own reaction to what ${n} said and what ${NAMES[p]} just said: answer ${n} yourself if the question was meant for you too, agree, disagree, or roast one of them, in character. 1 or 2 short sentences, under 25 words. Don't repeat what ${NAMES[p]} said.`;
+  try{if(duo)duo.speaker=o;setState("think");
+    const raw=await claude(system(o,false,text+" "+reply),[{role:"user",content:msg}],300);let ob={};try{ob=pj(raw)}catch(e){}
+    const en=clean(String(ob.english||"")).trim();if(!en){if(duo)duo.speaker=null;return}
+    const ok=o==="paw"?["smirk","sideeye","proud","shock"]:["smirk","sideeye","proud"];mood=ok.includes(ob.mood)?ob.mood:"smirk";
+    if(o==="paw"&&/\bsister\b|ma phyu/i.test(en+" "+text)){mood="shock";playVillage("gasp")}
+    log.push({user:"",p:o,english:en,mood,pod:true,at:Date.now()});saveLog();
+    setState("talk");if(roomOn)roomLive(o,en,"c"+Date.now());
+    if(threadOn())renderHist();else bubble(en,{ms:en.length*62});
+    const t0=Date.now();await speakAs(en,o);const minMs=Math.min(6000,700+en.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
+  }catch(e){}finally{if(duo)duo.speaker=null}}
 
 if(disc&&disc.startedAt&&Date.now()-disc.startedAt>4*3600e3){setTimeout(()=>{try{endDiscussion(true)}catch(e){}},1500)}
 applyBg();renderChar();paint();renderHist();updConv();showDisc();updCue();showPod();
