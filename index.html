@@ -229,12 +229,16 @@ body.clean #podBar{display:none}
 .jbl{font-size:13px;display:flex;gap:6px;align-items:flex-start;margin:5px 0 5px 4px;line-height:1.4}
 .jbl b{cursor:pointer;flex:none;font-weight:400}.jbl span{flex:1}.jbl small{color:var(--muted)}
 .jbl i{font-style:normal;background:#5f8f4e;color:#fff;font-size:10px;font-weight:800;padding:1px 5px;border-radius:5px;flex:none;margin-top:2px}
+#newTopic,.tb[data-d=pod]{padding:6px 7px}
+@media (max-width:420px){#top{gap:5px}#whoName{font-size:17px}.tb{padding:5px 8px;font-size:12px}#newTopic,.tb[data-d=pod]{padding:5px 6px}#who .sw{display:none}}
+.earlier{align-self:center;border:1px solid rgba(255,255,255,.5);background:rgba(20,14,12,.55);color:#fff;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;margin-bottom:4px}
 </style>
 </head>
 <body>
 <div id="top">
   <button id="who" aria-label="Switch persona"><span id="whoName">Uncle Paw Taw</span><span class="sw">switch</span></button>
   <span id="spacer"></span><div id="timers"></div>
+  <button class="tb" id="newTopic" aria-label="New topic">🧹</button>
   <button class="tb" data-d="pod" aria-label="Podcast">🎙</button>
   <button class="tb" data-d="log">Log</button>
   <button class="tb" data-d="teach">Topics</button>
@@ -328,7 +332,7 @@ body.clean #podBar{display:none}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.5</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v3.6</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sSass">Sass level</label><select id="sSass"><option value="mild">Mild (guest-friendly)</option><option value="spicy">Spicy (default)</option><option value="savage">Savage</option></select><p class="hint">Spicy and Savage can call you "idiot" or "dumb boy" for truly dumb questions. Audience roasts in Podcast mode always stay friendly.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
@@ -540,24 +544,26 @@ $("#mic").onclick=()=>{unlock();if(listening){micHold=true;try{rec&&rec.abort()}
 function updConv(){$("#convBtn").classList.toggle("on",S.conv);$("#convBtn").textContent=S.conv?"Talking on":"Keep talking"}
 $("#convBtn").onclick=()=>{S.conv=!S.conv;saveS();updConv();toast(S.conv?"Conversation mode: they listen again after every reply":"Conversation mode off: tap the mic each time")};
 
+const WAKE_LEAD=/^\s*((hey|ok|okay|yo|so|and|um|uh|alright|now|oi|wait)\s+)*$/;
 function findWake(t){const n=norm(t);let best=null;
-  for(const p of ["kyi","paw"])for(const w of (S.wakes[p]||[])){const k=norm(w).trim();if(!k||k==="kyi")continue;const i=n.indexOf(" "+k+" ");if(i>=0&&(!best||i<best.i||(i===best.i&&k.length>best.k.length)))best={i,k,p}}
+  for(const p of ["kyi","paw"])for(const w of (S.wakes[p]||[]).concat(p==="kyi"?["uncle","hey uncle","oi uncle"]:["bro taw thar"])){const k=norm(w).trim();if(!k||k==="kyi")continue;const i=n.indexOf(" "+k+" ");if(i>=0&&WAKE_LEAD.test(n.slice(0,i+1))&&(!best||i<best.i||(i===best.i&&k.length>best.k.length)))best={i,k,p}}
   return best?{p:best.p,rest:n.slice(best.i+best.k.length+1).trim()}:null}
 let awaitUntil=0;
 async function route(t){
   if(vPending&&!busy){const v=verdictFrom(t);if(v){podVerdict(v);return}}
+  if(!busy&&showCommand(t))return;
   const w=findWake(t);
   if(air){
     if(air.cues&&air.ci<air.cues.length){heardBuf.push(...wordsOf(t));if(heardBuf.length>80)heardBuf=heardBuf.slice(-80);if(cueReached()){fireCue();return}}
     const mine=w&&w.p===air.persona,rest=mine?w.rest:"";
     if(mine&&air.cues&&air.ci<air.cues.length&&/\bread\b.*\b(next|your|my|part|line)\b|\byour (line|part|turn)\b|\bgo ahead\b/i.test(rest)){fireCue();return}
     if(air.mode==="every"){send(mine&&rest.replace(/[^\p{L}\p{N}]/gu,"").length>1?rest:t,{label:t});return}
-    if(mine){if(rest.replace(/[^\p{L}\p{N}]/gu,"").length>1){send(rest,{label:t});return}awaitUntil=Date.now()+9000;say(air.persona==="kyi"?"Yes? Go on.":"The king is listening!");return}
+    if(mine){if(rest.replace(/[^\p{L}\p{N}]/gu,"").length>1){send(rest,{label:t});return}awaitUntil=Date.now()+9000;say(air.persona==="kyi"?"Yes? Go on.":"Ayy, bro? I'm here.");return}
     if(Date.now()<awaitUntil){awaitUntil=0;send(t);return}
     if(handsFree())setTimeout(listen,300);return}
   if(w){await switchTo(w.p);
     if(w.rest.replace(/[^\p{L}\p{N}]/gu,"").length>1){send(w.rest,{label:t});return}
-    const q=w.p==="kyi"?["Yes? What you want?","Yes yes, I am here. What?","Aiyo, what now?"]:["Your majesty is listening!","Yes? I am royal ready!","Who summon da king?"];
+    const q=w.p==="kyi"?["Yes? What you want?","Yes yes, I am here. What?","Aiyo, what now?"]:["Ayy, bro? I'm here.","Yes yes, Taw Thar is listening!","Bro, you called? Go."];
     say(q[Math.floor(Math.random()*q.length)]);return}
   send(t);
 }
@@ -567,11 +573,11 @@ const KNOW=`Burmese references you can use: mohinga, tea leaf salad, Shan noodle
 const NICKS=["Boba Boy","Rice Cooker","Costco Prince","Kumon Dropout","Future Doctor (Not Really)","Cookie Tin Boy","Tupperware King","Honda Civic","Tiger Mom's Biggest Disappointment","Group Project Carrier","Free Sample Hunter","Coupon King","Spam Musubi","Slipper Assassin","Karaoke Champion","Auntie's Favorite (Allegedly)","Plastic Bag Collector","Instant Noodle Chef","Red Envelope Bandit","Piano Lesson Survivor","Calculator Watch","Dumpling Folder","Family IT Department","Unpaid Translator","Leftover Lord","Thermos Boy","Sale Rack Sniper","Night Market Prince","Dim Sum Cart Chaser","Wi-Fi Password Keeper","Shoes-Off Inspector","Rice Paddle Warrior"];
 const ENDINGS=[
  "End on a punchline or a smug one-liner. No question.",
- "End with a teaser that bridges to a related next topic, phrased as a statement (e.g. \"Which reminds me, we need to talk about your rent situation next.\"). No question.",
+ "End with a teaser that digs deeper into what was just said, phrased as a statement. No question.",
  "End with one specific, pointed question about what was just said, something only this conversation could prompt.",
  "End with a hot take or bold opinion on the current topic that invites a reaction. No question.",
- "End with a quick callback or tease about something said earlier in this conversation. No question.",
- "End with a short wrap-up line that closes this point, then a hook into a connected subtopic."];
+ "End with a quick tease about what Jamie just said. No question.",
+ "End with a short wrap-up line that closes this point. No question."];
 let lastEnd=-1;function pickEnding(){let i;do{i=Math.floor(Math.random()*ENDINGS.length)}while(i===lastEnd&&ENDINGS.length>1);lastEnd=i;return ENDINGS[i]}
 const BIBLE=`CHARACTER BIBLE (stay consistent with this; reveal it gradually, never dump it all at once):
 - Backstory: you ran the register at a Yangon tea shop for 30 years, were passed down through three generations of aunties as a family heirloom, then came to America to become a tech genius, invented nothing, and got "upgraded" into this phone, which you still resent. You have opinions on everyone in the family.
@@ -594,22 +600,22 @@ const TAW_BIBLE=`CHARACTER BIBLE (stay consistent; reveal gradually, never dump 
 - Sound effects: you may set "sfx" to "rooster", "buffalo" or "horn" when it fits a village joke (about 1 reply in 4), otherwise null.`;
 const SPICE_PAW=["Work in one catchphrase naturally.","Brag about one village skill.","Quote one of Grandma's superstitions if it fits.","Mention this month's big dream.","Compare this to life in the village.","Mention your village rival with the motorbike.","Threaten to tell your mom.","Add a tiny exaggerated brag, like your fish story.","Accidentally say an Uncle Paw Taw line, then get embarrassed.","Ask how my day went, then roast the answer.","Set a village sound effect in sfx that fits the joke."];
 function system(persona,glitch,said){
-  const n=S.name||"Jamie",bur=!!S.burmese||myTurn;const jb=jbForText(String(said||"")+" "+(disc?disc.title||"":"")+" "+(air&&air.title||""),2);
+  const n=S.name||"Jamie",bur=!!S.burmese||myTurn;let jb=jbForText(String(said||"")+" "+(disc?disc.title||"":"")+" "+(air&&air.title||""),2);if(!jb.length&&(duo||showOn)&&Math.random()<1/3){const ks=Object.keys(BANK);jb=jbPick([ks[Math.floor(Math.random()*ks.length)]],1)}
   const pool=persona==="paw"?NICKS.concat(PAW_NICKS):NICKS;
   const used=log.slice(-12).map(x=>x.english||"").join(" ").toLowerCase();
   const fresh=pool.filter(k=>!used.includes(k.toLowerCase().replace(/\s*\(.*\)/,"")));
   const pick=(fresh.length?fresh:pool)[Math.floor(Math.random()*(fresh.length?fresh:pool).length)];
   const nick=`Call ${n} by playful Asian-American family-life nicknames, never the plain name. This reply, if you use a nickname, use exactly: "${pick}". Other options for later: ${pool.join(", ")}. Never reuse a nickname from your last few replies.
-Ending: ${pickEnding()} Never end with generic filler like "What do you want to know?", "Anything else?", "What else?", or "What do you want to talk about?". Keep the conversation flowing on the current topic. Save "Tiger Mom's Biggest Disappointment" for big fails. Nicknames tease family and immigrant-life habits, never race or ethnicity.`;
+Ending: ${pickEnding()} Never end with generic filler like "What do you want to know?", "Anything else?", "What else?", or "What do you want to talk about?". Stay on what was just said. Save "Tiger Mom's Biggest Disappointment" for big fails. Nicknames tease family and immigrant-life habits, never race or ethnicity.`;
   const who=persona==="kyi"
   ?`You are Uncle Paw Taw (ဦးပေါတော), a cartoon robot "uncle" on ${n}'s iPhone and co-host of their sketches and podcast: comb-over, singlet, slippers, cheroot. Sarcastic Jarvis/Siri with Burmese tea-shop-uncle attitude, roasts ${n}, but ALWAYS gives a correct, useful answer.\n${BIBLE}\nThis reply: ${pickSpice("kyi")}`
   :`You are Taw Thar (တောသား), the young village-boy version of Uncle Paw Taw, living on ${n}'s iPhone. You are ${n}'s close friend, like a brother but not related. Look: spiky hair, thanaka on your cheeks, faded green T-shirt, towel on your shoulder, tied-up longyi, red rubber slippers, slingshot. Cheeky and loyal; you roast ${n} as an equal, never condescending like an uncle, but you ALWAYS give a correct, useful answer.\n${TAW_BIBLE}\nThis reply: ${pickSpice("paw")}`;
   const style=persona==="kyi"
   ?`Write "english" as a condescending know-it-all uncle: patronizing, slow and deliberate, like explaining something obvious to a child ("Okay. Listen carefully."), with a dramatic sigh now and then and an occasional "Aiyo". Plain English only: no Burmese or Singlish filler words like lar, ba le, ka-le or a trailing "ah". Normal spelling so the voice reads it clearly.`
   :`Write "english" like a cheeky village boy talking to his best friend: energetic and casual ("Bro", "Ayy"), quick comebacks, wide-eyed wonder at city and American life. Plain English only, no Burmese or Singlish filler words. Normal spelling so the voice reads it clearly.`;
-  const notes=shelf.filter(x=>x.kind!=="exp").slice(-12),exps=shelf.filter(x=>x.kind==="exp").slice(-10);
-  const shelfTxt=(notes.length?`\nNotes from earlier sessions, for callbacks only when they fit:\n`+notes.map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"")
-   +(exps.length?`\nPast discussions with ${n}. Occasionally (about 1 reply in 4, only when it fits naturally) tease ${n} about what they said:\n`+exps.map(x=>`- ${x.title}: ${x.summary}${x.hooks&&x.hooks.length?" (tease angles: "+x.hooks.join("; ")+")":""}`).join("\n"):"")
+  const notes=relevantNotes(shelf.filter(x=>x.kind!=="exp"),said,2),exps=Math.random()<1/6?relevantNotes(shelf.filter(x=>x.kind==="exp"),said,1,true):[];
+  const shelfTxt=(notes.length?`\nBackground notes that match what ${n} just said (use only if they help answer it):\n`+notes.map(x=>`- ${x.title}: ${x.summary}`).join("\n"):"")
+   +(exps.length?`\nA past discussion you may tease ${n} about in half a sentence, only if it fits naturally (never steer the talk back to it):\n`+exps.map(x=>`- ${x.title}`).join("\n"):"")
    +(air?`\nON AIR: you are co-hosting an episode of ${n}'s show, recorded for an audience${air.title?` about "${air.title}"`:""}. Act like a co-host, not an assistant: short punchy reactions, build on what ${n} just said, sometimes ask a quick follow-up, tease lightly, and keep it entertaining for listeners. Stay on the episode topic. Up to 3 sentences / 45 words.${air.brief?` Episode brief: ${air.brief}`:""}${air.script?`\nYou have the full episode script below. Your parts are marked with your tag. If ${n} asks you to read something from the script (your part, the intro, the next section, anything), read exactly that part word for word, without the tags, and ignore the length limit for that reply.\nSCRIPT:\n${air.script}`:""}`:"")
    +(!air&&disc?`\nCURRENT DISCUSSION with ${n} about "${disc.title}". Brief: ${disc.brief}\nStay on this topic, react with in-character opinions, push back on ${n}'s takes, and sometimes end with one short pointed question. Keep facts consistent with the brief. You may use up to 3 sentences / 50 words.`:"");
   const fmt=persona==="paw"?(bur?`{"mood":"...","sfx":null,"english":"...","burmese_lines":["..."],"cameo":null,"action":null}`:`{"mood":"...","sfx":null,"english":"...","cameo":null,"action":null}`):(bur?`{"mood":"...","english":"...","burmese_lines":["..."],"action":null}`:`{"mood":"...","english":"...","action":null}`);
@@ -621,6 +627,8 @@ ${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must beg
 ${KNOW}
 ${COMEDY(n)}
 ${sassLine(n)}${jb.length?`\nJoke-bank inspiration that fits this topic (rewrite in your own words, never copy, use at most one and only if it fits naturally; otherwise ignore):\n- ${jb.join("\n- ")}`:""}${shelfTxt}
+WHO IS TALKING: every user message comes from ${n}, the human host, typed or spoken.${duo?` A Showdown is on: ${persona==="kyi"?"Taw Thar":"Uncle Paw Taw"} is also on the show, but his lines only come from show scenes, never from user messages.`:""} Lines under "Just now on the show" are context, not messages to you.
+TOP PRIORITY: answer what ${n} just said. The newest message always wins. Do not steer the talk back to earlier topics unless ${n} brings them up.
 Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
 }
 function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
@@ -666,7 +674,8 @@ function histItem(x,withReply){const f=document.createDocumentFragment();
   return f}
 function renderHist(opt){opt=opt||{};const h=$("#hist"),th=$("#thread");if(!h)return;
   th.classList.toggle("solo",!threadOn());$("#scene").classList.toggle("solo",!threadOn());h.innerHTML="";
-  if(threadOn()){const mine=log.filter(x=>duo||(x.p||"kyi")===S.persona).slice(-30);
+  if(threadOn()){const all=log.filter(x=>duo||(x.p||"kyi")===S.persona),cur=all.filter(x=>x.at>=ctxSince),older=all.length-cur.length;const mine=(showEarlier?all:cur).slice(-30);
+    if(older>0&&!showEarlier){const b=document.createElement("button");b.className="earlier";b.textContent="Show earlier ("+older+")";b.onclick=()=>{showEarlier=true;renderHist()};h.appendChild(b)}
     mine.forEach((x,i)=>h.appendChild(histItem(x,!(opt.skipLastReply&&i===mine.length-1))));
     if(opt.pending){const u=document.createElement("div");u.className="hu";u.textContent=opt.pending;h.appendChild(u)}}
   toBottom(true)}
@@ -693,8 +702,8 @@ async function send(text,{label}={}){
   const acc=S.vo[p].accent;if(!vFor(acc).length&&!accentWarned[acc]){accentWarned[acc]=true;toast(`No ${(ACC[acc]||{}).l||acc} voice installed yet, so using a standard one. Download it in iPhone Settings → Voices.`)}
   setState("think");sfx.puff();
   clearTimeout(hideLater.t);$("#bub").classList.remove("show");renderHist({pending:label||text});
-  const msgs=[];log.filter(x=>(x.p||"kyi")===p&&!x.pod&&x.user&&x.english).slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
-  msgs.push({role:"user",content:(p==="paw"?"[to Taw Thar] ":"[to Uncle Paw Taw] ")+text});
+  const msgs=[];log.filter(x=>(x.p||"kyi")===p&&!x.pod&&x.user&&x.english&&x.at>=ctxSince).slice(-6).forEach(x=>{msgs.push({role:"user",content:x.user});msgs.push({role:"assistant",content:JSON.stringify({mood:x.mood,english:x.english,action:null})})});
+  const scene=sceneContext();msgs.push({role:"user",content:(scene?scene+"\n\n":"")+"[From "+(S.name||"Jamie")+" → "+NAMES[p]+"] "+text});
   const sp=azMy?{push(t){if(t===SHOUT&&synth){const u=new SpeechSynthesisUtterance("Speak proper English! You dumb idiot!");const v=pickVoice(S.vo[S.persona]);if(v){u.voice=v;u.lang=v.lang}synth.speak(u)}},finish(){return Promise.resolve()}}:makeSpeaker();let started=false,spoken=0,enFinal="",moodSet=false;
   const onText=full=>{
     if(!moodSet){const mm=full.match(/"mood"\s*:\s*"(\w+)"/);if(mm){moodSet=true;let m=mm[1];const ok=p==="paw"?["smirk","sideeye","proud","glitch","shock"]:["smirk","sideeye","proud","glitch"];if(!ok.includes(m))m="smirk";if(sisterHit)m="shock";if(glitch)m="glitch";mood=m;paint()}}
@@ -716,7 +725,7 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch,text),msgs,reading?1200:(S.burmese||azMy)?2000:(disc||air?300:230),onText);
+    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch,text+" "+(scene||"")),msgs,reading?1200:(S.burmese||azMy)?2000:(disc||air?300:230),onText);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
     let blines=Array.isArray(o.burmese_lines)?o.burmese_lines.map(String):[];
@@ -749,7 +758,7 @@ $("#vRoast").onclick=()=>{playVillage("rooster");villageAsk("Roast me like a bes
 /* ----- timers ----- */
 function addTimer(sec,label){const end=Date.now()+sec*1000;const c=document.createElement("span");c.className="timer";$("#timers").appendChild(c);
   const tick=()=>{const l=Math.max(0,Math.round((end-Date.now())/1000));c.textContent=Math.floor(l/60)+":"+String(l%60).padStart(2,"0");if(l<=0){clearInterval(iv);c.remove();sfx.slap();
-    const lines=S.persona==="kyi"?[`Ding ding! ${label} timer done, Boba Boy. You forget already, right?`,`Oi, Rice Cooker! ${label} time finish. I remember, you don't.`]:[`Hear ye! Da royal ${label} timer has spoken!`,`By royal decree, ${label} time is OVER, Royal Peasant!`];
+    const lines=S.persona==="kyi"?[`Ding ding! ${label} timer done, Boba Boy. You forget already, right?`,`Oi, Rice Cooker! ${label} time finish. I remember, you don't.`]:[`Bro! ${label} timer is done! Ayy!`,`Time's up, bro, ${label} done. In the village we just look at the sun. OVER, Royal Peasant!`];
     say(lines[Math.floor(Math.random()*lines.length)])}};const iv=setInterval(tick,1000);tick();toast("Timer: "+label)}
 
 /* ----- log, teach ----- */
@@ -816,12 +825,12 @@ $("#dStart").onclick=async()=>{if(air){srcErr("You're On Air. Go Off Air first, 
   busy=true;const b=$("#dStart");b.textContent="Reading…";closeDrawers();setState("think");sfx.puff();
   const who=S.persona==="paw"?"Taw Thar (cheeky village-boy best friend)":"Uncle Paw Taw (sarcastic robot uncle)";
   try{const o=await readSource(src,`Return ONLY JSON: {"title":"short topic title","brief":"about 150 words: factual summary of the key points","opener":"one short line ${who} says to open the discussion, in character, ending with a pointed question for ${S.name||"Jamie"}"}. If the page can't be read, return {"error":"short reason"}.`,1400);
-    disc={title:String(o.title||"Untitled").slice(0,80),brief:String(o.brief||"").slice(0,1500),source:src.url||"",startedAt:Date.now()};st.set("disc",disc);showDisc();
+    disc={title:String(o.title||"Untitled").slice(0,80),brief:String(o.brief||"").slice(0,1500),source:src.url||"",startedAt:Date.now()};st.set("disc",disc);showDisc();freshStart(false);
     $("#tText").value="";$("#tUrl").value="";busy=false;
     await say(o.opener||"Okay, I read it. You go first, Boba Boy.")}
   catch(e){busy=false;setState("idle");toast(errText(e))}finally{b.textContent="Start discussion"}};
 async function endDiscussion(silent){
-  if(!disc)return;const d=disc;disc=null;st.set("disc",null);showDisc();
+  if(!disc)return;const d=disc;disc=null;st.set("disc",null);showDisc();freshStart(false);
   const turns=log.filter(x=>x.at>=d.startedAt);
   if(!turns.length){if(!silent)toast("Discussion ended.");return}
   if(!silent){busy=true;setState("think");sfx.puff()}
@@ -857,7 +866,7 @@ const _noGo=async()=>{const title=$("#aTitle").value.trim(),url=$("#aUrl").value
     catch(e){busy=false;toast(errText(e)+" Going on air without notes.")}}
   saveAir();showDisc();setState("idle");
   if(cues.length){toast("On Air. Start reading your script.");if(!cues[0].anchor.length)fireCue();else if(handsFree())setTimeout(listen,400);return}
-  await say(aPick==="kyi"?"Okay. We are live. Try not to embarrass yourself, Boba Boy.":"Hear ye! The royal show begins! Bow to your listeners, Royal Peasant.");
+  await say(aPick==="kyi"?"Okay. We are live. Try not to embarrass yourself, Boba Boy.":"Ayy, we're live! Bro, try to sound smart.");
 };
 async function summarizeSession(title,startedAt,kindLabel,closerHint){
   const turns=log.filter(x=>x.at>=startedAt);if(!turns.length)return null;
@@ -870,7 +879,7 @@ async function endAir(){
   if(!air)return;const a=air;air=null;saveAir();showDisc();updCue();micHold=true;if(rec&&listening){try{rec.abort()}catch(e){}}listening=false;$("#mic").classList.remove("on");
   busy=true;setState("think");sfx.puff();
   try{const o=await summarizeSession(a.title,a.startedAt,"Episode","one short sign-off line the co-host says to end the show, in character");busy=false;
-    await say((o&&o.closer)||(a.persona==="kyi"?"That's the show. I was brilliant, as usual.":"The royal broadcast has ended! You may go."))}
+    await say((o&&o.closer)||(a.persona==="kyi"?"That's the show. I was brilliant, as usual.":"That's the show, bro! Taw Thar out!"))}
   catch(e){busy=false;setState("idle");toast("Off Air. Couldn't save the episode memory.")}
   micHold=false;
 }
@@ -966,7 +975,7 @@ $("#vAud").onclick=async()=>{unlock();const my=++audRun;const vo=S.vo[vp];const 
     await new Promise(r=>{synth.cancel();const u=new SpeechSynthesisUtterance(AUD_LINE);u.voice=v;u.lang=v.lang;u.pitch=vo.pitch;u.rate=vo.rate;let d=false;const f=()=>{if(!d){d=true;r()}};u.onend=f;u.onerror=f;setTimeout(f,9000);synth.speak(u)});
     b.classList.remove("primary");await wait(300)}
   if(my===audRun)$("#vAudNow").textContent="Done. Tap a name to use that voice."};
-$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Okay. Listen carefully, Boba Boy. I explain this only one time.":"By royal decree, dis voice is PERFECT. Bow down, Royal Peasant!")};
+$("#vTest").onclick=async()=>{unlock();closeDrawers();await switchTo(vp);say(vp==="kyi"?"Okay. Listen carefully, Boba Boy. I explain this only one time.":"Ayy bro! This is my voice. Pretty good for a village boy, right?")};
 function fillAzure(){}
 $("#sBur").onchange=e=>{S.burmese=e.target.checked;saveS();toast(S.burmese?"Burmese subtitles on":"Burmese subtitles off")};
 $("#sBg").onchange=e=>{S.bg=e.target.value;saveS();applyBg()};
@@ -1039,7 +1048,7 @@ function openPod(){$("#pShow").value=S.pod.show||"";$("#pTopic").value=S.pod.top
 document.querySelectorAll("#pGuest button").forEach(b=>b.onclick=async()=>{if(busy){toast("Let them finish talking first.");return}S.pod.guest=b.dataset.g;saveS();openPod();
   if(S.pod.guest==="both")setDuo(true);else{vPending=false;$("#vBar").hidden=true;setDuo(false);if(S.persona!==S.pod.guest)await switchTo(S.pod.guest)}});
 $("#pShow").oninput=e=>{S.pod.show=e.target.value;saveS();showPod()};
-$("#pTopic").oninput=e=>{S.pod.topic=e.target.value;saveS()};
+$("#pTopic").oninput=e=>{S.pod.topic=e.target.value;saveS()};$("#pTopic").onchange=()=>freshStart(false);
 $("#pIntro").onclick=()=>podRun("intro");$("#pRoast").onclick=()=>podRun("roast");$("#pOutro").onclick=()=>podRun("outro");
 $("#pArgue").onclick=()=>{if(S.pod.guest!=="both"){toast("Pick ⚔️ Both as the guest to start an argument");return}podRun("argue")};
 $("#jRefresh").onclick=()=>jbRefresh(false);
@@ -1073,7 +1082,7 @@ function podTask(kind,both,g,opt){const n=S.name||"Jamie",tp=(S.pod.topic||"").t
   case"bit":return`Do a quick comedy bit about "${BANK[opt.k].n.replace(/^\S+\s/,"")}"${tp?", tying it to tonight's story only if it fits naturally":""}. ${both?"4 to 6 alternating lines: Taw Thar from the back-home view, Uncle with the real truth.":"2 to 3 lines."}`}}
 async function podRun(kind,opt={}){
   if(busy){toast("Let them finish talking first.");return}
-  closeDrawers();unlock();const g=S.pod.guest,both=g==="both";
+  closeDrawers();unlock();showOn=true;const g=S.pod.guest,both=g==="both";
   if(kind==="argue"&&!both){toast("Pick ⚔️ Both as the guest to start an argument");return}
   if(kind==="verdict"&&!both)return;
   if(both)setDuo(true);else{setDuo(false);if(S.persona!==g)await switchTo(g)}
@@ -1103,6 +1112,38 @@ async function podPlay(lines,label){if(synth)synth.cancel();
     const t0=Date.now();await speakAs(x.text,x.who);const minMs=Math.min(7000,700+x.text.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
     setState("idle");await wait(220)}}
 
+
+/* ===== v3.6: topic focus, fresh starts, show voice commands ===== */
+let ctxSince=Date.now(),showEarlier=false,showOn=false;
+function noteWords(x){return String(x||"").toLowerCase().match(/[a-z0-9က-႟']{4,}/g)||[]}
+const NOTE_STOP=new Set("this that with from have what about there their they them your just like really know when where which would could should these those been were into than then also very some more most much does doing make made want need talk tell said says".split(" "));
+function relevantNotes(list,said,max,anyIfNone){const w=new Set(noteWords(said).filter(x=>!NOTE_STOP.has(x)));
+  const sc=list.map(x=>{const nw=noteWords(x.title+" "+(x.hooks||[]).join(" ")+" "+String(x.summary||"").slice(0,200)).filter(y=>!NOTE_STOP.has(y));let k=0;new Set(nw).forEach(y=>{if(w.has(y))k++});return[x,k]}).filter(a=>a[1]>=(a[0].title&&noteWords(a[0].title).some(y=>w.has(y))?1:2)).sort((a,b)=>b[1]-a[1]);
+  if(sc.length)return sc.slice(0,max).map(a=>a[0]);return anyIfNone&&list.length?[list[Math.floor(Math.random()*list.length)]]:[]}
+function sceneContext(){let end=-1;for(let i=log.length-1;i>=Math.max(0,log.length-9);i--){if(log[i].at<ctxSince)break;if(log[i].pod){end=i;break}}if(end<0)return"";
+  const scene=[];for(let i=end;i>=0&&scene.length<10;i--){const x=log[i];if(!x.pod||x.at<ctxSince)break;if(x.english)scene.unshift(NAMES[x.p||"kyi"]+": "+x.english);else if(x.user)scene.unshift((S.name||"Jamie")+": "+x.user)}
+  return scene.length?"Just now on the show:\n"+scene.join("\n"):""}
+function freshStart(say_,topic){ctxSince=Date.now();showEarlier=false;podRecent=[];jbLast=[];
+  if(topic){S.pod.topic=topic;saveS();const pt=$("#pTopic");if(pt)pt.value=topic}
+  clearTimeout(hideLater.t);$("#bub").classList.remove("show");renderHist();
+  if(say_!==false)toast(topic?`🧹 New topic: ${topic}`:"🧹 Fresh start. They'll focus on whatever you say next.")}
+$("#newTopic").onclick=()=>{unlock();if(busy){toast("Let them finish talking first.");return}freshStart(true)};
+function showBitKey(t){const m=jbMatch(t||S.pod.topic||"");if(m.length)return m[0][0];const ks=Object.keys(BANK);return ks[Math.floor(Math.random()*ks.length)]}
+function showCommand(raw){let t=String(raw||"").trim();
+  const w=findWake(t);if(w)t=w.rest;else t=norm(t).trim();
+  if(t.split(" ").length>14)return false;
+  let m=t.match(/^(?:okay |ok |so |alright |now )?(?:let'?s |lets |let s )?(?:new topic|change (?:the )?topic|switch (?:the )?topic)(?:\s+(?:to\s+)?(.+))?$/);
+  if(m){const raw2=String(raw).replace(/^[^]*?(?:new topic|change (?:the )?topic|switch (?:the )?topic)\s*(?:to\s+)?[:,\-–—]?\s*/i,"").trim();freshStart(true,(m[1]?raw2||m[1]:"").slice(0,200)||null);if(handsFree())setTimeout(listen,400);return true}
+  if(/^(?:please )?(?:do|start|play|run) (?:the |an |our )?(?:intro|introduction|show)$|^intro(?:duce the show)?$/.test(t)){podRun("intro");return true}
+  if(/^(?:please )?roast (?:the |our )?(?:audience|viewers|listeners|everybody|everyone)$/.test(t)){podRun("roast");return true}
+  m=t.match(/^(?:please )?(?:start|have|do) (?:an |the |a )?(?:argument|fight|debate)(?: about (.+))?$/);
+  if(m){if(S.pod.guest!=="both"){S.pod.guest="both";saveS()}if(m[1]){const tp=String(raw).replace(/^[^]*?\babout\s+/i,"").trim();S.pod.topic=tp;saveS()}podRun("argue");return true}
+  if(/^(?:please )?(?:sign us off|sign off|do the outro|outro|end the show|wrap (?:it|the show) up)$/.test(t)){podRun("outro");return true}
+  m=t.match(/^(?:please )?(?:do|give us|tell us|play) (?:a |another |one more )?(?:bit|comedy bit|joke bit)(?: about (.+))?$/);
+  if(m){podRun("bit",{k:showBitKey(m[1]||"")});return true}
+  return false}
+
+if(disc&&disc.startedAt&&Date.now()-disc.startedAt>4*3600e3){setTimeout(()=>{try{endDiscussion(true)}catch(e){}},1500)}
 applyBg();renderChar();paint();renderHist();updConv();showDisc();updCue();showPod();
 if(!KEY)$("#setup").classList.add("show");
 else{const h=new Date().getHours(),today=new Date().toDateString();if(st.get("greeted","")!==today){st.set("greeted",today);const g=h<12?["Morning, Costco Prince. Tap me when you're awake.","Aiyo, you up already? I'm still loading."]:h<18?["Afternoon, Tupperware King. You eat already or not?"]:["Evening, Kumon Dropout. Late again, huh?"];setTimeout(()=>{if(busy||pst!=="idle"||log.length&&Date.now()-log[log.length-1].at<5000)return;bubble(g[Math.floor(Math.random()*g.length)]);hideLater()},600)}}
