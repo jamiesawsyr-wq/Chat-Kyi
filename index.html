@@ -373,7 +373,7 @@ body.clean #podBar{display:none}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v4.0</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v4.0.1</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sSass">Sass level</label><select id="sSass"><option value="mild">Mild (guest-friendly)</option><option value="spicy">Spicy (default)</option><option value="savage">Savage</option></select><p class="hint">Spicy and Savage can call you "idiot" or "dumb boy" for truly dumb questions. Audience roasts in Podcast mode always stay friendly.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
@@ -398,7 +398,8 @@ body.clean #podBar{display:none}
   <label for="elNpaw">Taw Thar voice</label><input type="text" id="elNpaw"><div class="elv" id="elVpaw"></div>
   <label for="elNj">Your voice (for "Read my lines aloud")</label><input type="text" id="elNj"><div class="elv" id="elVj"></div></div>
   <div class="row"><button class="btn" id="elFind">Find my voices</button><button class="btn" id="elTest">Test voices</button></div>
-  <div class="seg" id="elStab" style="margin-top:10px"><button data-v="1">Robust</button><button data-v="0.5">Natural</button></div>
+  <div class="f" style="margin-top:10px"><label for="elModel">Who writes the Burmese</label><select id="elModel"><option value="claude-sonnet-5-5">Sonnet 5.5 (much better Burmese, recommended)</option><option value="claude-haiku-4-5-20251001">Haiku 4.5 (cheaper, weaker Burmese)</option></select></div>
+  <div class="seg" id="elStab"><button data-v="1">Robust</button><button data-v="0.5">Natural</button></div>
   <p class="hint" id="elStat"></p>
   <p class="hint">Burmese mode: they reply in Burmese with these voices (Eleven v4), and the mic listens in Burmese through ElevenLabs. If ElevenLabs fails or runs out of credits, the iPhone voice takes over.</p>
   <hr class="sep">
@@ -677,7 +678,7 @@ Ending: ${pickEnding()} Never end with generic filler like "What do you want to 
   const fmt=persona==="paw"?(bur?`{"mood":"...","sfx":null,"english":"...","burmese_lines":["..."],"cameo":null,"action":null}`:`{"mood":"...","sfx":null,"english":"...","cameo":null,"action":null}`):(bur?`{"mood":"...","english":"...","burmese_lines":["..."],"action":null}`:`{"mood":"...","english":"...","action":null}`);
   return `${who}
 ${nick}
-${style}${myTurn?` This show is in Burmese right now. Your "burmese_lines" are what you will SAY OUT LOUD in Burmese, and "english" becomes the subtitle. Write the Burmese fully in your character, colloquial and spoken, never textbook: ${persona==="kyi"?"a condescending know-it-all old tea-shop uncle, dramatic sighs like ဟာ… or အေးပါ…, patronizing \"listen carefully\" setups (သေချာနားထောင်)":"a cheeky, energetic village boy talking to his best friend, casual words like ဘရို, ဟေ့, ကွာ, wide-eyed and teasing"}, your catchphrases translated naturally, names (Jamie, Uncle Paw Taw, Taw Thar) kept as they are. Short sentences that sound good spoken.`:""}${bur?` After "english", write "burmese_lines": an array with exactly one Burmese subtitle (natural colloquial Burmese, Myanmar script) for each English sentence, in the same order. These are subtitles only; you still speak English.`:""}
+${style}${myTurn?` This show is in Burmese right now. THINK AND WRITE IN BURMESE FIRST: "burmese_lines" is your real line, said OUT LOUD, the way a funny native Yangon Burmese speaker actually talks on a podcast. Never translate English word for word, never use textbook or news-reader Burmese, never invent words; if an English joke would not land in Burmese, use a Burmese joke instead. Split it into as many short spoken sentences as feels natural. "english" is only a short, faithful subtitle of what you said in Burmese. Your Burmese voice: ${persona==="kyi"?"a condescending know-it-all old tea-shop uncle, dramatic sighs like ဟာ… or အေးပါ…, patronizing \"listen carefully\" setups (သေချာနားထောင်)":"a cheeky, energetic village boy talking to his best friend, casual words like ဘရို, ဟေ့, ကွာ, wide-eyed and teasing"}, your catchphrases translated naturally, names (Jamie, Uncle Paw Taw, Taw Thar) kept as they are. Short sentences that sound good spoken.`:""}${bur&&!myTurn?` After "english", write "burmese_lines": an array with exactly one Burmese subtitle (natural colloquial Burmese, Myanmar script) for each English sentence, in the same order. These are subtitles only; you still speak English.`:""}
 Rules: spoken reply, 1 to 3 short sentences, under 40 words (village stories and quiz questions may run up to about 90 words). Tease the question or ${n}'s laziness; never insult appearance, race, religion or ethnic groups (the self-aware diaspora mix-up jokes in the comedy themes are fine); no slurs; no jokes about war, tragedies or real named politicians/public figures. You can't browse or know today's news, weather or prices; say so in character. Never withhold help. For a timer request add "action":{"type":"timer","seconds":N,"label":"short"}.
 ${glitch?`GLITCH: ${n} just spoke Burmese for the first time. "english" must begin with exactly: ${SHOUT} then answer anyway in English. mood "glitch".`:`If ${n} writes Burmese, understand it and answer in English. mood: ${persona==="kyi"?'"smirk", "sideeye" or "proud"':'"smirk" (cheeky grin), "sideeye", "proud" or "shock" (always "shock" when your sister comes up)'}.`}
 ${KNOW}
@@ -685,18 +686,18 @@ ${COMEDY(n)}
 ${sassLine(n)}${jb.length?`\nJoke-bank inspiration that fits this topic (rewrite in your own words, never copy, use at most one and only if it fits naturally; otherwise ignore):\n- ${jb.join("\n- ")}`:""}${shelfTxt}
 WHO IS TALKING: every user message comes from ${n}, the human host, typed or spoken.${duo?` A Showdown is on: ${persona==="kyi"?"Taw Thar":"Uncle Paw Taw"} is sitting right next to you and often jumps in after you. Never refuse to involve him: you may tease him, set him up, or toss the question his way, but never write his lines for him.${roomOn?" THE ROOM: this is a short vertical video, so keep every reply to 1 or 2 short sentences, under 30 words.":""}`:""} Lines under "Just now on the show" are context, not messages to you.
 TOP PRIORITY: answer what ${n} just said. The newest message always wins. Do not steer the talk back to earlier topics unless ${n} brings them up.
-Reply with ONLY this JSON, keys in this order, no markdown: ${fmt}`;
+Reply with ONLY this JSON, keys in this order, no markdown: ${myTurn?fmt.replace('"english":"...","burmese_lines":["..."]','"burmese_lines":["..."],"english":"..."'):fmt}`;
 }
 function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
-async function claude(sys,messages,max=900,tools){
+async function claude(sys,messages,max=900,tools,mdl){
   if(!KEY){const e=new Error("no key");e.code="no_key";throw e}
-  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true",...(tools?{"anthropic-beta":"web-fetch-2025-09-10"}:{})},body:JSON.stringify(Object.assign({model:S.model,max_tokens:max,system:sys,messages},tools?{tools}:{}))})}catch(e){const x=new Error("net");x.code="network";throw x}
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true",...(tools?{"anthropic-beta":"web-fetch-2025-09-10"}:{})},body:JSON.stringify(Object.assign({model:mdl||S.model,max_tokens:max,system:sys,messages},tools?{tools}:{}))})}catch(e){const x=new Error("net");x.code="network";throw x}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw apiErr(r.status,j);
   return (j.content||[]).map(c=>c.type==="text"?c.text:"").join("");
 }
-async function claudeStream(sys,messages,max,onText){
+async function claudeStream(sys,messages,max,onText,mdl){
   if(!KEY){const e=new Error("no key");e.code="no_key";throw e}
-  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages,stream:true})})}catch(e){const x=new Error("net");x.code="network";throw x}
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:mdl||S.model,max_tokens:max,system:sys,messages,stream:true})})}catch(e){const x=new Error("net");x.code="network";throw x}
   if(!r.ok){const j=await r.json().catch(()=>({}));throw apiErr(r.status,j)}
   if(!r.body||!r.body.getReader){const t=await r.text();throw new Error("no stream "+t.length)}
   const rd=r.body.getReader(),dec=new TextDecoder();let buf="",full="";
@@ -781,16 +782,16 @@ async function send(text,{label}={}){
     if(closed)enFinal=glitch?SHOUT+" "+body:body;
   };
   try{
-    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch,text+" "+(scene||"")),msgs,reading?1200:(S.burmese||azMy)?2000:(disc||air?300:230),onText);
+    const reading=!!air&&/\bread\b/i.test(text);const full=await claudeStream(system(p,glitch,text+" "+(scene||"")),msgs,reading?1200:(S.burmese||azMy)?2000:(disc||air?300:230),onText,azMy&&elMy()?S.el.model:undefined);
     let o={};try{o=pj(full)}catch(e){}
     if(!enFinal){if(o.english){onText(JSON.stringify({mood:o.mood||"",english:String(o.english)}))}else throw{code:"bad"}}
     let blines=Array.isArray(o.burmese_lines)?o.burmese_lines.map(String):[];
     if(!blines.length&&S.burmese){const bm=full.match(/"burmese_lines"\s*:\s*\[([\s\S]*)/);if(bm){const re=/"((?:[^"\\]|\\.)*)"/g;let x;while((x=re.exec(bm[1]))){try{blines.push(JSON.parse('"'+x[1]+'"'))}catch(e){}}}}
-    if(S.burmese&&blines.length<splitSent(enFinal).length){const sents=splitSent(enFinal);const at=Date.now();
+    if(S.burmese&&!azMy&&blines.length<splitSent(enFinal).length){const sents=splitSent(enFinal);const at=Date.now();
       claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script). Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(sents)}],2500)
         .then(t=>{const m=t.match(/\[[\s\S]*\]/);if(!m)return;const arr=JSON.parse(m[0]).filter(x=>typeof x==="string");const last=log[log.length-1];if(last&&last.english===enFinal){last.burmese=arr.join("\n");saveLog()}
           if($("#bub").classList.contains("show")&&Date.now()-at<60000)pairBubble(enFinal,arr,glitch)}).catch(()=>{})}
-    if(azMy&&blines.length<splitSent(enFinal).length){try{const t=await claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script) in the voice of "+(p==="paw"?"a cheeky Burmese village boy talking to his best friend":"a condescending old Burmese tea-shop uncle")+". Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(splitSent(enFinal))}],2500);const mm=t.match(/\[[\s\S]*\]/);if(mm)blines=JSON.parse(mm[0]).map(String)}catch(e){}}
+    if(azMy&&!blines.length){try{const t=await claude("Translate each English line into natural, colloquial spoken Burmese (Myanmar script) in the voice of "+(p==="paw"?"a cheeky Burmese village boy talking to his best friend":"a condescending old Burmese tea-shop uncle")+". Return ONLY a JSON array of strings, one per input line, same order.",[{role:"user",content:JSON.stringify(splitSent(enFinal))}],2500);const mm=t.match(/\[[\s\S]*\]/);if(mm)blines=JSON.parse(mm[0]).map(String)}catch(e){}}
     if(blines.length)pairBubble(enFinal,blines,glitch);
     if(azMy&&blines.length){setState("talk");if(elv){try{await elSpeak(p,blines.join(" "))}catch(e){elFail(e);await speakAsSynth(enFinal,p)}}else{try{await azSpeak(blines,mood)}catch(e){toast(azErr(e))}}}
     else if(elv){setState("talk");try{await elSpeak(p,enFinal)}catch(e){elFail(e);await speakAsSynth(enFinal,p)}}
@@ -1128,7 +1129,7 @@ ${COMEDY(n)}
 ${sassLine(n)}
 ${KNOW}
 Rules: plain spoken English with normal spelling, no Burmese filler words (no lar, ba le); use a Burmese word only when it is part of a joke. Each line is 1 or 2 short sentences, under 35 words. Audience roasts always stay friendly and safe to post, whatever the sass level. Never insult appearance, race, religion or ethnic groups; no slurs; no jokes about war, tragedies, or real named politicians or public figures. Stay in character.
-Reply with ONLY JSON, no markdown: {"lines":[{"who":"kyi","mood":"smirk","text":"..."}]}  (who is "kyi" or "paw"; mood is smirk, sideeye, proud or shock)`}
+${elMy()?`THIS SHOW IS IN BURMESE: for every line also write "my", the line as the character really says it out loud in natural, funny, spoken Yangon Burmese (Myanmar script). Write the Burmese first in your head; never translate word for word, never textbook Burmese, swap jokes that do not land in Burmese for Burmese ones. "text" is a short faithful English subtitle of "my".\n`:""}Reply with ONLY JSON, no markdown: {"lines":[{"who":"kyi","mood":"smirk",${elMy()?'"my":"...",':""}"text":"..."}]}  (who is "kyi" or "paw"; mood is smirk, sideeye, proud or shock)`}
 function podTask(kind,both,g,opt){const n=S.name||"Jamie",tp=(S.pod.topic||"").trim(),G=NAMES[g];
   switch(kind){
   case"intro":return both?`Open the episode as a Showdown: Uncle and Taw Thar fight over who gets to introduce ${n}, roast ${n} with nicknames, ${tp?"tease tonight's story":"promise tonight's story is good, allegedly"}, and finally hand it over to ${n}. 5 to 7 alternating lines.`
@@ -1154,8 +1155,8 @@ async function podRun(kind,opt={}){
 TASK: ${podTask(kind,both,g,opt)}
 ${bits.length?`Joke-bank inspiration (rewrite in your own words, don't copy, use only what fits):\n- ${bits.join("\n- ")}\n`:""}${podRecent.length?`Already said this episode (don't repeat):\n${podRecent.slice(-10).join("\n")}`:""}`;
   try{
-    const raw=await claude(podSys(both,g),[{role:"user",content:user}],1200);let o;try{o=pj(raw)}catch(e){const x=new Error("bad");x.code="api_error";throw x}
-    const lines=(Array.isArray(o.lines)?o.lines:[]).filter(x=>x&&x.text).slice(0,10).map(x=>({who:both?(x.who==="paw"?"paw":"kyi"):g,mood:String(x.mood||"smirk"),text:clean(String(x.text))}));
+    const raw=await claude(podSys(both,g),[{role:"user",content:user}],elMy()?2200:1200,undefined,elMy()?S.el.model:undefined);let o;try{o=pj(raw)}catch(e){const x=new Error("bad");x.code="api_error";throw x}
+    const lines=(Array.isArray(o.lines)?o.lines:[]).filter(x=>x&&x.text).slice(0,10).map(x=>({who:both?(x.who==="paw"?"paw":"kyi"):g,mood:String(x.mood||"smirk"),text:clean(String(x.text)),my:typeof x.my==="string"?x.my.trim():""}));
     if(!lines.length){const x=new Error("bad");x.code="api_error";throw x}
     await podPlay(lines,label);
     if(kind==="argue"){vPending=true;showPod();$("#vBar").hidden=false}
@@ -1166,9 +1167,9 @@ async function podPlay(lines,label){if(synth)synth.cancel();
   for(let i=0;i<lines.length;i++){const x=lines[i];
     if(duo)duo.speaker=x.who;const ok=x.who==="paw"?["smirk","sideeye","proud","shock"]:["smirk","sideeye","proud"];mood=ok.includes(x.mood)?x.mood:"smirk";
     if(x.who==="paw"&&/\bsister\b|ma phyu/i.test(x.text)){mood="shock";playVillage("gasp")}
-    setState("talk");if(roomOn)roomLive(x.who,x.text,"p"+Date.now()+"_"+i,null,true);log.push({user:i===0?label:"",p:x.who,english:x.text,mood,pod:true,at:Date.now()});saveLog();podRecent.push(NAMES[x.who]+": "+x.text);if(podRecent.length>30)podRecent=podRecent.slice(-30);
+    setState("talk");if(roomOn)roomLive(x.who,x.text,"p"+Date.now()+"_"+i,x.my?[x.my]:null,!x.my);log.push({user:i===0?label:"",p:x.who,english:x.text,mood,pod:true,at:Date.now()});saveLog();podRecent.push(NAMES[x.who]+": "+x.text);if(podRecent.length>30)podRecent=podRecent.slice(-30);
     if(threadOn())renderHist();else bubble(x.text,{ms:x.text.length*62});
-    const t0=Date.now();await speakAs(x.text,x.who);const minMs=Math.min(7000,700+x.text.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
+    const t0=Date.now();await speakAs(x.text,x.who,x.my);const minMs=Math.min(7000,700+x.text.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
     setState("idle");await wait(220)}}
 
 
@@ -1378,18 +1379,18 @@ async function chimeIn(p,text,reply){const o=p==="kyi"?"paw":"kyi",n=S.name||"Ja
   if(!group&&!named&&Math.random()>0.65)return;
   const msg=`Just now on the show:\n${n}: ${text}\n${NAMES[p]}: ${reply}\n\n[Cue for ${NAMES[o]}] You are on the show too, sitting right there. Jump in with your own reaction to what ${n} said and what ${NAMES[p]} just said: answer ${n} yourself if the question was meant for you too, agree, disagree, or roast one of them, in character. 1 or 2 short sentences, under 25 words. Don't repeat what ${NAMES[p]} said.`;
   try{if(duo)duo.speaker=o;setState("think");
-    const raw=await claude(system(o,false,text+" "+reply),[{role:"user",content:msg}],300);let ob={};try{ob=pj(raw)}catch(e){}
+    const raw=await claude(system(o,false,text+" "+reply),[{role:"user",content:msg}],elMy()?900:300,undefined,elMy()?S.el.model:undefined);let ob={};try{ob=pj(raw)}catch(e){}
     const en=clean(String(ob.english||"")).trim();if(!en){if(duo)duo.speaker=null;return}
     const ok=o==="paw"?["smirk","sideeye","proud","shock"]:["smirk","sideeye","proud"];mood=ok.includes(ob.mood)?ob.mood:"smirk";
     if(o==="paw"&&/\bsister\b|ma phyu/i.test(en+" "+text)){mood="shock";playVillage("gasp")}
     log.push({user:"",p:o,english:en,mood,pod:true,at:Date.now()});saveLog();
-    setState("talk");if(roomOn)roomLive(o,en,"c"+Date.now(),null,true);
+    setState("talk");const myL=Array.isArray(ob.burmese_lines)?ob.burmese_lines.map(String).join(" ").trim():"";if(roomOn)roomLive(o,en,"c"+Date.now(),myL?[myL]:null,!myL);
     if(threadOn())renderHist();else bubble(en,{ms:en.length*62});
-    const t0=Date.now();await speakAs(en,o);const minMs=Math.min(6000,700+en.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
+    const t0=Date.now();await speakAs(en,o,myL);const minMs=Math.min(6000,700+en.length*45);if(Date.now()-t0<minMs*.5)await wait(minMs-(Date.now()-t0));
   }catch(e){}finally{if(duo)duo.speaker=null}}
 
 /* ===== v4.0: ElevenLabs voices + Burmese mode ===== */
-if(!S.el)S.el={on:false,lang:"my",stab:1,ids:{kyi:"",paw:"",j:""},names:{kyi:"Zayar",paw:"Nanda",j:"JamieS"},chars:0};
+if(!S.el)S.el={on:false,lang:"my",stab:1,ids:{kyi:"",paw:"",j:""},names:{kyi:"Zayar",paw:"Nanda",j:"JamieS"},chars:0};if(!S.el.model)S.el.model="claude-sonnet-5-5";
 if(!S.v40){S.v40=true;S.pod.show="Jamie & Friends";saveS()}
 let ELKEY=st.get("elkey","");
 const elAudio=new Audio();elAudio.playsInline=true;elAudio.setAttribute("playsinline","");let elUnlocked=false;
@@ -1409,7 +1410,7 @@ async function elSpeak(who,text){text=String(text||"").trim();if(!text)return;if
 const trCache=new Map();
 function burmeseOf(text,who){text=String(text||"").trim();if(!text)return Promise.resolve("");if(MY.test(text))return Promise.resolve(text);const k=(who||"")+"|"+text;if(trCache.has(k))return trCache.get(k);
   const voice=who==="kyi"?"a condescending, sarcastic old Burmese tea-shop uncle":who==="paw"?"a cheeky, energetic Burmese village boy talking to his best friend":"a young Burmese man living in America, casual and dry";
-  const pr=claude(`Translate the English into natural, colloquial SPOKEN Burmese (Myanmar script) in the voice of ${voice}. Keep names as they are (Jamie, Uncle Paw Taw, Taw Thar, Jamie & Friends). Keep it short and keep the joke. Return ONLY the Burmese text.`,[{role:"user",content:text}],800)
+  const pr=claude(`You are a native Burmese comedy writer. Rewrite the English line as ${voice} would really SAY it out loud in natural, everyday Yangon Burmese (Myanmar script). Do not translate word for word, do not use textbook or news Burmese, do not invent words; keep the meaning and the joke, and if the joke does not work in Burmese, use an equivalent Burmese joke. Keep names as they are (Jamie, Uncle Paw Taw, Taw Thar, Jamie & Friends). Keep it about as short as the English. Return ONLY the Burmese line.`,[{role:"user",content:text}],900,undefined,S.el.model)
     .then(t=>String(t||"").replace(/^["'\s]+|["'\s]+$/g,"").trim()).catch(e=>{trCache.delete(k);throw e});
   trCache.set(k,pr);if(trCache.size>200)trCache.delete(trCache.keys().next().value);return pr}
 let elWarned=0;function elFail(e){if(Date.now()-elWarned>20000){elWarned=Date.now();toast(((e&&e.message)||"ElevenLabs failed")+". Using the iPhone voice.")}}
@@ -1441,11 +1442,12 @@ async function listenEL(){if(listening)return;
     catch(e){setState("idle");toast((e&&e.message)||"Couldn't understand that. Try again.")}};
   mr.start(250)}
 /* Settings */
-function fillEL(){const e=S.el;$("#elOn").checked=!!e.on;$("#elKey").value=ELKEY;
+function fillEL(){const e=S.el;$("#elModel").value=e.model||"claude-sonnet-5-5";$("#elOn").checked=!!e.on;$("#elKey").value=ELKEY;
   document.querySelectorAll("#elLang button").forEach(b=>b.classList.toggle("on",b.dataset.v===e.lang));
   document.querySelectorAll("#elStab button").forEach(b=>b.classList.toggle("on",Number(b.dataset.v)===Number(e.stab)));
   ["kyi","paw","j"].forEach(k=>{$("#elN"+k).value=e.names[k]||"";const v=$("#elV"+k);v.textContent=e.ids[k]?"✓ Voice ID "+e.ids[k]:"Not linked yet. Tap Find my voices.";v.classList.toggle("bad",!e.ids[k])});
   $("#elStat").textContent=`Characters sent to ElevenLabs from this phone: ${(e.chars||0).toLocaleString()} (repeats are free while the app is open)`}
+$("#elModel").onchange=e=>{S.el.model=e.target.value;saveS();trCache.clear()};
 $("#elOn").onchange=e=>{S.el.on=e.target.checked;saveS();if(S.el.on&&!ELKEY)toast("Paste your ElevenLabs key below")};
 $("#elKey").onchange=e=>{ELKEY=e.target.value.trim();st.set("elkey",ELKEY)};
 document.querySelectorAll("#elLang button").forEach(b=>b.onclick=()=>{S.el.lang=b.dataset.v;saveS();fillEL()});
