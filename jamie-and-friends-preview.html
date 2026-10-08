@@ -1,0 +1,229 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jamie & Friends Intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@700;800;900&family=Noto+Sans+Myanmar:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#120d1f;--ink:#f5ecd9;--mut:#b9a9cf;--gold:#ffe2a3;--card:#211936;--line:#43365f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,system-ui,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:12px 14px 40px;display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.phone{position:relative;width:min(100%,400px);aspect-ratio:9/16;border-radius:24px;overflow:hidden;box-shadow:0 0 0 7px #000;flex:none;container-type:inline-size}
+.phone canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#zone{position:absolute;left:6.5%;right:12%;top:28%;height:36.5%;overflow-y:auto;scrollbar-width:none;padding-bottom:5cqw;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 7cqw);mask-image:linear-gradient(to bottom,transparent 0,#000 7cqw)}
+#zone::-webkit-scrollbar{display:none}#list{min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2.4cqw}
+.rb{position:relative;background:#fff;color:#141014;border:1.1cqw solid #111;border-radius:4.4cqw;padding:2.4cqw 3.4cqw 2.8cqw;box-shadow:0 1.2cqw 0 rgba(0,0,0,.35)}
+.rb .who{display:inline-block;font:400 2.6cqw 'Press Start 2P',monospace;color:#fff;padding:1.2cqw 1.8cqw;border-radius:1.4cqw;margin-bottom:1.4cqw}
+.rb.u .who{background:#b07a12}.rb.t .who{background:#4f8a3c}.rb.j .who{background:#c0392b}.rb.t{background:#fff6cf}.rb.j{background:#ffe9e6}
+.rb .my{font:700 5cqw/1.7 'Noto Sans Myanmar','Myanmar Sangam MN',sans-serif}.rb .en{font:800 3.6cqw/1.35 Nunito,sans-serif;color:#4a3f3a;margin-top:.8cqw}
+body.enbig .rb .en{font:900 5cqw/1.3 Nunito,sans-serif;color:#141014;margin-top:0}body.enbig .rb .my{font:600 3.6cqw/1.7 'Noto Sans Myanmar',sans-serif;color:#4a3f3a;margin-top:1cqw}body.enbig .rb .en{order:1}
+.rb .body{display:flex;flex-direction:column}
+.rb::after{content:"";position:absolute;bottom:-4.4cqw;left:var(--tail,50%);border-left:3cqw solid transparent;border-right:3cqw solid transparent;border-top:4.4cqw solid #111;transform:translateX(-50%)}
+.rb.old{opacity:.6}.rb.old::after{display:none}.rb.old .my{font-size:3.8cqw}.rb.old .en{font-size:3cqw}
+.side{flex:1;min-width:290px;max-width:520px}
+h1{font:800 18px ui-monospace,Menlo,monospace;color:var(--gold);margin:4px 0 6px;letter-spacing:.04em}
+.mut{color:var(--mut);font-size:13px}.card{background:var(--card);border-radius:14px;padding:12px;margin:10px 0}
+.card b.h{display:block;color:var(--gold);font-size:12.5px;letter-spacing:.06em;margin-bottom:6px}
+button{border:0;border-radius:10px;padding:10px 12px;font-weight:800;font-size:14px;cursor:pointer;background:#ffe2a3;color:#2c1f4a}
+button.sec{background:#43365f;color:#fff}button.on{outline:2px solid #ffe2a3}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+input,textarea{background:#120d1f;border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:9px 10px;font-size:15px;width:100%}
+textarea{font-family:'Noto Sans Myanmar',system-ui,sans-serif;line-height:1.6}
+.vrow{display:grid;grid-template-columns:92px 1fr;gap:6px;align-items:center;margin:5px 0;font-size:13.5px}
+.vid{font:12px ui-monospace,monospace;color:#8fd17a;word-break:break-all}.vid.bad{color:#ff7a6b}
+#stat{font-size:13px;color:var(--mut);margin-top:6px}
+.sc{background:#43365f;color:#fff}.sc.on{background:#ffe2a3;color:#2c1f4a}
+</style></head><body><div class="wrap">
+<div class="phone"><canvas id="roomCv" width="1080" height="1920"></canvas><div id="zone"><div id="list"></div></div></div>
+<div class="side">
+ <h1>JAMIE &amp; FRIENDS · INTRO MOCK-UP</h1>
+ <p class="mut">Real ElevenLabs voices on Eleven v4: <b>Zayar</b> as Uncle Paw Taw, <b>Nanda</b> as Taw Thar, and your <b>JamieS</b> clone as you. Your key stays on this device and only goes to ElevenLabs. Lines you've already played are replayed for free.</p>
+ <div class="card"><b class="h">1 · ELEVENLABS KEY</b>
+  <input id="key" type="password" placeholder="Paste your ElevenLabs API key" autocomplete="off">
+  <div class="row"><button id="find">Find my voices</button><span class="mut">Looks up JamieS, Zayar and Nanda in your voices</span></div>
+  <div class="vrow"><span>Uncle</span><div><input id="nU" value="Zayar"><div class="vid" id="vU">not found yet</div></div></div>
+  <div class="vrow"><span>Taw Thar</span><div><input id="nT" value="Nanda"><div class="vid" id="vT">not found yet</div></div></div>
+  <div class="vrow"><span>Jamie</span><div><input id="nJ" value="JamieS"><div class="vid" id="vJ">not found yet</div></div></div>
+  <p class="mut" style="margin:4px 0 0">Not found? On ElevenLabs, open the voice and tap <b>Add to My Voices</b>, then try again. Or paste a Voice ID straight into the box.</p>
+ </div>
+ <div class="card"><b class="h">2 · VOICE STYLE</b>
+  <div class="row"><button class="sc on" data-st="1">Robust</button><button class="sc" data-st="0.5">Natural</button><span class="mut">Stability, like on their site</span></div>
+  <div class="row"><button class="sc on" data-big="my">Burmese big</button><button class="sc" data-big="en">English big</button></div>
+  <div class="row"><button class="sc on" data-scene="studio">🎙 Studio</button><button class="sc" data-scene="camp">🔥 Campfire</button></div>
+ </div>
+ <div class="card"><b class="h">3 · PLAY THE SCENE</b>
+  <p class="mut" style="margin:0 0 6px">One line each: <code>Name: Burmese | English</code>. Edit freely. Names: Jamie, Uncle, Taw Thar.</p>
+  <textarea id="script" rows="9"></textarea>
+  <div class="row"><button id="play">▶ Play with real voices</button><button id="stop" class="sec">■ Stop</button></div>
+  <div id="stat"></div>
+ </div>
+ <div class="card"><b class="h">4 · TEST BURMESE LISTENING</b>
+  <p class="mut" style="margin:0 0 6px">Tap, speak a sentence in Burmese, tap again. ElevenLabs turns it into text and shows it in your bubble.</p>
+  <div class="row"><button id="rec">🎤 Start listening</button><span class="mut" id="recStat"></span></div>
+ </div>
+</div></div>
+<script>
+const W=1080,H=1920,c=document.getElementById('roomCv'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
+const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
+const P={K:'#0d0d0f',H:'#27272d',h:'#4b4b57',s:'#f2d9c6',p:'#e8aaa4',N:'#e3a08a',W:'#f7f7f4',O:'#6b7f5a',B:'#3b5ba5',r:'#e4572e',M:'#2b211c',C:'#8b5a2b',F:'#ff7a3d',T:'#7FA36B',Y:'#E7CF97',U:'#f4efe3',u:'#c94f4f',L:'#8a5a3c',l:'#c98a5a',E:'#0d0d0f',R:'#d1524c',b:'#9b3a36',n:'#26357a',D:'#3f2b3a'};
+const MAP={
+u:["...KKKKKKKK...",".KKsssHHHHKK..","KssHHHHHHHHssK","KHHHHHHHHssssK","KHsssssssssHHK","KHssssssssssHK","KssKKssssKKssK","KsssEssssEsssK","KspssssNssspsK",".KsssMMMMsssK.","..KKsssKCCCCCF",".KsWWssssWWsK.","KsKWWWWWWWWKsK","KsKWWWWWWWWKsK","KsKWWWWWWWWKsK",".KKOOOOOOOOKK."],
+j:["...KKKKKKKK...",".KKHHHHHHHHKK.","KHHHHhHHHhHHHK","KHhHHHHHHHHhHK","KHHHHHHHHHHHHK","KHssssssssssHK","KsssEssssEsssK","KsssEssssEsssK","KspssssNssspsK",".KssssssssssK.","..KKssssssKK..",".KRRRRRRRRRRK.","KRRRRbRRbRRRRK","KsKRRRRRRRRKsK","KsKRRRRRRRRKsK",".KKRRRRRRRRKK."],
+t:["..K.KK.KK.K...",".KKHHHHHHHHKK.","KHHHHhHHHhHHHK","KHhHHHHHHHHhHK","KHHHHHHHHHHHHK","KHssssssssssHK","KsssEssssEsssK","KsssEssssEsssK","KYYssssNsssYYK",".KssssKKssssK.","..KKssssssKK..",".KUTTTTTTTTUK.","KUTTTTTTTTTTTK","KuKTTTTTTTTKsK","KsKLLLLLLLLKsK",".KKLlLLlLLlKK."]};
+const SC=17,DESK=1580,CX={u:200,j:520,t:836};let speaking=null,bob=0;
+
+function wall(){const bands=['#1b1430','#21183a','#271c44','#2c2048','#30234d','#33264f'];bands.forEach((col,i)=>R(0,i*240,W,240,col));
+ for(let y=0;y<DESK;y+=20)R(0,y,W,2,'rgba(255,255,255,.015)');
+ const foam=(x0,y0,cols,rows)=>{for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const x=x0+i*60,y=y0+j*60;R(x,y,60,60,'#3a3166');const h=(i+j)%2;for(let k=0;k<5;k++)R(x+(h?k*10:0),y+(h?0:k*10),h?10:50,h?50:10,'#463c7a');R(x,y,60,6,'#2a2350');R(x,y,6,60,'#2a2350')}};
+ foam(0,560,2,10);foam(960,560,2,10);
+ // shelf + plant + tea tin left, pagoda frame right (kept out of bubble zone)
+ 
+ R(150,1250,150,14,'#5a3a26');R(170,1196,46,54,'#b9653a');[[188,1130,14,66],[166,1150,22,12],[200,1144,22,12],[178,1136,10,14]].forEach(a=>R(...a,'#5f8f4e'));R(232,1204,48,46,'#d1524c');R(232,1214,48,8,'#e8b440');R(780,1170,120,140,'#c98a2a');R(790,1180,100,120,'#f6c27a');R(790,1250,100,50,'#e08a5d');[[840,1192,6,16],[832,1208,22,10],[822,1218,42,10],[814,1228,58,10],[806,1238,74,12]].forEach(a=>R(...a,'#e3aa32'));}
+function neon(){g.save();g.textAlign='center';g.textBaseline='middle';
+ const glowText=(t,x,y,size,col,glow)=>{g.font=size+"px 'Press Start 2P'";g.shadowColor=glow;for(const b of [40,22,10]){g.shadowBlur=b;g.fillStyle=col;g.fillText(t,x,y)}g.shadowBlur=0;g.fillStyle='#fff';g.globalAlpha=.55;g.fillText(t,x,y);g.globalAlpha=1};
+ // backing board
+ g.fillStyle='rgba(10,6,20,.55)';g.fillRect(70,262,940,262);g.strokeStyle='rgba(255,95,162,.35)';g.lineWidth=4;g.strokeRect(70,262,940,262);
+ signLines().forEach((l,i)=>glowText(l.t,540,l.y,l.sz,i===0?'#ff5fa2':'#5ff3ff',i===0?'#ff2d8a':'#18c8ff'));
+ // ON AIR
+ g.fillStyle='rgba(255,60,60,.12)';g.fillRect(380,150,320,92);R(392,158,296,76,'#3a0d14');R(400,166,280,60,'#ff3b3b');R(408,174,264,44,'#c81e2a');
+ g.font="34px 'Press Start 2P'";g.fillStyle='#ffe9e9';g.shadowColor='#ff3b3b';g.shadowBlur=18;g.fillText('ON AIR',540,198);g.restore()}
+function person(k){const m=MAP[k],cx=CX[k],ox=cx-7*SC,talk=speaking===k,dy=talk&&bob?-8:0,oy=DESK-14*SC+dy,camp=SCENE==='camp';
+ m.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.'&&P[ch])R(ox+x*SC,oy+y*SC,SC,SC,P[ch])}));
+ if(k==='t'){[[13,11],[14,11],[13,12],[13,13],[14,10],[12,10]].forEach(([x,y])=>R(ox+x*SC,oy+y*SC,SC,SC,P.C))}
+ if(k==='u'){g.fillStyle='rgba(233,228,222,.8)';[[15,8],[15,6],[16,4]].forEach(([x,y],i)=>R(ox+x*SC,oy+y*SC-(bob&&i?6:0),SC,SC,'#e9e4de'))}
+ if(camp){if(k==='j'){[[13,10,'#2b2b2b'],[14,10,'#2b2b2b'],[13,9,'#4b4b57'],[14,9,'#4b4b57'],[13,11,'#8a8a92'],[13,12,'#8a8a92']].forEach(([x,y,col])=>R(ox+x*SC,oy+y*SC,SC,SC,col))}if(talk){g.fillStyle='rgba(255,200,90,.9)';g.font="28px 'Press Start 2P'";g.textAlign='center';g.fillText('♪',cx+(k==='t'?-150:150),oy+40)}return}
+ // headphones
+ const hb=k==='t'?0:-6;R(ox+2*SC,oy+hb-10,10*SC,10,'#1a1a22');R(ox+2*SC,oy+hb-10,10*SC,4,'#3b3b48');R(ox-10,oy+2*SC,12,3*SC,'#1a1a22');R(ox+14*SC-2,oy+2*SC,12,3*SC,'#1a1a22');
+ const cup={u:'#e8b440',j:'#d1524c',t:'#7FA36B'}[k];R(ox-26,oy+4*SC,30,4*SC,'#1a1a22');R(ox-20,oy+4*SC+6,16,4*SC-12,cup);R(ox+14*SC-4,oy+4*SC,30,4*SC,'#1a1a22');R(ox+14*SC+2,oy+4*SC+6,16,4*SC-12,cup);
+ // mic on stand, in front-side
+ const mx=cx+7*SC+16;R(mx,DESK-150,40,76,'#1f1f27');for(let y=DESK-142;y<DESK-86;y+=12)R(mx+5,y,30,5,'#5a5a66');R(mx,DESK-74,40,10,'#c0c0c8');R(mx+14,DESK-64,12,64,'#2b2b33');R(mx-8,DESK-8,56,10,'#2b2b33');
+ R(mx+14,DESK-166,12,12,talk?'#ff3b3b':'#4a1a1a');if(talk){g.fillStyle='rgba(255,59,59,.35)';g.fillRect(mx+6,DESK-174,28,28)}}
+function desk(){R(0,DESK,W,H-DESK,'#5c3822');R(0,DESK,W,26,'#a8714a');R(0,DESK+26,W,8,'#4f2f1c');for(let x=20;x<W;x+=140)R(x,DESK+90,90,6,'#4f2f1c');
+ const plate=(k,t)=>{g.font="22px 'Press Start 2P'";const w=g.measureText(t).width+40,cx=CX[k];R(cx-w/2,DESK+28,w,52,'#111');R(cx-w/2+6,DESK+34,w-12,40,'#fff3c4');g.fillStyle='#111';g.textAlign='center';g.textBaseline='middle';g.fillText(t,cx,DESK+56)};
+ plate('u','UNCLE');plate('j','JAMIE');plate('t','TAW THAR');
+ R(352,DESK-50,44,50,'#f4efe3');R(396,DESK-40,12,22,'#f4efe3');R(358,DESK-44,32,7,'#c98a5a');}
+
+let SCENE='studio',flick=0,SEASON='summer',TOD='night';
+const rnd=(i)=>{const x=Math.sin(i*99.13)*43758.5;return x-Math.floor(x)};
+const SKY={day:['#4fa3f0','#62b2f3','#78c0f5','#8fcdf7','#a7d9f8','#bfe4f9'],sunset:['#2c1f4a','#5e2f6c','#a9476d','#e27e62','#f0a062','#f6c27a'],night:['#070b1f','#0b1230','#101a3f','#16224d','#1c2a58','#22325f']};
+const MTN={day:'#6f8fb3',sunset:'#7a3f5e',night:'#1a2148'};
+function treeCols(){const t=TOD,s=SEASON;
+ if(s==='winter')return{back:t==='night'?'#122033':t==='sunset'?'#3a2f4f':'#2f5a4a',front:t==='night'?'#0b141f':t==='sunset'?'#2a2038':'#24493b',snow:t==='night'?'#b9c6e0':t==='sunset'?'#f3d6e0':'#ffffff'};
+ return{back:t==='night'?'#0f1a2e':t==='sunset'?'#3a1d3a':'#2f6b3a',front:t==='night'?'#0b141f':t==='sunset'?'#2a1530':'#245a2e'}}
+let parts=[];function resetParts(){parts=[];const n=SEASON==='winter'?90:SEASON==='fall'?26:0;for(let i=0;i<n;i++)parts.push({x:rnd(i+7)*W,y:rnd(i+13)*H,s:SEASON==='winter'?(rnd(i)*8+6):14,v:SEASON==='winter'?(rnd(i+3)*6+4):(rnd(i+3)*4+3),c:['#e0632b','#f0a03b','#c8382b','#e8c13b'][i%4]})}
+function stepParts(){parts.forEach((p,i)=>{p.y+=p.v;p.x+=Math.sin((p.y+i*40)/60)*(SEASON==='fall'?3:1.5);if(p.y>H){p.y=-20;p.x=rnd(i+flick)*W}})}
+function drawParts(){parts.forEach(p=>{if(SEASON==='winter')R(p.x,p.y,p.s,p.s,'rgba(255,255,255,.9)');else{R(p.x,p.y,p.s,p.s*0.6,p.c);R(p.x+p.s*0.3,p.y-4,4,4,'#6b4128')}})}
+function pine(cx,base,h,col,snow){for(let y=0;y<h;y+=10){const w=Math.round((y/h)*h*0.5/10)*10+10;R(cx-w/2,base-h+y,w,10,col);if(snow&&y%40===0)R(cx-w/2,base-h+y,w,4,snow)}R(cx-8,base,16,24,'#3a2414')}
+function oak(cx,base,r,col,trunk){R(cx-10,base-r,20,r+24,trunk);for(let y=-r;y<=r;y+=10)for(let x=-r;x<=r;x+=10){if(x*x+y*y<=r*r)R(cx+x,base-r*1.6+y,10,10,(x+y)%30===0?shade(col):col)}}
+function shade(c){return c==='#e0632b'?'#b8471c':c==='#f0a03b'?'#c9801f':c==='#c8382b'?'#962719':'#c49a22'}
+function campBg(){SKY[TOD].forEach((col,i)=>R(0,i*230,W,230,col));R(0,1380,W,600,SKY[TOD][5]);
+ if(TOD==='night'){for(let i=0;i<90;i++){const x=rnd(i)*W,y=140+rnd(i+300)*820;const tw=(i+flick)%7===0;R(x,y,tw?8:5,tw?8:5,tw?'#fff6c8':'#cfd6ff')}
+  for(let y=-60;y<=60;y+=10)for(let x=-60;x<=60;x+=10){if(x*x+y*y<=3600&&!((x-22)*(x-22)+(y+10)*(y+10)<=1700))R(880+x,190+y,10,10,'#f6eec8')}}
+ else if(TOD==='day'){for(let y=-56;y<=56;y+=10)for(let x=-56;x<=56;x+=10){if(x*x+y*y<=3136)R(880+x,190+y,10,10,'#fff3a8')}
+  [[140,640,1],[700,720,0]].forEach(([x,y,b])=>{for(let i=0;i<5;i++)R(x+i*40-(b?20:0),y-(i%2?20:0),90,40,'rgba(255,255,255,.85)')})}
+ else{for(let y=-110;y<=0;y+=10)for(let x=-110;x<=110;x+=10){if(x*x+y*y<=12100)R(760+x,1010+y,10,10,y>-40?'#ffb35c':'#ffd27a')}}
+ const mc=MTN[TOD];for(let x=0;x<W;x+=10){const h=180+Math.round((Math.sin(x/140)*60+Math.sin(x/53)*24)/10)*10;R(x,1160-h,10,h+500,mc);if(SEASON==='winter')R(x,1160-h,10,24,treeCols().snow)}
+ const tc=treeCols(),snow=SEASON==='winter'?tc.snow:null;
+ if(SEASON==='fall'){[[40,1250,70,'#e0632b'],[190,1260,60,'#f0a03b'],[330,1240,75,'#c8382b'],[480,1255,58,'#e8c13b'],[640,1245,72,'#e0632b'],[800,1260,62,'#f0a03b'],[960,1245,74,'#c8382b']].forEach(([x,b,r,c],i)=>{if(i%3===2)pine(x,b,220,tc.back,null);else oak(x,b,r,TOD==='night'?'#3a2030':c,'#3a2414')})}
+ else [[40,1230,230],[150,1250,190],[300,1220,250],[460,1240,170],[620,1230,240],[780,1250,200],[930,1225,260],[1050,1245,190]].forEach(([x,b,h])=>pine(x,b,h,tc.back,snow));
+ const ground=SEASON==='winter'?(TOD==='night'?'#9fb0cf':TOD==='sunset'?'#e9cfd9':'#eef3fb'):SEASON==='fall'?(TOD==='night'?'#1c1712':'#6b4a2a'):(TOD==='night'?'#13202a':TOD==='sunset'?'#3d4a2a':'#4f9a47');
+ R(0,1250,W,700,ground);
+ [[90,1330,170],[260,1320,150],[1000,1330,180],[700,1325,140]].forEach(([x,b,h])=>pine(x,b,h,tc.front,snow));
+ // bear (snowman in winter: the bear is hibernating)
+ if(SEASON==='winter'){const sx=140,sy=1330;const ball=(cx,cy,r)=>{for(let y=-r;y<=r;y+=10)for(let x=-r;x<=r;x+=10)if(x*x+y*y<=r*r)R(cx+x,cy+y,10,10,'#ffffff')};ball(sx,sy,60);ball(sx,sy-90,44);ball(sx,sy-160,32);R(sx-14,sy-172,8,8,'#111');R(sx+8,sy-172,8,8,'#111');R(sx-2,sy-160,24,8,'#ff7a1f');R(sx-30,sy-130,60,10,'#c0392b');R(sx-22,sy-210,44,22,'#111');R(sx-32,sy-192,64,8,'#111')}
+ else{const bear=["....KK....KK....","...KbbK..KbbK...","...KbbbbbbbbK...","..KbbbbbbbbbbK..","..KbEbbbbbbEbK..","..KbbbbNNbbbbK..","...KbbbNNbbbK...","..KbbbbbbbbbbbK.",".KbbbbbbbbbbbbbK",".KbbbbbbbbbbbbbK",".KbbbbbbbbbbbbbK","..KbbK....KbbK.."];
+  const BP={K:'#120a06',b:TOD==='day'?'#5a3a22':'#3b2414',E:TOD==='night'?'#ffd36b':'#111',N:'#8a6a4a'};bear.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')R(60+x*11,1190+y*11,11,11,BP[ch])}))}
+ const deer=["K...K.K...K","KK.K...K.KK",".KKK...KKK.","..KddddK...",".KdEddEdK..","..KddddK...","...KdNK....","...KddK....","..KddddddddK","..KdddddddddK","..KdddddddddK","...KdK...KdK","...KdK...KdK","...KK....KK"];
+ const DP={K:'#1a0f08',d:TOD==='day'?'#a8743c':'#8a5a2c',E:TOD==='night'?'#ffd36b':'#111',N:'#3a2414'};deer.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')R(770+x*11,1150+y*11,11,11,DP[ch])}));
+ for(let i=0;i<12;i++)R(1010-i*10,1250+i*10,20+i*20,10,SEASON==='winter'?'#2f7fbf':'#c8641f');R(1004,1262,12,108,'#7a3a12');if(SEASON==='winter')for(let i=0;i<6;i++)R(1010-i*10,1250+i*10,20+i*20,4,'#fff');
+ R(640,1250,6,70,'#4a2b14');R(630,1236,26,26,TOD==='day'?'#c9a24a':'#ffcf6b');R(634,1240,18,18,TOD==='day'?'#e9d9a0':'#fff1b8');
+ if(SEASON==='summer'&&TOD==='night')for(let i=0;i<14;i++){const x=rnd(i+50)*W,y=900+rnd(i+80)*500;if((i+flick)%3)R(x,y,6,6,'#d8ff7a')}
+ // sign
+ R(120,250,16,330,'#4a2b14');R(944,250,16,330,'#4a2b14');R(90,262,900,262,'#6b4128');R(100,272,880,242,'#8a5a3c');for(let y=290;y<510;y+=40)R(100,y,880,4,'#7a4c30');
+ if(SEASON==='winter'){R(86,248,908,18,'#ffffff');for(let x=96;x<990;x+=60)R(x,266,30,10,'#ffffff')}
+ g.save();g.textAlign='center';g.textBaseline='middle';const lit=TOD!=='day';const gt=(t,y,sz,col)=>{g.font=sz+"px 'Press Start 2P'";g.fillStyle=lit?'#3a1f0e':'#f3d9a8';g.fillText(t,544,y+5);if(lit){g.shadowColor='#ff9a3d';g.shadowBlur=TOD==='night'?18:8}g.fillStyle=lit?col:'#3a1f0e';g.fillText(t,540,y);g.shadowBlur=0};
+ signLines().forEach((l,i)=>gt(l.t,l.y+10,Math.min(l.sz,66),i===0?'#ffd27a':'#ffe9b0'));g.restore();
+ R(470,160,140,64,'#2a0a10');R(478,168,124,48,'#ff3b3b');g.save();g.font="20px 'Press Start 2P'";g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor='#ff3b3b';g.shadowBlur=14;g.fillText('ON AIR',540,193);g.restore()}
+function hats(){if(SEASON!=='winter')return;const col={u:'#e8b440',j:'#d1524c',t:'#5f8f4e'};['u','j','t'].forEach(k=>{const cx=CX[k],ox=cx-7*SC,dy=speaking===k&&bob?-8:0,oy=DESK-14*SC+dy;R(ox+1*SC,oy-1.4*SC,12*SC,1*SC,col[k]);R(ox+0.4*SC,oy-0.6*SC,13.2*SC,2.6*SC,col[k]);R(ox+0.2*SC,oy+1.6*SC,13.6*SC,1.2*SC,'#ffffff');for(let x=1;x<13;x+=2)R(ox+x*SC,oy+1.6*SC,SC,1.2*SC,'#e9e4de');R(ox+6*SC,oy-2.6*SC,2*SC,1.4*SC,'#ffffff');R(ox+9*SC,oy-0.6*SC,3*SC,2.2*SC,'rgba(0,0,0,.15)')})}
+function campFront(){hats();const wood=SEASON==='winter'?'#5a3418':'#5a3418';
+ R(0,DESK-30,W,70,wood);R(0,DESK-30,W,12,SEASON==='winter'?'#ffffff':'#7a4a24');for(let x=40;x<W;x+=120)R(x,DESK-10,60,6,'#3f2410');
+ const gnd=SEASON==='winter'?(TOD==='night'?'#8d9dbd':'#dfe8f5'):SEASON==='fall'?(TOD==='night'?'#1a1410':'#5a3d22'):(TOD==='night'?'#1a1410':TOD==='sunset'?'#33402a':'#3f7f3a');
+ R(0,DESK+40,W,H-DESK,gnd);for(let x=0;x<W;x+=60)R(x+((x/60)%2?20:0),DESK+70,10,10,SEASON==='fall'?['#e0632b','#f0a03b','#c8382b'][(x/60)%3]:'rgba(0,0,0,.18)');
+ const fx=540,fy=DESK+170;[[-110,0],[-70,26],[-20,34],[30,34],[80,26],[110,0]].forEach(([dx,dy])=>{R(fx+dx-26,fy+dy,52,30,'#5a5a66');if(SEASON==='winter')R(fx+dx-26,fy+dy,52,8,'#fff')});
+ R(fx-90,fy-14,180,20,'#4a2b14');R(fx-60,fy-30,120,18,'#6b4128');
+ const col=['#ff3b1f','#ff7a1f','#ffb43b','#ffe27a'];
+ for(let layer=0;layer<4;layer++){const w=150-layer*34,h=170-layer*36;for(let x=-w/2;x<w/2;x+=12){const hh=h*(1-Math.abs(x)/(w/2))*(0.75+((Math.sin(x*1.7+flick*1.3+layer)+1)/2)*0.35);R(fx+x,fy-30-hh,12,hh,col[layer])}}
+ for(let i=0;i<6;i++){R(fx-60+((i*53+flick*17)%120),fy-230-((flick*23+i*41)%160),6,6,'#ffb43b')}
+ const plate=(k,t)=>{g.font="22px 'Press Start 2P'";const w=g.measureText(t).width+40,cx=CX[k];R(cx-w/2,DESK-4,w,46,'#111');R(cx-w/2+6,DESK+2,w-12,34,'#fff3c4');g.fillStyle='#111';g.textAlign='center';g.textBaseline='middle';g.fillText(t,cx,DESK+20)};
+ plate('u','UNCLE');plate('j','JAMIE');plate('t','TAW THAR');
+ drawParts();
+ const a=TOD==='night'?.32:TOD==='sunset'?.2:.08;const gr=g.createRadialGradient(fx,fy-60,40,fx,fy-60,760);gr.addColorStop(0,`rgba(255,150,60,${a})`);gr.addColorStop(.5,`rgba(255,120,40,${a*.4})`);gr.addColorStop(1,'rgba(255,120,40,0)');g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function draw(){g.clearRect(0,0,W,H);if(SCENE==='camp'){campBg();['u','j','t'].forEach(person);campFront()}else{wall();neon();['u','j','t'].forEach(person);desk()}}
+
+function signLines(){return[{t:"JAMIE &",y:345,sz:78},{t:"FRIENDS",y:452,sz:78}]}
+SEASON='fall';TOD='sunset';resetParts();
+let timer=setInterval(()=>{flick++;if(speaking){bob=!bob;const z=document.getElementById('zone');z.scrollTop=z.scrollHeight}else bob=0;if(SCENE==='camp')stepParts();draw()},120);
+document.fonts&&document.fonts.load("60px 'Press Start 2P'").then(draw);draw();
+/* ---------- state ---------- */
+const $=s=>document.querySelector(s),ls={get(k,d){try{const v=localStorage.getItem('bmp_'+k);return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem('bmp_'+k,v)}catch(e){}}};
+let KEY=ls.get('key',''),IDS=JSON.parse(ls.get('ids','{}')||'{}'),STAB=1,charsUsed=+ls.get('chars','0'),cache={},stopRun=0;
+$('#key').value=KEY;$('#key').onchange=e=>{KEY=e.target.value.trim();ls.set('key',KEY)};
+function showIds(){[['U','u'],['T','t'],['J','j']].forEach(([a,k])=>{const el=$('#v'+a);el.textContent=IDS[k]?('Voice ID: '+IDS[k]):'not found yet';el.classList.toggle('bad',!IDS[k])})}
+showIds();
+['nU','nT','nJ'].forEach((id,i)=>$('#'+id).onchange=e=>{const v=e.target.value.trim(),k=['u','t','j'][i];if(/^[A-Za-z0-9]{18,}$/.test(v)){IDS[k]=v;ls.set('ids',JSON.stringify(IDS));showIds()}});
+function stat(){$('#stat').textContent=`Characters sent to ElevenLabs on this device: ${charsUsed.toLocaleString()} (replays are free)`}stat();
+document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{STAB=+b.dataset.st;cache={};document.querySelectorAll('[data-st]').forEach(x=>x.classList.toggle('on',x===b))});
+document.querySelectorAll('[data-big]').forEach(b=>b.onclick=()=>{document.body.classList.toggle('enbig',b.dataset.big==='en');document.querySelectorAll('[data-big]').forEach(x=>x.classList.toggle('on',x===b))});
+document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>{SCENE=b.dataset.scene;document.querySelectorAll('[data-scene]').forEach(x=>x.classList.toggle('on',x===b));draw()});
+/* ---------- find voices ---------- */
+async function api(path,opt={}){if(!KEY)throw new Error('Paste your ElevenLabs API key first.');const r=await fetch('https://api.elevenlabs.io'+path,Object.assign({},opt,{headers:Object.assign({'xi-api-key':KEY},opt.headers||{})}));
+  if(!r.ok){let m='';try{const j=await r.json();m=(j.detail&&(j.detail.message||j.detail.status||JSON.stringify(j.detail)))||''}catch(e){}throw new Error(`ElevenLabs said ${r.status}${m?': '+m:''}`)}return r}
+$('#find').onclick=async()=>{const b=$('#find');b.textContent='Looking…';try{const j=await (await api('/v1/voices')).json();const vs=j.voices||[];
+  [['nU','u'],['nT','t'],['nJ','j']].forEach(([id,k])=>{const want=$('#'+id).value.trim().toLowerCase();if(!want)return;
+    const hit=vs.find(v=>(v.name||'').toLowerCase()===want)||vs.find(v=>(v.name||'').toLowerCase().startsWith(want))||vs.find(v=>(v.name||'').toLowerCase().includes(want));
+    if(hit)IDS[k]=hit.voice_id});ls.set('ids',JSON.stringify(IDS));showIds();
+  const miss=['u','t','j'].filter(k=>!IDS[k]);b.textContent=miss.length?'Some not found, see below':'✓ All 3 voices found'}
+ catch(e){b.textContent='Find my voices';alert(e.message)}};
+/* ---------- audio (iOS-safe single element) ---------- */
+const audio=new Audio();audio.playsInline=true;
+const SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+function unlockAudio(){try{audio.src=SILENT;audio.play().catch(()=>{})}catch(e){}}
+async function tts(k,text){const id=IDS[k];if(!id)throw new Error(`No voice ID for ${k==='u'?'Uncle':k==='t'?'Taw Thar':'Jamie'} yet. Tap "Find my voices" or paste an ID.`);
+  const ck=id+'|'+STAB+'|'+text;if(cache[ck])return cache[ck];
+  const r=await api(`/v1/text-to-speech/${id}?output_format=mp3_44100_128`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'audio/mpeg'},
+    body:JSON.stringify({text,model_id:'eleven_v4',voice_settings:{stability:STAB,similarity_boost:0.4}})});
+  const url=URL.createObjectURL(await r.blob());charsUsed+=text.length;ls.set('chars',String(charsUsed));stat();cache[ck]=url;return url}
+function playUrl(url){return new Promise(res=>{audio.onended=res;audio.onerror=res;audio.src=url;audio.play().catch(()=>res())})}
+/* ---------- bubbles ---------- */
+const NAME={u:'UNCLE PAW TAW',t:'TAW THAR',j:'JAMIE'},TAIL={u:(200-70)/(1080*0.815-70)*100,j:(520-70)/(1080*0.815-70)*100,t:(836-70)/(1080*0.815-70)*100};
+function bubble(k,my,en){setTimeout(()=>{const z=$('#zone');z.scrollTop=z.scrollHeight},400);const L=$('#list');[...L.children].forEach(b=>b.classList.add('old'));const b=document.createElement('div');b.className='rb '+k;b.style.setProperty('--tail',Math.max(8,Math.min(92,TAIL[k]))+'%');
+  b.innerHTML=`<span class="who">${NAME[k]}</span><div class="body"><div class="my"></div><div class="en"></div></div>`;b.querySelector('.my').textContent=my||'';b.querySelector('.en').textContent=en||'';if(!en)b.querySelector('.en').remove();if(!my)b.querySelector('.my').remove();L.appendChild(b);const z=$('#zone');z.scrollTop=z.scrollHeight}
+/* ---------- script ---------- */
+const DEFAULT=`Jamie: မင်္ဂလာပါ။ Jamie & Friends ကနေ ကြိုဆိုပါတယ်။ ဒီနေ့ ခေါင်းစဉ်က စစ်တပ်နဲ့ ပိုက်ဆံ။ | Hello, welcome to Jamie & Friends. Today's topic: the junta and money.
+Uncle: ကဲ… သေချာနားထောင်။ ဗိုလ်ချုပ်ကြီးတွေက ငွေစက္ကူကို ဗေဒင်ဆရာ ပြောတဲ့အတိုင်း ရိုက်ခဲ့တာ။ ၄၅ ကျပ်တန်၊ ၉၀ ကျပ်တန်။ | Okay… listen carefully. The generals printed money the way the fortune teller told them. 45-kyat notes. 90-kyat notes.
+Taw Thar: ဘရို၊ ကိုးဂဏန်းက ကံကောင်းတယ်ဆိုလို့လား? ငါ့အဖေရဲ့ စုငွေကတော့ ကံမကောင်းခဲ့ဘူး။ | Bro, because nine is lucky? My dad's savings weren't so lucky.
+Jamie: အခုလည်း အတူတူပဲ။ ကျပ်ငွေက တန်ဖိုး ကျနေတုန်းပဲ။ | It's the same now. The kyat keeps losing value.
+Taw Thar: ဒါကြောင့် Jamie က ဒေါ်လာနဲ့ ပို့ပေးရမယ်လေ ဘရို! | That's why Jamie has to send dollars, bro!
+Uncle: ကြည့်။ ဒါ စီးပွားရေး မဟုတ်ဘူး။ ဒါ တောသားရဲ့ ဖုန်းအသစ် စီမံကိန်း။ | Look. This isn't economics. This is Taw Thar's new-phone project.
+Jamie: အမေရိကမှာလည်း အခွန်ဆောင်ရ၊ မြန်မာပြည်ကိုလည်း ပို့ရ… ကျွန်တော့် ပိုက်ဆံက ဘယ်သူ့ဆီ ရောက်နေတာလဲ? | Taxes in America, money home to Myanmar… where does my money even end up?
+Uncle: မင်းပိုက်ဆံက အမြဲ ခရီးထွက်နေတာ။ မင်းဆီ တစ်ခါမှ မရောက်ဘူး။ | Your money is always traveling. It never arrives at you.
+Taw Thar: Jamie & Friends ကို follow လုပ်ထားနော်! ငါ့ဖုန်းအသစ်အတွက်ပါ! | Follow Jamie & Friends! It's for my new phone, too!`;
+$('#script').value=ls.get('jf_script',DEFAULT);$('#script').onchange=e=>ls.set('jf_script',e.target.value);
+function parse(){return $('#script').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const m=l.match(/^(jamie|uncle|taw\s*thar)\s*[:：]\s*(.*)$/i);if(!m)return null;
+  const k=/^jamie/i.test(m[1])?'j':/^uncle/i.test(m[1])?'u':'t';const [my,en]=m[2].split('|').map(x=>(x||'').trim());return{k,my,en}}).filter(Boolean)}
+$('#play').onclick=async()=>{unlockAudio();const run=++stopRun;const lines=parse();if(!lines.length)return;$('#list').innerHTML='';
+  const b=$('#play');b.textContent='Loading voices…';
+  try{let next=tts(lines[0].k,lines[0].my);
+    for(let i=0;i<lines.length;i++){if(run!==stopRun)return;const url=await next;if(i+1<lines.length)next=tts(lines[i+1].k,lines[i+1].my).catch(e=>{throw e});
+      b.textContent='Playing…';bubble(lines[i].k,lines[i].my,lines[i].en);speaking=lines[i].k;await playUrl(url);speaking=null;await new Promise(r=>setTimeout(r,250))}}
+  catch(e){alert(e.message)}finally{speaking=null;b.textContent='▶ Play with real voices'}};
+$('#stop').onclick=()=>{stopRun++;audio.pause();speaking=null};
+/* ---------- Burmese listening (ElevenLabs speech-to-text) ---------- */
+let mr=null,chunks=[];
+$('#rec').onclick=async()=>{const b=$('#rec'),st=$('#recStat');
+  if(mr&&mr.state==='recording'){mr.stop();b.textContent='🎤 Start listening';return}
+  try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];mr=new MediaRecorder(stream);mr.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+    mr.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());st.textContent='Understanding…';speaking=null;
+      try{const blob=new Blob(chunks,{type:mr.mimeType||'audio/mp4'});const fd=new FormData();fd.append('file',blob,'speech.'+((mr.mimeType||'').includes('webm')?'webm':'m4a'));fd.append('model_id','scribe_v1');fd.append('language_code','mya');
+        const j=await (await api('/v1/speech-to-text',{method:'POST',body:fd})).json();const txt=(j.text||'').trim();st.textContent=txt?'✓ Heard you':'Heard nothing. Try again, a bit louder.';
+        if(txt)bubble('j',txt,'')}catch(e){st.textContent='';alert(e.message)}};
+    mr.start();speaking='j';b.textContent='■ Stop';st.textContent='Listening… speak Burmese'}
+  catch(e){alert('Microphone not available: '+e.message)}};
+</script></body></html>
