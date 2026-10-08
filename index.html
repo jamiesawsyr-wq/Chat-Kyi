@@ -373,7 +373,7 @@ body.clean #podBar{display:none}
   <hr class="sep"><span class="lbl">Memory shelf (topics they learned and past discussions)</span>
   <div id="shelf"></div>
 </div></aside>
-<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v4.0.1</span></h2><button class="btn" data-close>Done</button></div><div class="db">
+<aside class="drawer" id="d-settings"><div class="dh"><h2>Settings <span style="font-size:12px;color:var(--muted);font-weight:600">v4.0.2</span></h2><button class="btn" data-close>Done</button></div><div class="db">
   <div class="f"><label for="sChar">Character</label><select id="sChar"><option value="kyi">Uncle Paw Taw</option><option value="paw">Taw Thar (village boy)</option></select><p class="hint">Pick one per episode. You can also tap the name at the top, or say his name.</p></div>
   <div class="f"><label for="sSass">Sass level</label><select id="sSass"><option value="mild">Mild (guest-friendly)</option><option value="spicy">Spicy (default)</option><option value="savage">Savage</option></select><p class="hint">Spicy and Savage can call you "idiot" or "dumb boy" for truly dumb questions. Audience roasts in Podcast mode always stay friendly.</p></div>
   <div class="f"><label for="sName">Your name</label><input type="text" id="sName" maxlength="24"></div>
@@ -1393,6 +1393,21 @@ async function chimeIn(p,text,reply){const o=p==="kyi"?"paw":"kyi",n=S.name||"Ja
 if(!S.el)S.el={on:false,lang:"my",stab:1,ids:{kyi:"",paw:"",j:""},names:{kyi:"Zayar",paw:"Nanda",j:"JamieS"},chars:0};if(!S.el.model)S.el.model="claude-sonnet-5-5";
 if(!S.v40){S.v40=true;S.pod.show="Jamie & Friends";saveS()}
 let ELKEY=st.get("elkey","");
+/* v4.0.2: ElevenLabs Burmese voices on by default; reuse key + voices from the preview pages on this site */
+if(!S.v402){S.v402=true;S.el.on=true;S.el.lang="my";saveS()}
+try{if(!ELKEY){const k=localStorage.getItem("bmp_key");if(k&&k.trim()){ELKEY=k.trim();st.set("elkey",ELKEY)}}
+  const pi=JSON.parse(localStorage.getItem("bmp_ids")||"{}"),mp={u:"kyi",t:"paw",j:"j"};let ch=false;
+  for(const a in mp)if(pi[a]&&!S.el.ids[mp[a]]){S.el.ids[mp[a]]=pi[a];ch=true}if(ch)saveS()}catch(e){}
+let elAutoFound=false;
+async function elAutoFind(quiet){if(!ELKEY||elAutoFound)return;if(["kyi","paw","j"].every(k=>S.el.ids[k]))return;elAutoFound=true;
+  try{const j=await (await elApi("/v1/voices")).json(),vs=j.voices||[];
+    ["kyi","paw","j"].forEach(k=>{if(S.el.ids[k])return;const want=String(S.el.names[k]||"").toLowerCase();if(!want)return;
+      const hit=vs.find(v=>(v.name||"").toLowerCase()===want)||vs.find(v=>(v.name||"").toLowerCase().startsWith(want))||vs.find(v=>(v.name||"").toLowerCase().includes(want));if(hit)S.el.ids[k]=hit.voice_id});
+    saveS();if(typeof fillEL==="function"&&$("#elOn"))fillEL();
+    if(!quiet){const miss=["kyi","paw","j"].filter(k=>!S.el.ids[k]);toast(miss.length?"Some voices not found. Check the names in Settings.":"ElevenLabs voices linked ✓")}}
+  catch(e){elAutoFound=false;if(!quiet)toast(e.message)}}
+let elNoKeyWarned=false;
+function elNeedKey(){if(S.el&&S.el.on&&!ELKEY&&!elNoKeyWarned){elNoKeyWarned=true;toast("Burmese voices are on. Paste your ElevenLabs key in Settings to hear Zayar and Nanda.")}}
 const elAudio=new Audio();elAudio.playsInline=true;elAudio.setAttribute("playsinline","");let elUnlocked=false;
 function elUnlock(){if(elUnlocked)return;try{elAudio.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";const pr=elAudio.play();if(pr&&pr.then)pr.then(()=>{elUnlocked=true}).catch(()=>{})}catch(e){}}
 function elReady(who){return !!(S.el&&S.el.on&&ELKEY&&S.el.ids&&S.el.ids[who])}
@@ -1414,7 +1429,7 @@ function burmeseOf(text,who){text=String(text||"").trim();if(!text)return Promis
     .then(t=>String(t||"").replace(/^["'\s]+|["'\s]+$/g,"").trim()).catch(e=>{trCache.delete(k);throw e});
   trCache.set(k,pr);if(trCache.size>200)trCache.delete(trCache.keys().next().value);return pr}
 let elWarned=0;function elFail(e){if(Date.now()-elWarned>20000){elWarned=Date.now();toast(((e&&e.message)||"ElevenLabs failed")+". Using the iPhone voice.")}}
-async function voiceLine(who,text,myText){if(!elReady(who))return false;
+async function voiceLine(who,text,myText){if(!elReady(who)){elNeedKey();if(ELKEY&&S.el.on&&!S.el.ids[who]){await elAutoFind(true);if(!elReady(who))return false}else return false}
   try{let say=text;if(S.el.lang==="my")say=myText||await burmeseOf(text,who);await elSpeak(who,say);return true}catch(e){elFail(e);return false}}
 /* Burmese listening via ElevenLabs speech-to-text */
 let elStream=null,elRec=null,elCancel=false;
@@ -1449,7 +1464,7 @@ function fillEL(){const e=S.el;$("#elModel").value=e.model||"claude-sonnet-5-5";
   $("#elStat").textContent=`Characters sent to ElevenLabs from this phone: ${(e.chars||0).toLocaleString()} (repeats are free while the app is open)`}
 $("#elModel").onchange=e=>{S.el.model=e.target.value;saveS();trCache.clear()};
 $("#elOn").onchange=e=>{S.el.on=e.target.checked;saveS();if(S.el.on&&!ELKEY)toast("Paste your ElevenLabs key below")};
-$("#elKey").onchange=e=>{ELKEY=e.target.value.trim();st.set("elkey",ELKEY)};
+$("#elKey").onchange=e=>{ELKEY=e.target.value.trim();st.set("elkey",ELKEY);elAutoFound=false;if(ELKEY){if(!S.el.on){S.el.on=true;saveS();fillEL()}elAutoFind(false)}};
 document.querySelectorAll("#elLang button").forEach(b=>b.onclick=()=>{S.el.lang=b.dataset.v;saveS();fillEL()});
 document.querySelectorAll("#elStab button").forEach(b=>b.onclick=()=>{S.el.stab=Number(b.dataset.v);saveS();fillEL()});
 ["kyi","paw","j"].forEach(k=>$("#elN"+k).onchange=e=>{const v=e.target.value.trim();S.el.names[k]=v;if(/^[A-Za-z0-9]{18,}$/.test(v))S.el.ids[k]=v;saveS();fillEL()});
@@ -1459,6 +1474,7 @@ $("#elFind").onclick=async()=>{if(!ELKEY){toast("Paste your ElevenLabs key first
       const hit=vs.find(v=>(v.name||"").toLowerCase()===want)||vs.find(v=>(v.name||"").toLowerCase().startsWith(want))||vs.find(v=>(v.name||"").toLowerCase().includes(want));if(hit)S.el.ids[k]=hit.voice_id});
     saveS();fillEL();const miss=["kyi","paw","j"].filter(k=>!S.el.ids[k]);toast(miss.length?"Some voices not found. Add them to My Voices on ElevenLabs.":"All 3 voices linked")}
   catch(e){toast(e.message)}finally{b.textContent="Find my voices"}};
+setTimeout(()=>elAutoFind(true),1500);
 $("#elTest").onclick=async()=>{unlock();const L=S.el.lang==="my"?{kyi:"ကဲ… သေချာနားထောင်။ ဦးလေး တစ်ခါပဲ ရှင်းပြမယ်။",paw:"ဟေ့ ဘရို! Jamie & Friends ကို ကြိုဆိုပါတယ်!",j:"မင်္ဂလာပါ။ ကျွန်တော် Jamie ပါ။"}:{kyi:"Okay. Listen carefully. I explain only one time.",paw:"Ayy bro! Welcome to Jamie and Friends!",j:"Hi, I'm Jamie."};
   for(const k of ["kyi","paw","j"]){if(!S.el.ids[k])continue;try{await elSpeak(k,L[k])}catch(e){toast(e.message);break}}fillEL()};
 
