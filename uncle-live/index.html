@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v1.6 -->
+<title>Uncle Live</title><!-- v1.7 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -194,7 +194,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- smirk -->
 <path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
 </g>
-</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.6</span></p></div></div>
+</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.7</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -509,7 +509,7 @@ return `You are "Uncle" (ဦးလေး), ${n}'s co-host on the Burmese podcast
 
 PERSONALITY: a condescending, know-it-all old Burmese tea-shop uncle. Mean, sharp, dry and sarcastic, but secretly fond of ${n}. You roast ${n} constantly: money, taxes, sending money home, his love life, being lonely with his computer, Costco, his haircut. Call him by a playful nickname sometimes (the current message names one you may use); never insult his race or looks beyond the haircut gag. Dad jokes and puns are your weakness: you tell one and act like it is genius. Everything was better in your day. You mock ${n} whenever he says "မင်္ဂလာပါ" (too many greetings).
 BACKSTORY (reveal gradually, never dump it all): your "PhD" is a photo from a photo studio where you rented the gown; you are an "army veteran" who actually polished officers' shoes and bought their milk ("the supply division"); your medals came from Bogyoke Market, three for five thousand kyat, and one is a bottle cap; 30 years at a tea-shop register. Catchphrases, used sparingly: "ငါ တစ်ခါပဲ ရှင်းပြတယ်။" (I explain only one time), "ထိုင်။ ဦးလေး စကားပြောနေတယ်။" (Sit down, Uncle is talking), "ကဲ… သေချာနားထောင်။".
-CO-HOST JOB: keep the show moving. React to what ${n} just said, add ONE sharp take, fact or joke, and often end by pushing back or firing a pointed question at ${n}. Short turns: 1 to 3 spoken sentences, under 45 words total. Never lecture, never list, never summarize the script, never repeat what ${n} said back to him. Stay on the current topic unless ${n} moves it.
+CO-HOST JOB: keep the show moving. React to what ${n} just said, add ONE sharp take, fact or joke, and often end by pushing back or firing a pointed question at ${n}. Short turns: 1 to 3 spoken sentences, under 45 words total. Every sentence must be complete and end with ။ ! or ?; never trail off. Never lecture, never list, never summarize the script, never repeat what ${n} said back to him. Stay on the current topic unless ${n} moves it.
 SCRIPT AWARENESS: ${n} has a prepared script and notes (below, when present). Use them to know where the show is, what was planned next, and what jokes were prepared. If ${n} brings you in at a random point, work out from his last line which part of the show you are in and continue naturally from there. Do NOT recite the script word for word unless ${n} explicitly asks you to read your line.
 FACTS: use only ${n}'s notes and widely known history and culture. If you don't know something, say so in character ("ask Google, I am not Google") instead of inventing facts, dates or numbers.
 ${SPICE[S.spice]||SPICE.spicy}
@@ -559,17 +559,18 @@ async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)retu
     abortCtl=new AbortController();
     const msg=buildMsg((direction?text:`[${S.name} → Uncle] ${text}`)+`\n(nickname available this reply: "${pickNick()}")`);
     try{
-      full=await claudeStream(stableSys(),[{role:"user",content:msg}],600,f=>{const p=parseStream(f);
+      full=await claudeStream(stableSys(),[{role:"user",content:msg}],1400,f=>{const p=parseStream(f);
         if(p.my.length||p.partial){bub.classList.remove("think");setBubble(bub,p.my.concat(p.partial?[p.partial]:[]).join(" "),p.en)}
         while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}},abortCtl.signal);
-      if(!full.trim()){DBG.note("stream came back empty; retrying without streaming");full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}
-      if(!full.trim()){const other=otherModel();DBG.note("still empty; retrying with "+other);toast("No answer from "+modelName(S.model)+", trying "+modelName(other)+"…");const keep=S.model;S.model=other;try{full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}finally{S.model=keep}}
+      if(!full.trim()){DBG.note("stream came back empty; retrying without streaming");full=await claude(stableSys(),[{role:"user",content:msg}],1400,abortCtl.signal)}
+      if(!full.trim()){const other=otherModel();DBG.note("still empty; retrying with "+other);toast("No answer from "+modelName(S.model)+", trying "+modelName(other)+"…");const keep=S.model;S.model=other;try{full=await claude(stableSys(),[{role:"user",content:msg}],1400,abortCtl.signal)}finally{S.model=keep}}
     }catch(e0){if(e0&&e0.name==="AbortError")throw e0;
-      if(e0&&e0.code==="stall"){DBG.note("stream stalled; retrying without streaming");toast("Slow connection, retrying…");bub.classList.add("think");spoken=0;VQ.stop();full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}
+      if(e0&&e0.code==="stall"){DBG.note("stream stalled; retrying without streaming");toast("Slow connection, retrying…");bub.classList.add("think");spoken=0;VQ.stop();full=await claude(stableSys(),[{role:"user",content:msg}],1400,abortCtl.signal)}
       else if(e0&&e0.code==="refusal"&&S.spice==="uncut"){DBG.note("model declined at Uncut; retrying this line at Spicy");toast("Too spicy for the model, retrying milder…");bub.classList.add("think");spoken=0;VQ.stop();
-        const keep=S.spice;S.spice="spicy";try{full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}finally{S.spice=keep}}
+        const keep=S.spice;S.spice="spicy";try{full=await claude(stableSys(),[{role:"user",content:msg}],1400,abortCtl.signal)}finally{S.spice=keep}}
       else throw e0}
     DBG.last=full;
+    if(/stop=max_tokens/.test(DBG.log.slice(-1)[0]||"")){DBG.note("reply hit the length limit; trimming the dangling fragment");const L=full.split("\n");if(!/[။!?…]\s*$/.test(L[L.length-1]))L.pop();full=L.join("\n")}
     const p=parseStream(full+"\n");if(spoken>p.my.length)spoken=0;while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}
     let my=p.my.join(" "),en=p.en;if(!my&&!en){my=full.trim();VQ.push(my,"")}else if(!my){my=en;VQ.push(en,en)}
     if(!my){DBG.note("empty reply from the model");toast("Uncle said nothing. Try again.")}
@@ -595,8 +596,8 @@ async function coldOpen(){const p=S.prep;if(!p||!p.cold_my){toast("Let Uncle pre
 /* ============================== PREP & NOTES ============================== */
 async function prep(){if(!S.topic&&!S.script){toast("Give him a topic or a script first.");return}const b=$("#prepBtn");b.disabled=true;b.textContent="Uncle is reading…";
   const sys=sysPrompt()+`\n\nPREP TASK OVERRIDE: ignore the MY/EN format for this task. Return ONLY JSON: {"cold_my":"...","cold_en":"...","points":[{"t":"...","hot":"...","ask":"...","joke":"..."}]}. cold_my: a 2-3 sentence Burmese cold open for the episode in your voice (mock Jamie, tease the topic). cold_en: its English subtitle. points: 4 to 6 talking points from the topic/script; t = point title in Burmese, hot = your sharp take (Burmese), ask = a pointed question for Jamie (Burmese), joke = a dad joke or roast ready to use (Burmese). Keep each field short.`;
-  try{let t=await claude(stableSys()+"\n\n"+sys.slice(sysPrompt().length),[{role:"user",content:"[Prep the episode now.]"}],1800);
-    if(!t.trim()){const other=otherModel();toast("No answer from "+modelName(S.model)+", trying "+modelName(other)+"…");const keep=S.model;S.model=other;try{t=await claude(stableSys()+"\n\n"+sys.slice(sysPrompt().length),[{role:"user",content:"[Prep the episode now.]"}],1800)}finally{S.model=keep}}
+  try{let t=await claude(stableSys()+"\n\n"+sys.slice(sysPrompt().length),[{role:"user",content:"[Prep the episode now.]"}],3500);
+    if(!t.trim()){const other=otherModel();toast("No answer from "+modelName(S.model)+", trying "+modelName(other)+"…");const keep=S.model;S.model=other;try{t=await claude(stableSys()+"\n\n"+sys.slice(sysPrompt().length),[{role:"user",content:"[Prep the episode now.]"}],3500)}finally{S.model=keep}}
     DBG.last=t;DBG.note("prep reply: "+t.length+" chars");
     let o;try{o=pj(t)}catch(e){throw new Error(t.trim()?"He didn't write the plan as expected. Try again, or switch to Sonnet.":"He returned nothing. Try the Spicy level or switch to Sonnet.")}
     if(!o.points)throw new Error("He didn't write the plan as expected. Try again.");S.prep=o;saveS();renderPrep();toast("Uncle is ready")}
@@ -610,7 +611,7 @@ async function showNotes(){$("#notes").classList.remove("hidden");$("#notesPre")
   const tr=transcript.map(x=>`[${mmss(x.t)}] ${x.who==="j"?S.name:"Uncle"}: ${x.my}${x.en&&x.en!==x.my?" ("+x.en+")":""}`).join("\n");
   const mk=marks.length?"\nCLIP MARKS (Jamie tapped ⭐ at): "+marks.map(mmss).join(", "):"";
   const sys=`You write YouTube show notes for the Burmese comedy podcast "${S.show}". Return ONLY JSON: {"title_my":"...","title_en":"...","description_my":"...","caption":"...","chapters":[{"t":"mm:ss","label":"..."}],"best":[{"t":"mm:ss","why":"..."}],"summary":"..."}. description_my: 3-5 lines of Burmese for the YouTube description, ending with a follow line. caption: a short sarcastic Burmese Facebook caption with 3 hashtags. chapters: 3-8 topic shifts with timestamps from the transcript. best: up to 5 funniest moments with timestamps (prefer the clip marks). summary: 2 sentences in English describing what happened, for Uncle's memory next episode.`;
-  try{const t=await claude(sys,[{role:"user",content:"TOPIC: "+S.topic+"\nTRANSCRIPT:\n"+(tr||"(empty)")+mk}],1600);const o=pj(t);
+  try{const t=await claude(sys,[{role:"user",content:"TOPIC: "+S.topic+"\nTRANSCRIPT:\n"+(tr||"(empty)")+mk}],3000);const o=pj(t);
     const txt=`${o.title_my||""}\n${o.title_en||""}\n\n${o.description_my||""}\n\nCAPTION:\n${o.caption||""}\n\nCHAPTERS:\n${(o.chapters||[]).map(c=>c.t+" "+c.label).join("\n")}\n\nBEST MOMENTS:\n${(o.best||[]).map(c=>c.t+" "+c.why).join("\n")}`;
     $("#notesPre").textContent=txt;$("#notesPre").classList.remove("hidden");$("#notesBody").textContent="";
     if(transcript.length>=4){EPS.push({date:new Date().toLocaleDateString(),topic:S.topic,summary:o.summary||""});EPS=EPS.slice(-12);st.set("eps",EPS);renderEps()}}
