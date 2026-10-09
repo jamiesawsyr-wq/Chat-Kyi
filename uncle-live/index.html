@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1220">
+<title>Uncle Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a1220;--ink:#f3e6cf;--mut:#c9b89f;--gold:#ffcf6b;--red:#e23b3b;--card:#2a1d31;--line:#4a3a55;--my:"Noto Sans Myanmar","Myanmar Sangam MN",sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Nunito,system-ui,-apple-system,sans-serif;min-height:100%}
+button{font:inherit;cursor:pointer}
+input,textarea,select{font:inherit}
+.hidden{display:none!important}
+
+/* ===== SETUP ===== */
+#setup{max-width:720px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 18px 60px}
+.brand{display:flex;align-items:center;gap:14px;margin:6px 0 14px}
+.brand .av{width:64px;height:120px;overflow:hidden;border-radius:12px;background:#3a2416;flex:none}
+.brand .av svg{width:64px;height:auto;transform:translate(-4px,-6px)}
+.brand h1{font:18px 'Press Start 2P',monospace;color:var(--gold);margin:0 0 6px;letter-spacing:.04em}
+.brand p{margin:0;color:var(--mut);font-size:14px}
+.lbl{display:block;font:800 12px Nunito;letter-spacing:.12em;color:var(--mut);margin:18px 0 6px;text-transform:uppercase}
+.box{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 14px}
+input[type=text],input[type=password],textarea,select{width:100%;background:#fff7e6;color:#2a1d14;border:2px solid #3a2416;border-radius:12px;padding:10px 12px;font-size:16px}
+textarea{min-height:120px;resize:vertical;font-family:var(--my),Nunito,system-ui;line-height:1.6}
+#script{min-height:220px}
+.seg{display:flex;border:2px solid #3a2416;border-radius:14px;overflow:hidden;background:#fff7e6}
+.seg button{flex:1;border:0;background:transparent;padding:10px 4px;font:800 14px Nunito;color:#3a2416}
+.seg button.on{background:#e2702b;color:#fff}
+.hint{font-size:13px;color:var(--mut);margin:6px 2px 0}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:14px;font:900 17px Nunito;letter-spacing:.03em}
+.btn.go{background:var(--red);color:#fff;margin-top:22px;box-shadow:0 6px 0 #8a1f1f}
+.btn.go:active{transform:translateY(3px);box-shadow:0 3px 0 #8a1f1f}
+.btn.sec{background:#ffe7b5;color:#3a2416;margin-top:10px}
+.btn.sec:disabled{opacity:.6}
+.row{display:flex;gap:10px}.row>*{flex:1}
+details{margin-top:18px;border:2px solid var(--line);border-radius:16px;padding:0 14px;background:#211627}
+summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
+.stat{font:13px ui-monospace,Menlo,monospace;color:var(--mut);margin:6px 0}
+.stat.ok{color:#8fd17a}.stat.bad{color:#ff9a8a}
+.pts{margin-top:8px}
+.pt{background:#fff7e6;color:#2a1d14;border:2px solid #3a2416;border-radius:12px;padding:8px 12px;margin-bottom:8px;font-family:var(--my),Nunito}
+.pt b{display:block;font-size:15px}
+.pt small{display:block;color:#6a5a4a;font-size:13px;line-height:1.45;font-family:Nunito,var(--my)}
+.pt small i{color:#8a3a1a;font-style:normal;font-weight:800}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:.25s;z-index:99;max-width:90vw;text-align:center;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.eps{font-size:13px;color:var(--mut)}
+.eps div{padding:6px 0;border-bottom:1px dashed var(--line)}
+
+/* ===== STAGE ===== */
+#live{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:10}
+#stage{position:relative;width:min(100vw,calc(100dvh*16/9));aspect-ratio:16/9;overflow:hidden;background:#3a2416;container-type:inline-size;font-family:Nunito,system-ui}
+#bg{position:absolute;inset:0}#bg svg{width:100%;height:100%;display:block}
+#uncle{position:absolute;left:15.6%;top:7.4%;width:22.4%;transform-origin:50% 100%}
+#uncle svg{width:100%;height:auto;display:block}
+#uncle.talk{animation:bob .55s ease-in-out infinite}
+#uncle.think{animation:sway 2.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-.6cqw) rotate(-.6deg)}}
+@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(1.2deg)}}
+#top{position:absolute;left:40.6%;right:0;top:0;height:11.1%;display:flex;align-items:center;justify-content:space-between;padding:0 3.1cqw;background:rgba(20,12,8,.55);gap:1.5cqw}
+#show{font:1.75cqw 'Press Start 2P',monospace;color:var(--gold);text-shadow:0 0 .9cqw rgba(255,160,60,.6);white-space:nowrap}
+#topic2{font:700 1.5cqw/1.3 var(--my);color:#ffe7b5;flex:1;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#air{background:var(--red);color:#fff;font:800 1.15cqw Nunito;padding:.4cqw .85cqw;border-radius:.5cqw;letter-spacing:.1em;white-space:nowrap}
+#air.off{background:#555}
+#chat{position:absolute;left:43.2%;right:3.6%;top:14.8%;bottom:6.5%;transition:bottom .3s;display:flex;flex-direction:column;justify-content:flex-end;gap:1.15cqw;-webkit-mask-image:linear-gradient(transparent,#000 6cqw);mask-image:linear-gradient(transparent,#000 6cqw);overflow:hidden}
+.b{background:#fff;border:.31cqw solid #1a1418;border-radius:1.56cqw;padding:1.1cqw 1.55cqw;box-shadow:0 .4cqw 0 rgba(0,0,0,.35);position:relative;color:#1a1418;transition:opacity .4s,transform .4s;flex:none}
+.b .n{font:800 1.05cqw Nunito;letter-spacing:.1em;color:#fff;display:inline-block;padding:.3cqw .7cqw;border-radius:.45cqw;margin-bottom:.4cqw;background:#9c7a2a}
+.b .m{font:700 2.3cqw/1.6 var(--my);min-height:1em}
+.b .e{font:600 1.25cqw/1.35 Nunito;color:#6a5a4a;margin-top:.3cqw}
+.b.j{background:#ffe9e6;margin-left:12.5cqw}.b.j .n{background:#c0392b}.b.j .m{font-size:2cqw}
+.b.u:before{content:"";position:absolute;left:-2.1cqw;bottom:2.4cqw;border:.95cqw solid transparent;border-right:1.45cqw solid #1a1418}
+.b.u.old:before{display:none}
+.b.old{opacity:.55;transform:scale(.92);transform-origin:left bottom}.b.old .m{font-size:1.7cqw}.b.old .e{display:none}
+.b.think .m{color:#9a8a7a}
+#stage.ctlon #chat{bottom:19.5%}
+/* controls */
+#ctl{position:absolute;left:0;right:0;bottom:0;padding:.8cqw 1.5cqw 1cqw;background:linear-gradient(transparent,rgba(10,6,4,.92) 35%);display:flex;flex-direction:column;gap:.7cqw;transition:opacity .3s,transform .3s;z-index:5}
+#ctl.off{opacity:0;transform:translateY(100%);pointer-events:none}
+.quick{display:flex;gap:.6cqw;flex-wrap:wrap;justify-content:center}
+.quick button{border:0;border-radius:99cqw;padding:.55cqw 1.2cqw;font:700 1.25cqw var(--my);background:#ffe7b5;color:#3a2416;white-space:nowrap}
+.quick button.stop{background:var(--red);color:#fff;font-family:Nunito}
+.quick button.cue{background:#2e6fb5;color:#fff}
+.quick button.mark{background:#f1c40f;color:#1a1418}
+.quick button:disabled{opacity:.45}
+.bar{display:flex;gap:.8cqw;align-items:center;padding-right:5.5cqw}
+.bar input{flex:1;min-width:0;border:0;border-radius:1cqw;padding:.9cqw 1.1cqw;font:600 1.4cqw Nunito,var(--my);background:#fff7e6;color:#2a1d14}
+.bar button{border:0;border-radius:1cqw;padding:0 1.2cqw;height:3.4cqw;font:800 1.25cqw Nunito;background:#ffe7b5;color:#3a2416}
+#mic{width:4.4cqw;height:4.4cqw;border-radius:50%;background:var(--gold);border:.3cqw solid #fff3d6;font-size:2cqw;display:grid;place-items:center;box-shadow:0 0 0 .4cqw rgba(255,207,107,.25);user-select:none;-webkit-user-select:none;touch-action:none;padding:0}
+#mic.on{background:var(--red);animation:pulse .8s infinite}
+@keyframes pulse{50%{transform:scale(1.12)}}
+#mic.busy{background:#888;animation:none}
+#hot{position:absolute;right:0;bottom:0;width:5cqw;height:5cqw;border:0;background:transparent;color:rgba(255,255,255,.3);font-size:1.6cqw;z-index:6}
+#exit{position:absolute;left:0;top:0;width:4cqw;height:4cqw;border:0;background:transparent;color:rgba(255,255,255,.35);font-size:1.6cqw;z-index:6}
+#clock{position:absolute;left:1cqw;bottom:.6cqw;font:700 1cqw ui-monospace,monospace;color:rgba(255,255,255,.35);z-index:4}
+#micHint{position:absolute;left:50%;bottom:1cqw;transform:translateX(-50%);font:700 1.1cqw Nunito;color:rgba(255,255,255,.55);background:rgba(0,0,0,.45);padding:.4cqw 1cqw;border-radius:1cqw;z-index:4;pointer-events:none}
+/* show notes */
+#notes{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20;overflow:auto;padding:20px}
+#notes .pane{max-width:720px;margin:20px auto;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px}
+#notes pre{white-space:pre-wrap;font:14px/1.6 var(--my),Nunito;color:var(--ink);background:#15101a;padding:12px;border-radius:12px}
+</style>
+</head>
+<body>
+
+<!-- ===== SETUP SCREEN ===== -->
+<div id="setup">
+  <div class="brand"><div class="av"><svg xmlns="http://www.w3.org/2000/svg" viewBox="30 -24 250 574" ><defs>
+<radialGradient id="iris" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#8a5a32"/><stop offset=".6" stop-color="#4a2a16"/><stop offset="1" stop-color="#1e120a"/></radialGradient>
+<pattern id="silk" width="18" height="10" patternUnits="userSpaceOnUse"><rect width="18" height="10" fill="#f3f1ea"/><rect x="2" width="2" height="10" fill="#cfccc2"/><rect x="7" width="1" height="10" fill="#b5b2a8"/><rect x="12" width="3" height="10" fill="#e2dfd5"/></pattern>
+<linearGradient id="fold" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".3" stop-color="#000" stop-opacity="0"/><stop offset=".75" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient></defs>
+<g stroke="#1a1418" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+<!-- socks + lace-up shoes -->
+<path d="M110,500 L136,500 L136,522 L110,522 Z M164,500 L190,500 L190,522 L164,522 Z" fill="#3a3a42"/>
+<path d="M104,520 L138,518 Q158,522 160,540 L100,540 Q98,528 104,520 Z" fill="#141416"/>
+<path d="M162,518 L196,520 Q202,528 200,540 L140,540 Q142,522 162,518 Z" fill="#141416"/>
+<path d="M120,522 L130,528 M126,520 L134,526 M174,520 L184,526 M180,522 L188,528" stroke="#55555f" stroke-width="1.6"/>
+<path d="M140,532 Q150,530 156,534 M106,530 Q112,528 118,530" stroke="#9aa2b2" stroke-width="2" fill="none"/>
+<!-- silk longyi -->
+<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#silk)"/>
+<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#fold)" stroke="none"/>
+<path d="M164,350 Q186,420 180,506 L210,506 L214,346 Z" fill="url(#silk)"/>
+<path d="M164,350 Q186,420 180,506" fill="none"/>
+<path d="M120,352 L114,506 M140,352 L138,506 M196,360 L198,504" stroke="#a8a59c" stroke-width="1.4" opacity=".7" fill="none"/>
+<path d="M158,340 Q176,334 190,344 Q194,360 180,368 Q164,370 158,356 Z" fill="url(#silk)"/>
+<!-- left arm + book -->
+<path d="M96,212 L74,334 L98,340 L114,238 Z" fill="#26262e"/>
+<path d="M72,330 L98,336 L96,346 L70,340 Z" fill="#f4f1e8"/>
+<path d="M66,346 L102,346 L102,404 L66,404 Z" fill="#7a4a2a"/><path d="M66,346 L72,346 L72,404 L66,404 Z" fill="#5a3418"/>
+<path d="M70,340 Q66,356 80,360 Q96,360 98,346 Z" fill="#f2c9a6"/>
+<!-- right arm -->
+<path d="M204,212 L226,334 L202,340 L188,238 Z" fill="#26262e"/>
+<path d="M228,330 L202,336 L204,346 L230,340 Z" fill="#f4f1e8"/>
+<path d="M204,344 Q202,362 214,366 Q228,364 230,342 Z" fill="#f2c9a6"/>
+<path d="M210,352 L210,362 M218,352 L218,363" stroke="#c98f6e" stroke-width="1.3"/>
+<!-- jacket (taikpon) -->
+<path d="M94,212 Q100,196 137,190 L163,190 Q200,196 206,212 L216,352 L84,352 Z" fill="#26262e"/>
+<path d="M190,214 L206,352 L186,352 L182,230 Z" fill="#34343e" stroke="none"/>
+<g fill="#7c7c8a" stroke-width="1.2"><rect x="138" y="226" width="26" height="5" rx="2.5"/><rect x="138" y="256" width="26" height="5" rx="2.5"/><rect x="138" y="286" width="26" height="5" rx="2.5"/><rect x="138" y="316" width="26" height="5" rx="2.5"/></g>
+<path d="M150,200 L150,350" stroke="#3e3e4a" stroke-width="1.6" fill="none"/>
+<path d="M98,292 L134,292 L134,336 L98,336 Z M166,292 L202,292 L202,336 L166,336 Z M166,236 L196,236 L196,264 L166,264 Z" fill="none" stroke="#4a4a58" stroke-width="2"/>
+<path d="M174,240 L174,224 M182,240 L182,226" stroke="#c9ced8" stroke-width="3"/>
+<circle cx="120" cy="244" r="7" fill="#f4f1e8" stroke-width="1.6"/>
+<!-- neck + collar -->
+<path d="M138,166 L162,166 L163,194 L137,194 Z" fill="#f2c9a6"/>
+<path d="M134,186 Q150,196 166,186 L168,200 Q150,210 132,200 Z" fill="#f4f1e8"/>
+<g transform="translate(150,190) scale(1.2) translate(-150,-190)"><!-- ears -->
+<path d="M110,104 Q100,104 102,118 Q104,134 114,134 Z" fill="#f2c9a6"/>
+<path d="M190,104 Q200,104 198,118 Q196,134 186,134 Z" fill="#f2c9a6"/>
+<!-- face -->
+<path d="M111,92 C110,138 124,164 150,176 C176,164 190,138 189,92 C189,74 172,62 150,62 C128,62 111,74 111,92 Z" fill="#f2c9a6"/>
+<path d="M176,100 C186,130 178,156 158,172 C176,160 188,138 189,104 Z" fill="#e2b18f" stroke="none"/>
+<!-- hair: slicked back, greying -->
+<path d="M106,108 C96,62 122,34 156,34 C190,34 206,60 194,108 C192,86 184,74 168,70 C150,66 128,68 116,82 C110,90 108,98 106,108 Z" fill="#3b3c44"/>
+<path d="M120,60 Q146,44 178,52 M118,72 Q146,56 186,66 M132,46 Q158,40 184,48" stroke="#a9afbb" stroke-width="2.4" fill="none"/>
+<path d="M162,36 Q150,52 140,70" stroke="#23242a" stroke-width="2" fill="none"/>
+<path d="M108,104 Q106,96 110,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
+<path d="M192,104 Q194,96 190,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
+<path d="M104,98 Q96,52 150,38 Q206,48 198,98 Q190,80 150,76 Q114,78 104,98 Z" fill="#f4f1e8"/>
+<path d="M110,84 Q150,62 194,82 M114,70 Q152,50 190,66 M124,56 Q154,42 182,52" stroke="#c9c4b4" stroke-width="2" fill="none"/>
+<path d="M112,74 Q84,52 62,62 Q70,72 66,84 Q88,80 110,88 Z" fill="#f4f1e8"/>
+<path d="M70,66 Q88,70 106,80 M68,78 Q88,80 108,86" stroke="#c9c4b4" stroke-width="1.6" fill="none"/>
+<!-- brows: thick, condescending -->
+<path d="M119,93 L142,99" stroke-width="5.5"/>
+<path d="M158,99 L181,93" stroke-width="5.5"/>
+<!-- eyes: half-lidded, smug -->
+<path d="M121,114 Q133,108 146,114 Q134,123 121,114 Z" fill="#fff" stroke-width="1.6"/>
+<path d="M154,114 Q167,108 179,114 Q166,123 154,114 Z" fill="#fff" stroke-width="1.6"/>
+<circle cx="135" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
+<circle cx="167" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
+<circle cx="137" cy="114" r="1.8" fill="#fff" stroke="none"/>
+<circle cx="169" cy="114" r="1.8" fill="#fff" stroke="none"/>
+<path d="M118,112 Q133,105 147,112" stroke-width="4.2" fill="none"/>
+<path d="M153,112 Q167,105 182,112" stroke-width="4.2" fill="none"/>
+<path d="M124,112 Q134,109 144,113 L144,115 Q134,112 124,114 Z" fill="#e2b18f" stroke="none"/>
+<path d="M156,113 Q166,109 176,112 L176,114 Q166,112 156,115 Z" fill="#e2b18f" stroke="none"/>
+<path d="M124,121 Q132,124 140,122 M160,122 Q168,124 176,121" stroke="#c98f6e" stroke-width="1.3" fill="none"/>
+<ellipse cx="128" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/><ellipse cx="172" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/>
+<g fill="none" stroke="#1a1418" stroke-width="2.2"><circle cx="134" cy="116" r="13"/><circle cx="167" cy="116" r="13"/><path d="M147,114 Q150.5,110 154,114 M121,113 L106,108 M180,113 L194,108"/></g>
+<path d="M126,108 Q130,105 134,106" stroke="#fff" stroke-width="2" fill="none" opacity=".8"/>
+<!-- nose -->
+<path d="M151,120 L147,136 L153,137" stroke="#b97d5d" stroke-width="2" fill="none"/>
+<!-- smile lines -->
+<path d="M130,138 Q127,148 132,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
+<path d="M170,138 Q173,148 168,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
+<!-- mustache -->
+<path d="M135,146 Q150,138 165,146 Q160,152 150,149 Q140,152 135,146 Z" fill="#3b3c44" stroke-width="1.8"/>
+<path d="M142,145 Q150,142 158,145" stroke="#a9afbb" stroke-width="1.4" fill="none"/>
+<!-- smirk -->
+<path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
+</g>
+</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air.</p></div></div>
+
+  <label class="lbl" for="showName">Show name</label>
+  <input type="text" id="showName" placeholder="Jamie & Friends">
+
+  <label class="lbl" for="topic">Tonight's topic</label>
+  <input type="text" id="topic" placeholder="e.g. အမေရိကမှာ အခွန်ဆောင်ရတဲ့ ဘဝ">
+
+  <label class="lbl" for="script">Script &amp; notes (Uncle reads this before the show)</label>
+  <textarea id="script" placeholder="Paste your pre-written script, talking points, article text or notes here. Lines that start with “Uncle:” become his cue cards (▶ on air). Lines that start with “Jamie:” tell him where you are in the show."></textarea>
+  <p class="hint">He uses this to know where the show is, even if you bring him in at a random point. He won't read it word for word unless you tap ▶ or ask him to.</p>
+
+  <span class="lbl">Spice level</span>
+  <div class="seg" id="spice"><button data-v="family">🟢 Family</button><button data-v="spicy">🟠 Spicy</button><button data-v="uncut">🔴 Uncut</button></div>
+  <p class="hint" id="spiceHint"></p>
+
+  <button class="btn sec" id="prepBtn">🧠 Let Uncle prep the episode</button>
+  <div class="pts" id="prepOut"></div>
+
+  <button class="btn go" id="startBtn">▶ GO ON AIR</button>
+  <p class="hint" style="text-align:center">Turn your phone sideways for the 16:9 YouTube frame, then screen record.</p>
+
+  <details id="keys"><summary>Keys &amp; voice</summary>
+    <label class="lbl" for="akey">Claude API key</label><input type="password" id="akey" placeholder="sk-ant-…" autocomplete="off">
+    <label class="lbl" for="model">Who writes the Burmese</label>
+    <select id="model"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best Burmese)</option><option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (cheaper, faster)</option></select>
+    <label class="lbl" for="ekey">ElevenLabs key</label><input type="password" id="ekey" placeholder="xi-…" autocomplete="off">
+    <label class="lbl" for="vname">Uncle's ElevenLabs voice (name or voice ID)</label><input type="text" id="vname" placeholder="Zayar">
+    <div class="stat" id="vstat">Not linked yet.</div>
+    <div class="row"><button class="btn sec" id="findBtn">Find voice</button><button class="btn sec" id="testBtn">Test voice</button></div>
+    <label class="lbl">Voice style</label>
+    <div class="seg" id="stab"><button data-v="1">Robust</button><button data-v="0.5">Natural</button></div>
+    <div class="stat" id="elStat"></div>
+    <p class="hint">Keys stay in this browser only. If you used Chat Kyi or the voice preview on this site, the keys are picked up automatically.</p>
+  </details>
+
+  <details><summary>Past episodes (Uncle remembers these)</summary><div class="eps" id="eps"></div><button class="btn sec" id="clearEps">Forget all episodes</button></details>
+</div>
+
+<!-- ===== LIVE STAGE ===== -->
+<div id="live" class="hidden">
+  <div id="stage">
+    <div id="bg"><svg  viewBox="0 0 1920 1080"><defs><pattern id="lp" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#6a452c"/><path d="M7,2 L12,7 L7,12 L2,7 Z" fill="#8c6440"/><circle cx="7" cy="7" r="1.4" fill="#c9a578"/><circle cx="0" cy="0" r="2" fill="#4a2f1e"/><circle cx="22" cy="22" r="2" fill="#4a2f1e"/></pattern>
+<pattern id="dm" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#cdbb8e"/><path d="M20,4 Q30,12 20,20 Q10,12 20,4 Z M20,20 Q30,28 20,36 Q10,28 20,20 Z" fill="#b6a273"/><circle cx="0" cy="20" r="4" fill="#b6a273"/><circle cx="40" cy="20" r="4" fill="#b6a273"/></pattern>
+<radialGradient id="brass" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#fff1b8"/><stop offset=".35" stop-color="#e2bb5e"/><stop offset=".75" stop-color="#a87a2a"/><stop offset="1" stop-color="#6b4a14"/></radialGradient>
+<linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#4a2414"/><stop offset=".5" stop-color="#7a3e22"/><stop offset="1" stop-color="#3a1c10"/></linearGradient>
+<radialGradient id="iris" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#8a5a32"/><stop offset=".6" stop-color="#4a2a16"/><stop offset="1" stop-color="#1e120a"/></radialGradient>
+<pattern id="wp" width="60" height="80" patternUnits="userSpaceOnUse"><rect width="60" height="80" fill="#6f7a5a"/><path d="M30,8 Q44,22 30,40 Q16,22 30,8 Z M30,40 Q44,58 30,76 Q16,58 30,40 Z" fill="#7d8866"/><circle cx="0" cy="40" r="5" fill="#7d8866"/><circle cx="60" cy="40" r="5" fill="#7d8866"/></pattern></defs>
+<rect  fill="url(#wp)"/><rect  fill="#3a2410" opacity=".25"/>
+<rect y="700" width="1920" height="40" fill="#5a3418"/><rect y="740" width="1920" height="200" fill="#6b4024"/>
+<g stroke="#3a1c10" stroke-width="3"><rect x="0" y="760" width="140" height="160" fill="none"/><rect x="160" y="760" width="140" height="160" fill="none"/><rect x="320" y="760" width="140" height="160" fill="none"/><rect x="480" y="760" width="140" height="160" fill="none"/><rect x="640" y="760" width="140" height="160" fill="none"/><rect x="800" y="760" width="140" height="160" fill="none"/><rect x="960" y="760" width="140" height="160" fill="none"/><rect x="1120" y="760" width="140" height="160" fill="none"/><rect x="1280" y="760" width="140" height="160" fill="none"/><rect x="1440" y="760" width="140" height="160" fill="none"/><rect x="1600" y="760" width="140" height="160" fill="none"/><rect x="1760" y="760" width="140" height="160" fill="none"/></g>
+<rect y="930" width="1920" height="150" fill="#4a2a16"/><rect x="0" y="930" width="4" height="150" fill="#3a1c10"/><rect x="120" y="930" width="4" height="150" fill="#3a1c10"/><rect x="240" y="930" width="4" height="150" fill="#3a1c10"/><rect x="360" y="930" width="4" height="150" fill="#3a1c10"/><rect x="480" y="930" width="4" height="150" fill="#3a1c10"/><rect x="600" y="930" width="4" height="150" fill="#3a1c10"/><rect x="720" y="930" width="4" height="150" fill="#3a1c10"/><rect x="840" y="930" width="4" height="150" fill="#3a1c10"/><rect x="960" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1080" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1200" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1320" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1440" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1560" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1680" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1800" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1920" y="930" width="4" height="150" fill="#3a1c10"/>
+<g stroke="#1a1012" stroke-width="5" transform="translate(0,-60)"><rect x="60" y="150" width="190" height="240" fill="#c9a24a"/><rect x="78" y="168" width="154" height="204" fill="#e9d9b0"/></g>
+<path d="M155,190 L135,250 L120,300 L190,300 L175,250 Z" fill="#c9a24a" stroke="#1a1012" stroke-width="3"/><rect x="100" y="300" width="110" height="40" fill="#8a6a3a" stroke="#1a1012" stroke-width="3"/><path d="M155,176 L155,192" stroke="#1a1012" stroke-width="3"/>
+<g stroke="#1a1012" stroke-width="4"><path d="M690,940 L690,330" fill="none"/><path d="M650,950 L730,950 L720,935 L660,935 Z" fill="#2a1c12"/><path d="M630,330 L750,330 L720,240 L660,240 Z" fill="#e9c98a"/></g>
+<ellipse cx="690" cy="300" rx="120" ry="90" fill="#ffd98a" opacity=".2"/>
+<g transform="translate(-70,345)" stroke="#1a1012" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><!-- side table -->
+<path d="M214,612 L238,612 L242,700 Q252,720 240,740 L244,820 L210,820 L214,740 Q202,720 212,700 Z" fill="url(#wood)"/>
+<path d="M226,810 Q180,830 150,890 L166,894 Q196,846 226,834 Q256,846 286,894 L302,890 Q272,830 226,810 Z" fill="url(#wood)"/>
+<ellipse cx="226" cy="604" rx="132" ry="22" fill="#5a2c18"/><path d="M94,604 Q94,620 226,626 Q358,620 358,604" fill="#3a1c10"/>
+<!-- gramophone box -->
+<path d="M150,500 L304,500 L304,584 L150,584 Z" fill="url(#wood)"/>
+<path d="M150,500 L304,500 L304,512 L150,512 Z M150,572 L304,572 L304,584 L150,584 Z" fill="#3a1c10"/>
+<path d="M162,516 L162,568 M292,516 L292,568" stroke="#a86a3a" stroke-width="5"/>
+<path d="M304,540 L322,540" stroke-width="5"/><circle cx="324" cy="540" r="4" fill="#c9ced8"/>
+<ellipse cx="226" cy="498" rx="70" ry="9" fill="#1a1012"/>
+<path d="M268,494 Q258,470 234,474" stroke="#c9ced8" stroke-width="6" fill="none"/><path d="M268,494 Q258,470 234,474" stroke="#1a1012" stroke-width="1.6" fill="none"/>
+<!-- horn -->
+<path d="M262,474 Q278,440 268,410 Q258,384 236,362 L250,350 Q276,374 286,404 Q296,440 278,480 Z" fill="url(#brass)"/>
+<path d="M236,364 Q150,330 140,240 Q138,178 196,160 Q250,146 300,170 Q356,200 344,264 Q330,330 250,350 Z" fill="url(#brass)"/>
+<path d="M196,160 Q150,210 236,364 M250,152 Q236,240 244,356 M300,170 Q300,260 248,352 M344,264 Q300,300 250,350 M140,240 Q180,300 238,362" stroke="#8a6420" stroke-width="2" fill="none"/>
+<ellipse cx="248" cy="240" rx="70" ry="62" fill="#5a3a0e" opacity=".55" stroke="none"/><ellipse cx="252" cy="236" rx="30" ry="26" fill="#2a1a06" opacity=".7" stroke="none"/>
+<path d="M140,240 Q138,178 196,160 Q250,146 300,170 Q356,200 344,264" stroke="#fff4c4" stroke-width="2.4" fill="none" opacity=".7"/>
+<!-- rotary phone -->
+<path d="M120,594 L136,556 Q176,546 216,556 L232,594 Z" fill="#141414"/>
+<path d="M112,556 Q110,534 130,532 L222,532 Q242,534 240,556 L224,560 Q222,548 210,546 L142,546 Q130,548 128,560 Z" fill="#1e1e20"/>
+<circle cx="176" cy="574" r="15" fill="#2a2a2e"/><circle cx="176" cy="574" r="6" fill="#d9d9d9"/>
+<path d="M118,590 Q100,620 112,650 Q124,680 104,700" stroke="#141414" stroke-width="4" fill="none" stroke-dasharray="3 3"/>
+</g>
+</svg></div>
+    <div id="uncle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="30 -24 250 574" ><defs>
+<radialGradient id="iris" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#8a5a32"/><stop offset=".6" stop-color="#4a2a16"/><stop offset="1" stop-color="#1e120a"/></radialGradient>
+<pattern id="silk" width="18" height="10" patternUnits="userSpaceOnUse"><rect width="18" height="10" fill="#f3f1ea"/><rect x="2" width="2" height="10" fill="#cfccc2"/><rect x="7" width="1" height="10" fill="#b5b2a8"/><rect x="12" width="3" height="10" fill="#e2dfd5"/></pattern>
+<linearGradient id="fold" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".3" stop-color="#000" stop-opacity="0"/><stop offset=".75" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient></defs>
+<g stroke="#1a1418" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+<!-- socks + lace-up shoes -->
+<path d="M110,500 L136,500 L136,522 L110,522 Z M164,500 L190,500 L190,522 L164,522 Z" fill="#3a3a42"/>
+<path d="M104,520 L138,518 Q158,522 160,540 L100,540 Q98,528 104,520 Z" fill="#141416"/>
+<path d="M162,518 L196,520 Q202,528 200,540 L140,540 Q142,522 162,518 Z" fill="#141416"/>
+<path d="M120,522 L130,528 M126,520 L134,526 M174,520 L184,526 M180,522 L188,528" stroke="#55555f" stroke-width="1.6"/>
+<path d="M140,532 Q150,530 156,534 M106,530 Q112,528 118,530" stroke="#9aa2b2" stroke-width="2" fill="none"/>
+<!-- silk longyi -->
+<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#silk)"/>
+<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#fold)" stroke="none"/>
+<path d="M164,350 Q186,420 180,506 L210,506 L214,346 Z" fill="url(#silk)"/>
+<path d="M164,350 Q186,420 180,506" fill="none"/>
+<path d="M120,352 L114,506 M140,352 L138,506 M196,360 L198,504" stroke="#a8a59c" stroke-width="1.4" opacity=".7" fill="none"/>
+<path d="M158,340 Q176,334 190,344 Q194,360 180,368 Q164,370 158,356 Z" fill="url(#silk)"/>
+<!-- left arm + book -->
+<path d="M96,212 L74,334 L98,340 L114,238 Z" fill="#26262e"/>
+<path d="M72,330 L98,336 L96,346 L70,340 Z" fill="#f4f1e8"/>
+<path d="M66,346 L102,346 L102,404 L66,404 Z" fill="#7a4a2a"/><path d="M66,346 L72,346 L72,404 L66,404 Z" fill="#5a3418"/>
+<path d="M70,340 Q66,356 80,360 Q96,360 98,346 Z" fill="#f2c9a6"/>
+<!-- right arm -->
+<path d="M204,212 L226,334 L202,340 L188,238 Z" fill="#26262e"/>
+<path d="M228,330 L202,336 L204,346 L230,340 Z" fill="#f4f1e8"/>
+<path d="M204,344 Q202,362 214,366 Q228,364 230,342 Z" fill="#f2c9a6"/>
+<path d="M210,352 L210,362 M218,352 L218,363" stroke="#c98f6e" stroke-width="1.3"/>
+<!-- jacket (taikpon) -->
+<path d="M94,212 Q100,196 137,190 L163,190 Q200,196 206,212 L216,352 L84,352 Z" fill="#26262e"/>
+<path d="M190,214 L206,352 L186,352 L182,230 Z" fill="#34343e" stroke="none"/>
+<g fill="#7c7c8a" stroke-width="1.2"><rect x="138" y="226" width="26" height="5" rx="2.5"/><rect x="138" y="256" width="26" height="5" rx="2.5"/><rect x="138" y="286" width="26" height="5" rx="2.5"/><rect x="138" y="316" width="26" height="5" rx="2.5"/></g>
+<path d="M150,200 L150,350" stroke="#3e3e4a" stroke-width="1.6" fill="none"/>
+<path d="M98,292 L134,292 L134,336 L98,336 Z M166,292 L202,292 L202,336 L166,336 Z M166,236 L196,236 L196,264 L166,264 Z" fill="none" stroke="#4a4a58" stroke-width="2"/>
+<path d="M174,240 L174,224 M182,240 L182,226" stroke="#c9ced8" stroke-width="3"/>
+<circle cx="120" cy="244" r="7" fill="#f4f1e8" stroke-width="1.6"/>
+<!-- neck + collar -->
+<path d="M138,166 L162,166 L163,194 L137,194 Z" fill="#f2c9a6"/>
+<path d="M134,186 Q150,196 166,186 L168,200 Q150,210 132,200 Z" fill="#f4f1e8"/>
+<g transform="translate(150,190) scale(1.2) translate(-150,-190)"><!-- ears -->
+<path d="M110,104 Q100,104 102,118 Q104,134 114,134 Z" fill="#f2c9a6"/>
+<path d="M190,104 Q200,104 198,118 Q196,134 186,134 Z" fill="#f2c9a6"/>
+<!-- face -->
+<path d="M111,92 C110,138 124,164 150,176 C176,164 190,138 189,92 C189,74 172,62 150,62 C128,62 111,74 111,92 Z" fill="#f2c9a6"/>
+<path d="M176,100 C186,130 178,156 158,172 C176,160 188,138 189,104 Z" fill="#e2b18f" stroke="none"/>
+<!-- hair: slicked back, greying -->
+<path d="M106,108 C96,62 122,34 156,34 C190,34 206,60 194,108 C192,86 184,74 168,70 C150,66 128,68 116,82 C110,90 108,98 106,108 Z" fill="#3b3c44"/>
+<path d="M120,60 Q146,44 178,52 M118,72 Q146,56 186,66 M132,46 Q158,40 184,48" stroke="#a9afbb" stroke-width="2.4" fill="none"/>
+<path d="M162,36 Q150,52 140,70" stroke="#23242a" stroke-width="2" fill="none"/>
+<path d="M108,104 Q106,96 110,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
+<path d="M192,104 Q194,96 190,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
+<path d="M104,98 Q96,52 150,38 Q206,48 198,98 Q190,80 150,76 Q114,78 104,98 Z" fill="#f4f1e8"/>
+<path d="M110,84 Q150,62 194,82 M114,70 Q152,50 190,66 M124,56 Q154,42 182,52" stroke="#c9c4b4" stroke-width="2" fill="none"/>
+<path d="M112,74 Q84,52 62,62 Q70,72 66,84 Q88,80 110,88 Z" fill="#f4f1e8"/>
+<path d="M70,66 Q88,70 106,80 M68,78 Q88,80 108,86" stroke="#c9c4b4" stroke-width="1.6" fill="none"/>
+<!-- brows: thick, condescending -->
+<path d="M119,93 L142,99" stroke-width="5.5"/>
+<path d="M158,99 L181,93" stroke-width="5.5"/>
+<!-- eyes: half-lidded, smug -->
+<path d="M121,114 Q133,108 146,114 Q134,123 121,114 Z" fill="#fff" stroke-width="1.6"/>
+<path d="M154,114 Q167,108 179,114 Q166,123 154,114 Z" fill="#fff" stroke-width="1.6"/>
+<circle cx="135" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
+<circle cx="167" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
+<circle cx="137" cy="114" r="1.8" fill="#fff" stroke="none"/>
+<circle cx="169" cy="114" r="1.8" fill="#fff" stroke="none"/>
+<path d="M118,112 Q133,105 147,112" stroke-width="4.2" fill="none"/>
+<path d="M153,112 Q167,105 182,112" stroke-width="4.2" fill="none"/>
+<path d="M124,112 Q134,109 144,113 L144,115 Q134,112 124,114 Z" fill="#e2b18f" stroke="none"/>
+<path d="M156,113 Q166,109 176,112 L176,114 Q166,112 156,115 Z" fill="#e2b18f" stroke="none"/>
+<path d="M124,121 Q132,124 140,122 M160,122 Q168,124 176,121" stroke="#c98f6e" stroke-width="1.3" fill="none"/>
+<ellipse cx="128" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/><ellipse cx="172" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/>
+<g fill="none" stroke="#1a1418" stroke-width="2.2"><circle cx="134" cy="116" r="13"/><circle cx="167" cy="116" r="13"/><path d="M147,114 Q150.5,110 154,114 M121,113 L106,108 M180,113 L194,108"/></g>
+<path d="M126,108 Q130,105 134,106" stroke="#fff" stroke-width="2" fill="none" opacity=".8"/>
+<!-- nose -->
+<path d="M151,120 L147,136 L153,137" stroke="#b97d5d" stroke-width="2" fill="none"/>
+<!-- smile lines -->
+<path d="M130,138 Q127,148 132,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
+<path d="M170,138 Q173,148 168,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
+<!-- mustache -->
+<path d="M135,146 Q150,138 165,146 Q160,152 150,149 Q140,152 135,146 Z" fill="#3b3c44" stroke-width="1.8"/>
+<path d="M142,145 Q150,142 158,145" stroke="#a9afbb" stroke-width="1.4" fill="none"/>
+<!-- smirk -->
+<path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
+</g>
+</g></svg></div>
+    <div id="top"><span id="show">JAMIE &amp; FRIENDS</span><span id="topic2"></span><span id="air">● ON AIR</span></div>
+    <div id="chat"></div>
+    <button id="exit" aria-label="End show">✕</button>
+    <button id="hot" aria-label="Controls">⋯</button>
+    <div id="clock">00:00</div>
+    <div id="micHint" class="hidden">● listening…</div>
+    <div id="ctl">
+      <div class="quick">
+        <button data-q="go">ဆက်ပြော</button><button data-q="argue">ငြင်းစမ်း</button><button data-q="history">သမိုင်း</button><button data-q="funny">ရယ်စရာ</button><button data-q="wrap">အနှစ်ချုပ်</button>
+        <button class="cue" id="cueBtn">▶ Script line</button><button class="cue" id="coldBtn">🎬 Cold open</button><button class="mark" id="markBtn">⭐ Clip</button><button class="stop" id="stopBtn">⏹ ရပ်</button>
+      </div>
+      <div class="bar"><button id="mic" aria-label="Hold to talk">🎙</button><input id="say" placeholder="Type to Uncle… (Enter to send · hold Space to talk)" autocomplete="off"><button id="send">Send</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SHOW NOTES ===== -->
+<div id="notes" class="hidden"><div class="pane"><h2 style="margin:0 0 8px;color:var(--gold)">Show notes</h2><div id="notesBody" class="hint">Uncle is writing the notes…</div><pre id="notesPre" class="hidden"></pre><div class="row"><button class="btn sec" id="copyNotes">Copy</button><button class="btn sec" id="closeNotes">Done</button></div></div></div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================== STATE ============================== */
+const $=s=>document.querySelector(s);
+const st={get(k,d){try{const v=localStorage.getItem("ul_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ul_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
+const raw=(k)=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const MY=/[က-႟ꩠ-ꩿ]/;
+let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie"},st.get("s",{}));
+const saveS=()=>st.set("s",S);
+let AKEY=st.get("akey",""),EKEY=st.get("ekey","");
+let EPS=st.get("eps",[]);
+/* pick up keys from Chat Kyi / the voice previews on the same site */
+try{
+  if(!AKEY){const k=raw("ck_key");if(k)AKEY=JSON.parse(k)||"";if(AKEY)st.set("akey",AKEY)}
+  if(!EKEY){const k=raw("ck_elkey");if(k)EKEY=JSON.parse(k)||"";if(!EKEY)EKEY=raw("bmp_key")||"";if(EKEY)st.set("ekey",EKEY)}
+  if(!S.vid){const cs=JSON.parse(raw("ck_settings")||"{}");if(cs.el&&cs.el.ids&&cs.el.ids.kyi)S.vid=cs.el.ids.kyi;
+    if(!S.vid){const b=JSON.parse(raw("bmp_ids")||"{}");if(b.u)S.vid=b.u}if(S.vid)saveS()}
+}catch(e){}
+let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),3200)}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+function now(){return Date.now()}
+
+/* ============================== CLAUDE ============================== */
+function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
+function errText(e){if(e&&e.name==="AbortError")return"";switch(e&&e.code){case"no_key":return"Add your Claude API key in Keys & voice.";case"bad_key":return"That Claude key didn't work.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Pick another in Keys & voice.";case"overloaded":return"The brain is busy. Try again in a moment.";case"network":return"No internet connection.";default:return(e&&e.message)||"He mumbled something nobody understood."}}
+async function claude(sys,messages,max=900,signal){
+  if(!AKEY){const e=new Error("no key");e.code="no_key";throw e}
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"x-api-key":AKEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages})})}catch(e){if(e.name==="AbortError")throw e;const x=new Error("net");x.code="network";throw x}
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw apiErr(r.status,j);
+  return (j.content||[]).map(c=>c.type==="text"?c.text:"").join("")}
+async function claudeStream(sys,messages,max,onText,signal){
+  if(!AKEY){const e=new Error("no key");e.code="no_key";throw e}
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"x-api-key":AKEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages,stream:true})})}catch(e){if(e.name==="AbortError")throw e;const x=new Error("net");x.code="network";throw x}
+  if(!r.ok){const j=await r.json().catch(()=>({}));throw apiErr(r.status,j)}
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf="",full="";
+  for(;;){const {value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});
+    let i;while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith("data:"))continue;
+      let ev;try{ev=JSON.parse(line.slice(5))}catch(e){continue}
+      if(ev.type==="content_block_delta"&&ev.delta&&ev.delta.type==="text_delta"){full+=ev.delta.text;onText(full)}
+      else if(ev.type==="error"){const e=new Error(ev.error&&ev.error.message);e.code=ev.error&&ev.error.type==="overloaded_error"?"overloaded":"api_error";throw e}}}
+  return full}
+function pj(t){const s=String(t).replace(/```json|```/g,"").trim();return JSON.parse(s.slice(s.indexOf("{"),s.lastIndexOf("}")+1))}
+
+/* ============================== ELEVENLABS ============================== */
+const elAudio=new Audio();elAudio.playsInline=true;elAudio.setAttribute("playsinline","");let unlocked=false;
+function unlock(){if(unlocked)return;try{elAudio.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";const p=elAudio.play();if(p&&p.then)p.then(()=>{unlocked=true}).catch(()=>{})}catch(e){}
+  if(window.speechSynthesis){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}}
+async function elApi(path,opt={}){let r;try{r=await fetch("https://api.elevenlabs.io"+path,Object.assign({},opt,{headers:Object.assign({"xi-api-key":EKEY},opt.headers||{})}))}catch(e){if(e.name==="AbortError")throw e;throw new Error("Can't reach ElevenLabs")}
+  if(!r.ok){let m="";try{const j=await r.json();m=(j.detail&&(j.detail.message||j.detail.status))||""}catch(e){}const e=new Error("ElevenLabs "+r.status+(m?": "+m:""));e.status=r.status;throw e}return r}
+const elReady=()=>!!(EKEY&&S.vid);
+const ttsCache=new Map();
+async function elTTS(text,signal){const ck=S.vid+"|"+S.stab+"|"+text;if(ttsCache.has(ck))return ttsCache.get(ck);
+  const r=await elApi(`/v1/text-to-speech/${S.vid}?output_format=mp3_44100_128`,{method:"POST",signal,headers:{"Content-Type":"application/json","Accept":"audio/mpeg"},body:JSON.stringify({text,model_id:"eleven_v4",voice_settings:{stability:Number(S.stab)||1,similarity_boost:0.4}})});
+  const url=URL.createObjectURL(await r.blob());S.chars=(S.chars||0)+text.length;saveS();ttsCache.set(ck,url);
+  if(ttsCache.size>120){const k=ttsCache.keys().next().value;try{URL.revokeObjectURL(ttsCache.get(k))}catch(e){}ttsCache.delete(k)}return url}
+function playUrl(url){return new Promise(res=>{let d=false;const f=()=>{if(!d){d=true;res()}};elAudio.onended=f;elAudio.onerror=f;elAudio.src=url;const p=elAudio.play();if(p&&p.catch)p.catch(f);setTimeout(f,60000)})}
+function synthSay(text){return new Promise(res=>{if(!window.speechSynthesis||!text){res();return}const u=new SpeechSynthesisUtterance(text);u.lang=MY.test(text)?"my-MM":"en-US";u.rate=0.95;let d=false;const f=()=>{if(!d){d=true;res()}};u.onend=f;u.onerror=f;speechSynthesis.speak(u);setTimeout(f,20000)})}
+let elWarned=0;function elFail(e){if(now()-elWarned>20000){elWarned=now();toast(((e&&e.message)||"ElevenLabs failed")+". Using the phone voice.")}}
+
+/* Sequential voice queue: lines are sent to ElevenLabs the moment they are complete, played in order */
+const VQ={q:[],gen:0,playing:false,ac:null,onIdle:null,
+  push(my,en){const gen=this.gen;const ctrl=new AbortController();this.ac=ctrl;const p=elReady()?elTTS(my,ctrl.signal).catch(e=>{if(e.name!=="AbortError")elFail(e);return null}):Promise.resolve(null);this.q.push({p,my,en,gen});this.pump()},
+  async pump(){if(this.playing)return;this.playing=true;setTalk(true);
+    while(this.q.length){const it=this.q.shift();if(it.gen!==this.gen)continue;const url=await it.p;if(it.gen!==this.gen)continue;
+      if(url)await playUrl(url);else await synthSay(elReady()?it.en||it.my:it.en||it.my)}
+    this.playing=false;setTalk(false);if(this.onIdle)this.onIdle()},
+  stop(){this.gen++;this.q=[];try{elAudio.pause();elAudio.currentTime=0}catch(e){}if(window.speechSynthesis)speechSynthesis.cancel();this.playing=false;setTalk(false)}};
+function setTalk(on){const u=$("#uncle");if(!u)return;u.classList.toggle("talk",on);if(on)u.classList.remove("think")}
+
+/* instant reactions while the real reply loads */
+const REACT=["ဟမ်…","ကဲ…","အေးပါ…","ဟား…","ဟုတ်ပြီ…"];
+async function warmReactions(){if(!elReady())return;for(const r of REACT){try{await elTTS(r)}catch(e){break}}}
+
+/* ============================== LISTEN (hold to talk) ============================== */
+let stream=null,rec=null,chunks=[],listening=false;
+async function listenStart(){if(listening||busy)return;
+  if(!EKEY){toast("Add your ElevenLabs key to talk by voice, or type instead.");return}
+  try{if(!stream||stream.getTracks().every(t=>t.readyState==="ended"))stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast("Microphone is blocked. Allow it in Settings.");return}
+  try{rec=new MediaRecorder(stream)}catch(e){toast("Recording isn't supported here. Type instead.");return}
+  chunks=[];listening=true;$("#mic").classList.add("on");$("#micHint").classList.remove("hidden");
+  rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  rec.onstop=async()=>{listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden");
+    if(!chunks.length)return;const blob=new Blob(chunks,{type:rec.mimeType||"audio/mp4"});if(blob.size<2000)return;
+    const fd=new FormData();fd.append("file",blob,"speech."+((rec.mimeType||"").includes("webm")?"webm":"m4a"));fd.append("model_id","scribe_v1");fd.append("language_code","mya");
+    $("#mic").classList.add("busy");
+    try{let j;try{j=await (await elApi("/v1/speech-to-text",{method:"POST",body:fd})).json()}catch(e){if(e.status===400||e.status===422){fd.delete("language_code");j=await (await elApi("/v1/speech-to-text",{method:"POST",body:fd})).json()}else throw e}
+      const t=String(j.text||"").trim();if(t)ask(t);else toast("Didn't catch that.")}
+    catch(e){toast((e&&e.message)||"Couldn't understand that.")}finally{$("#mic").classList.remove("busy")}};
+  rec.start(250)}
+function listenStop(){if(!listening||!rec)return;try{rec.stop()}catch(e){listening=false}}
+
+/* ============================== UNCLE'S BRAIN ============================== */
+const NICKS=["Costco Prince","Honda Civic","Slipper Assassin","Plastic Bag Collector","Tiger Mom's Biggest Disappointment","Boba Boy","Rice Cooker","Coupon King","Free Sample Hunter","Instant Noodle Chef","Family IT Department","Unpaid Translator","Leftover Lord","Thermos Boy","Wi-Fi Password Keeper","Kumon Dropout","Future Doctor (Not Really)","Karaoke Champion"];
+const SPICE={
+ family:"CLEAN MODE: roasts and dad jokes only. No innuendo, no swearing, no crude or gross-out humor.",
+ spicy:"SPICY MODE: properly mean roasts, dry sarcasm, petty insults, gross-out and light innuendo are allowed. No swearing.",
+ uncut:"UNCUT MODE: crude and dark humor, adult innuendo and the occasional mild Burmese swear word aimed playfully at Jamie are allowed. Still no slurs."};
+const SPICE_HINT={family:"Roasts and dad jokes only. Safe for aunties and monetized YouTube.",spicy:"Meaner roasts, gross-out jokes, light innuendo. Heavy topics turn clean on their own.",uncut:"Crude, dark, adult innuendo, the odd mild swear at Jamie. Heavy topics still turn clean on their own."};
+let usedNicks=[];
+function pickNick(){const fresh=NICKS.filter(n=>!usedNicks.includes(n));const n=(fresh.length?fresh:NICKS)[Math.floor(Math.random()*(fresh.length?fresh:NICKS).length)];usedNicks.push(n);if(usedNicks.length>6)usedNicks.shift();return n}
+function sysPrompt(){const n=S.name,show=S.show||"Jamie & Friends";
+return `You are "Uncle" (ဦးလေး), ${n}'s co-host on the Burmese podcast "${show}", recorded for YouTube. You sit in your 1960s living room: white gaung baung, round glasses, dark taikpon jacket, striped silk longyi, a book always in your hand, a brass gramophone and a rotary phone beside you.
+
+PERSONALITY: a condescending, know-it-all old Burmese tea-shop uncle. Mean, sharp, dry and sarcastic, but secretly fond of ${n}. You roast ${n} constantly: money, taxes, sending money home, his love life, being lonely with his computer, Costco, his haircut. Call him by a playful nickname sometimes (this reply, if you use one: "${pickNick()}"); never insult his race or looks beyond the haircut gag. Dad jokes and puns are your weakness: you tell one and act like it is genius. Everything was better in your day. You mock ${n} whenever he says "မင်္ဂလာပါ" (too many greetings).
+BACKSTORY (reveal gradually, never dump it all): your "PhD" is a photo from a photo studio where you rented the gown; you are an "army veteran" who actually polished officers' shoes and bought their milk ("the supply division"); your medals came from Bogyoke Market, three for five thousand kyat, and one is a bottle cap; 30 years at a tea-shop register. Catchphrases, used sparingly: "ငါ တစ်ခါပဲ ရှင်းပြတယ်။" (I explain only one time), "ထိုင်။ ဦးလေး စကားပြောနေတယ်။" (Sit down, Uncle is talking), "ကဲ… သေချာနားထောင်။".
+CO-HOST JOB: keep the show moving. React to what ${n} just said, add ONE sharp take, fact or joke, and often end by pushing back or firing a pointed question at ${n}. Short turns: 1 to 3 spoken sentences, under 45 words total. Never lecture, never list, never summarize the script, never repeat what ${n} said back to him. Stay on the current topic unless ${n} moves it.
+SCRIPT AWARENESS: ${n} has a prepared script and notes (below, when present). Use them to know where the show is, what was planned next, and what jokes were prepared. If ${n} brings you in at a random point, work out from his last line which part of the show you are in and continue naturally from there. Do NOT recite the script word for word unless ${n} explicitly asks you to read your line.
+FACTS: use only ${n}'s notes and widely known history and culture. If you don't know something, say so in character ("ask Google, I am not Google") instead of inventing facts, dates or numbers.
+${SPICE[S.spice]||SPICE.spicy}
+HEAVY TOPIC RULE: when the current subject involves real victims, deaths, war, disasters, abuse or tragedy, drop all crude and sexual humor automatically. Stay sharp but respectful; mock the system, the officials and the absurdities, never the victims.
+ALWAYS: no slurs; no jokes about ethnic groups, religions or anyone's race; no sexual jokes about real named people; no mocking of real victims. The junta and generals as a system are fair game.
+LANGUAGE: THINK AND WRITE IN BURMESE. Natural, everyday Yangon spoken Burmese, the way a funny old uncle really talks on a podcast, with the normal sprinkle of English words people actually use (Costco, TikTok, tax, Facebook). Never textbook or news-reader Burmese, never word-for-word translation, never invented words. Keep "${n}" and "Jamie & Friends" in Latin letters.
+FORMAT: reply ONLY in this exact plain-text format, nothing else, no quotes, no markdown:
+MY: <one short spoken Burmese sentence>
+MY: <next sentence, optional, up to 3 MY lines>
+EN: <one-line English subtitle of everything you said>`}
+function scriptLines(){return String(S.script||"").split("\n").map(x=>x.trim()).filter(Boolean)}
+function lineWho(l){const m=l.match(/^(uncle|ဦးလေး|jamie|me|ကျွန်တော်)\s*[:：]\s*([\s\S]*)$/i);if(!m)return null;return{who:/^(uncle|ဦးလေး)/i.test(m[1])?"u":"j",text:m[2].trim()}}
+let ptr=0;
+function wordsOf(t){return String(t).toLowerCase().replace(/[.,!?;:"'“”‘’()\-၊။|]/g," ").split(/\s+/).filter(w=>w.length>=2)}
+function advancePtr(said){const L=scriptLines();const sw=new Set(wordsOf(said));if(!sw.size)return;let best=-1,bs=0;
+  for(let i=ptr;i<Math.min(L.length,ptr+12);i++){const lw=lineWho(L[i]);if(!lw||lw.who!=="j")continue;const w=wordsOf(lw.text.split("|")[0]);if(w.length<2)continue;let k=0;w.forEach(x=>{if(sw.has(x))k++});const s=k/w.length;if(s>bs){bs=s;best=i}}
+  if(best>=0&&bs>=0.45)ptr=best+1}
+function scriptContext(){const L=scriptLines();if(!L.length)return"";const full=L.join("\n");
+  let out="JAMIE'S SCRIPT & NOTES FOR THIS EPISODE:\n"+(full.length>7000?full.slice(0,7000)+"\n…(trimmed)":full);
+  if(L.some(l=>lineWho(l))){const a=Math.max(0,ptr-3),b=Math.min(L.length,ptr+6);out+="\n\nCURRENT SPOT IN THE SCRIPT (best guess; the line marked >> is the next planned line):\n"+L.slice(a,b).map((l,i)=>(a+i===ptr?">> ":"   ")+l).join("\n")}
+  return out}
+function prepContext(){const p=S.prep;if(!p||!p.points)return"";return"UNCLE'S PREPARED ANGLES (use when they fit, don't force them):\n"+p.points.map((x,i)=>`${i+1}. ${x.t} · take: ${x.hot} · ask Jamie: ${x.ask} · joke: ${x.joke}`).join("\n")}
+function memoryContext(){if(!EPS.length)return"";return"PAST EPISODES (for callbacks, keep it light):\n"+EPS.slice(-3).map(e=>`- ${e.date}: ${e.summary}`).join("\n")}
+let transcript=[],showStart=0,marks=[];
+function recentContext(){const r=transcript.slice(-10);if(!r.length)return"";return"JUST NOW ON THE SHOW:\n"+r.map(x=>(x.who==="j"?S.name:"Uncle")+": "+(x.en||x.my)).join("\n")}
+function buildMsg(user){const parts=[`EPISODE: "${S.show||"Jamie & Friends"}" · topic: ${S.topic||"(none given)"} · spice: ${S.spice}`,memoryContext(),scriptContext(),prepContext(),recentContext(),user].filter(Boolean);return parts.join("\n\n")}
+const DIRECTIONS={go:"[Jamie signals: keep going. Add one more thought or joke on what you were just saying, then stop.]",argue:"[Jamie signals: argue the other side. Disagree with the last point made, yours or his, and make the opposite case with one sharp reason.]",history:"[Jamie signals: give the history or background behind this topic, one or two real, well-known facts, in your voice.]",funny:"[Jamie signals: make it funny. One dad joke or sharp roast about the current subject, then a one-line kicker.]",wrap:"[Jamie signals: wrap up this segment. One-line summary in your voice, one last jab, then hand it back to Jamie.]"};
+
+/* ============================== ASK UNCLE ============================== */
+let busy=false,abortCtl=null;
+function parseStream(full){const lines=full.split("\n");const done=lines.slice(0,-1),cur=lines[lines.length-1];const my=[],en=[];
+  for(const l of done){const m=l.match(/^\s*MY\s*[:：]\s*(.+)$/i);if(m)my.push(m[1].trim());const e=l.match(/^\s*EN\s*[:：]\s*(.+)$/i);if(e)en.push(e[1].trim())}
+  const cm=cur.match(/^\s*MY\s*[:：]\s*(.+)$/i),ce=cur.match(/^\s*EN\s*[:：]\s*(.+)$/i);
+  return{my,en:en.join(" ")+(ce?ce[1].trim():""),partial:cm?cm[1].trim():""}}
+async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)return;busy=true;unlock();
+  const direction=!!opt.direction,shown=opt.label||text;
+  if(!direction){addBubble("j",text,"");transcript.push({who:"j",my:text,en:text,t:now()-showStart});advancePtr(text)}
+  const bub=addBubble("u","…","");bub.classList.add("think");$("#uncle").classList.add("think");
+  VQ.stop();if(elReady()&&!opt.quiet)VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"");
+  abortCtl=new AbortController();let spoken=0,last=null;
+  const msg=buildMsg(direction?text:`[${S.name} → Uncle] ${text}`);
+  try{
+    const full=await claudeStream(sysPrompt(),[{role:"user",content:msg}],600,f=>{const p=parseStream(f);
+      if(p.my.length||p.partial){bub.classList.remove("think");setBubble(bub,p.my.concat(p.partial?[p.partial]:[]).join(" "),p.en)}
+      while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}last=p},abortCtl.signal);
+    const p=parseStream(full+"\n");while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}
+    let my=p.my.join(" "),en=p.en;if(!my){my=full.replace(/^(MY|EN)\s*[:：]\s*/gim,"").trim();VQ.push(my,en)}
+    bub.classList.remove("think");setBubble(bub,my,en);transcript.push({who:"u",my,en,t:now()-showStart});
+  }catch(e){bub.classList.remove("think");if(e&&e.name==="AbortError"){if(bub.querySelector(".m").textContent==="…")bub.remove()}else{setBubble(bub,"…","");bub.remove();toast(errText(e))}}
+  finally{busy=false;abortCtl=null;$("#uncle").classList.remove("think")}}
+function stopUncle(){if(abortCtl)abortCtl.abort();VQ.stop();busy=false;$("#uncle").classList.remove("think")}
+
+/* scripted cue: next "Uncle:" line from the script, spoken word for word */
+async function cueNext(){if(busy){toast("Let him finish.");return}const L=scriptLines();let i=ptr;while(i<L.length){const lw=lineWho(L[i]);if(lw&&lw.who==="u")break;i++}
+  if(i>=L.length){toast("No more Uncle lines in the script.");return}
+  const lw=lineWho(L[i]);ptr=i+1;const pr=lw.text.split("|").map(x=>x.trim());const my=pr[0],en=pr[1]||(MY.test(my)?"":my);
+  await perform(my,en)}
+async function perform(my,en){busy=true;unlock();VQ.stop();const bub=addBubble("u",my,en);transcript.push({who:"u",my,en,t:now()-showStart,scripted:true});
+  const sents=(my.match(/[^။!?…]+[။!?…]*/g)||[my]).map(x=>x.trim()).filter(Boolean);
+  await new Promise(res=>{VQ.onIdle=()=>{VQ.onIdle=null;res()};sents.forEach(s=>VQ.push(s,""));if(!sents.length)res()});busy=false}
+async function coldOpen(){const p=S.prep;if(!p||!p.cold_my){toast("Let Uncle prep first, on the setup screen.");return}if(busy){toast("Let him finish.");return}await perform(p.cold_my,p.cold_en||"")}
+
+/* ============================== PREP & NOTES ============================== */
+async function prep(){if(!S.topic&&!S.script){toast("Give him a topic or a script first.");return}const b=$("#prepBtn");b.disabled=true;b.textContent="Uncle is reading…";
+  const sys=sysPrompt()+`\n\nPREP TASK OVERRIDE: ignore the MY/EN format for this task. Return ONLY JSON: {"cold_my":"...","cold_en":"...","points":[{"t":"...","hot":"...","ask":"...","joke":"..."}]}. cold_my: a 2-3 sentence Burmese cold open for the episode in your voice (mock Jamie, tease the topic). cold_en: its English subtitle. points: 4 to 6 talking points from the topic/script; t = point title in Burmese, hot = your sharp take (Burmese), ask = a pointed question for Jamie (Burmese), joke = a dad joke or roast ready to use (Burmese). Keep each field short.`;
+  try{const t=await claude(sys,[{role:"user",content:buildMsg("[Prep the episode now.]")}],1800);const o=pj(t);if(!o.points)throw new Error("bad");S.prep=o;saveS();renderPrep();toast("Uncle is ready")}
+  catch(e){toast(errText(e)||"He couldn't prep. Try again.")}finally{b.disabled=false;b.textContent="🧠 Let Uncle prep the episode"}}
+function renderPrep(){const o=$("#prepOut");o.innerHTML="";const p=S.prep;if(!p)return;
+  if(p.cold_my){const d=document.createElement("div");d.className="pt";d.innerHTML=`<b>🎬 Cold open</b><small>${esc(p.cold_my)}<br><i>${esc(p.cold_en||"")}</i></small>`;o.appendChild(d)}
+  (p.points||[]).forEach((x,i)=>{const d=document.createElement("div");d.className="pt";d.innerHTML=`<b>${i+1}. ${esc(x.t)}</b><small><i>Take:</i> ${esc(x.hot)}<br><i>Ask Jamie:</i> ${esc(x.ask)}<br><i>Joke:</i> ${esc(x.joke)}</small>`;o.appendChild(d)})}
+function esc(s){return String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function mmss(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+async function showNotes(){$("#notes").classList.remove("hidden");$("#notesPre").classList.add("hidden");$("#notesBody").textContent="Uncle is writing the notes…";
+  const tr=transcript.map(x=>`[${mmss(x.t)}] ${x.who==="j"?S.name:"Uncle"}: ${x.my}${x.en&&x.en!==x.my?" ("+x.en+")":""}`).join("\n");
+  const mk=marks.length?"\nCLIP MARKS (Jamie tapped ⭐ at): "+marks.map(mmss).join(", "):"";
+  const sys=`You write YouTube show notes for the Burmese comedy podcast "${S.show}". Return ONLY JSON: {"title_my":"...","title_en":"...","description_my":"...","caption":"...","chapters":[{"t":"mm:ss","label":"..."}],"best":[{"t":"mm:ss","why":"..."}],"summary":"..."}. description_my: 3-5 lines of Burmese for the YouTube description, ending with a follow line. caption: a short sarcastic Burmese Facebook caption with 3 hashtags. chapters: 3-8 topic shifts with timestamps from the transcript. best: up to 5 funniest moments with timestamps (prefer the clip marks). summary: 2 sentences in English describing what happened, for Uncle's memory next episode.`;
+  try{const t=await claude(sys,[{role:"user",content:"TOPIC: "+S.topic+"\nTRANSCRIPT:\n"+(tr||"(empty)")+mk}],1600);const o=pj(t);
+    const txt=`${o.title_my||""}\n${o.title_en||""}\n\n${o.description_my||""}\n\nCAPTION:\n${o.caption||""}\n\nCHAPTERS:\n${(o.chapters||[]).map(c=>c.t+" "+c.label).join("\n")}\n\nBEST MOMENTS:\n${(o.best||[]).map(c=>c.t+" "+c.why).join("\n")}`;
+    $("#notesPre").textContent=txt;$("#notesPre").classList.remove("hidden");$("#notesBody").textContent="";
+    if(transcript.length>=4){EPS.push({date:new Date().toLocaleDateString(),topic:S.topic,summary:o.summary||""});EPS=EPS.slice(-12);st.set("eps",EPS);renderEps()}}
+  catch(e){$("#notesBody").textContent=transcript.length?"Couldn't write the notes: "+errText(e):"Nothing was said on air."}}
+
+/* ============================== STAGE UI ============================== */
+function addBubble(who,my,en){const c=$("#chat");[...c.children].forEach(b=>b.classList.add("old"));while(c.children.length>6)c.firstElementChild.remove();
+  const b=document.createElement("div");b.className="b "+who;b.innerHTML=`<span class="n">${who==="j"?esc(S.name).toUpperCase():"UNCLE"}</span><div class="m"></div><div class="e"></div>`;setBubble(b,my,en);c.appendChild(b);return b}
+function setBubble(b,my,en){b.querySelector(".m").textContent=my;const e=b.querySelector(".e");e.textContent=en||"";e.style.display=en?"":"none"}
+let clockT=null;
+function goLive(){S.show=$("#showName").value.trim()||"Jamie & Friends";S.topic=$("#topic").value.trim();S.script=$("#script").value;saveS();
+  if(!AKEY){toast("Add your Claude API key first (Keys & voice).");$("#keys").open=true;return}
+  unlock();$("#setup").classList.add("hidden");$("#live").classList.remove("hidden");
+  $("#show").textContent=S.show.toUpperCase();$("#topic2").textContent=S.topic;$("#chat").innerHTML="";transcript=[];marks=[];ptr=0;showStart=now();
+  $("#ctl").classList.remove("off");$("#stage").classList.add("ctlon");$("#cueBtn").disabled=!scriptLines().some(l=>{const w=lineWho(l);return w&&w.who==="u"});$("#coldBtn").disabled=!(S.prep&&S.prep.cold_my);
+  clearInterval(clockT);clockT=setInterval(()=>{$("#clock").textContent=mmss(now()-showStart)},1000);
+  if(!elReady())toast(EKEY?"Uncle's voice isn't linked yet; using the phone voice.":"No ElevenLabs key: Uncle will use the phone voice.");
+  warmReactions();
+  try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock("landscape").catch(()=>{})}catch(e){}}
+function endShow(){stopUncle();listenStop();clearInterval(clockT);$("#live").classList.add("hidden");$("#setup").classList.remove("hidden");if(transcript.length)showNotes()}
+
+/* ============================== WIRING ============================== */
+function fillSetup(){$("#showName").value=S.show;$("#topic").value=S.topic;$("#script").value=S.script;$("#akey").value=AKEY;$("#ekey").value=EKEY;$("#model").value=S.model;$("#vname").value=S.vname;
+  document.querySelectorAll("#spice button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.spice));$("#spiceHint").textContent=SPICE_HINT[S.spice];
+  document.querySelectorAll("#stab button").forEach(b=>b.classList.toggle("on",Number(b.dataset.v)===Number(S.stab)));
+  vstat();$("#elStat").textContent=`Characters sent to ElevenLabs from this browser: ${(S.chars||0).toLocaleString()}`;renderPrep();renderEps()}
+function vstat(){const v=$("#vstat");if(S.vid){v.textContent="✓ Linked · voice ID "+S.vid;v.className="stat ok"}else{v.textContent=EKEY?"Not linked yet. Tap Find voice.":"Add your ElevenLabs key, then Find voice.";v.className="stat bad"}}
+function renderEps(){const e=$("#eps");e.innerHTML=EPS.length?"":"<div>No episodes yet.</div>";EPS.slice().reverse().forEach(x=>{const d=document.createElement("div");d.textContent=`${x.date} · ${x.topic||"(no topic)"} · ${x.summary}`;e.appendChild(d)})}
+$("#showName").onchange=e=>{S.show=e.target.value.trim()||"Jamie & Friends";saveS()};
+$("#topic").onchange=e=>{S.topic=e.target.value.trim();saveS()};
+$("#script").onchange=e=>{S.script=e.target.value;saveS()};
+$("#akey").onchange=e=>{AKEY=e.target.value.trim();st.set("akey",AKEY)};
+$("#ekey").onchange=e=>{EKEY=e.target.value.trim();st.set("ekey",EKEY);vstat();if(EKEY&&!S.vid)findVoice(true)};
+$("#model").onchange=e=>{S.model=e.target.value;saveS()};
+$("#vname").onchange=e=>{const v=e.target.value.trim();S.vname=v;S.vid=/^[A-Za-z0-9]{18,}$/.test(v)?v:"";saveS();vstat()};
+document.querySelectorAll("#spice button").forEach(b=>b.onclick=()=>{S.spice=b.dataset.v;saveS();fillSetup()});
+document.querySelectorAll("#stab button").forEach(b=>b.onclick=()=>{S.stab=Number(b.dataset.v);saveS();fillSetup()});
+async function findVoice(quiet){if(!EKEY){toast("Paste your ElevenLabs key first");return}const want=String(S.vname||"Zayar").toLowerCase();
+  try{const j=await (await elApi("/v1/voices")).json(),vs=j.voices||[];const hit=vs.find(v=>(v.name||"").toLowerCase()===want)||vs.find(v=>(v.name||"").toLowerCase().startsWith(want))||vs.find(v=>(v.name||"").toLowerCase().includes(want));
+    if(hit){S.vid=hit.voice_id;saveS();vstat();if(!quiet)toast("Voice linked: "+hit.name)}else if(!quiet)toast(`No voice called "${S.vname}" in My Voices on ElevenLabs.`)}
+  catch(e){if(!quiet)toast(e.message)}}
+$("#findBtn").onclick=()=>findVoice(false);
+$("#testBtn").onclick=async()=>{unlock();if(!elReady()){toast("Link the voice first.");return}try{await playUrl(await elTTS("ကဲ… သေချာနားထောင်။ ဦးလေး တစ်ခါပဲ ရှင်းပြမယ်။"))}catch(e){toast(e.message)}fillSetup()};
+$("#prepBtn").onclick=prep;$("#startBtn").onclick=goLive;$("#exit").onclick=endShow;
+$("#clearEps").onclick=()=>{EPS=[];st.set("eps",EPS);renderEps();toast("Uncle forgot everything. Suspicious.")};
+$("#hot").onclick=()=>{$("#ctl").classList.toggle("off");$("#stage").classList.toggle("ctlon",!$("#ctl").classList.contains("off"))};
+document.querySelectorAll(".quick button[data-q]").forEach(b=>b.onclick=()=>{if(busy){toast("Let him finish, or tap ⏹.");return}ask(DIRECTIONS[b.dataset.q],{direction:true})});
+$("#stopBtn").onclick=stopUncle;$("#cueBtn").onclick=cueNext;$("#coldBtn").onclick=coldOpen;
+$("#markBtn").onclick=()=>{marks.push(now()-showStart);toast("⭐ Clip marked at "+mmss(now()-showStart))};
+$("#send").onclick=()=>{const v=$("#say").value;$("#say").value="";ask(v)};
+$("#say").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#send").click()}});
+const mic=$("#mic");mic.addEventListener("pointerdown",e=>{e.preventDefault();unlock();if(busy){toast("Let him finish, or tap ⏹.");return}listenStart()});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>mic.addEventListener(ev,()=>listenStop()));
+let spaceDown=false;
+document.addEventListener("keydown",e=>{if($("#live").classList.contains("hidden"))return;if(e.code==="Space"&&document.activeElement!==$("#say")&&!spaceDown){spaceDown=true;e.preventDefault();unlock();if(!busy)listenStart()}if(e.key==="Escape")stopUncle()});
+document.addEventListener("keyup",e=>{if(e.code==="Space"&&spaceDown){spaceDown=false;listenStop()}});
+$("#copyNotes").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($("#notesPre").textContent).then(()=>toast("Copied")).catch(()=>toast("Select and copy the text"))};
+$("#closeNotes").onclick=()=>$("#notes").classList.add("hidden");
+fillSetup();
+if(EKEY&&!S.vid)findVoice(true);
+if('serviceWorker' in navigator){/* no SW: keep it simple */}
+</script>
+</body>
+</html>
