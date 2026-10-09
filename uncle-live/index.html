@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v1.1 -->
+<title>Uncle Live</title><!-- v1.2 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -194,7 +194,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- smirk -->
 <path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
 </g>
-</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.1</span></p></div></div>
+</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.2</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -227,6 +227,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
     <label class="lbl">Voice style</label>
     <div class="seg" id="stab"><button data-v="1">Robust</button><button data-v="0.5">Natural</button></div>
     <div class="stat" id="elStat"></div>
+    <label class="lbl">Debug (what Uncle heard and replied, for bug reports)</label><pre id="dbg" style="white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;background:#15101a;color:#c9b89f;padding:10px;border-radius:10px;max-height:220px;overflow:auto;margin:0">—</pre><button class="btn sec" id="copyDbg">Copy debug</button>
     <p class="hint">Keys stay in this browser only. If you used Chat Kyi or the voice preview on this site, the keys are picked up automatically.</p>
   </details>
 
@@ -401,6 +402,7 @@ let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("sh
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 function now(){return Date.now()}
 
+const DBG={last:"",log:[],note(t){this.log.push(new Date().toLocaleTimeString()+" "+t);if(this.log.length>30)this.log.shift();const e=$("#dbg");if(e)e.textContent=this.text()},text(){return (this.log.join("\n")+"\n\nLAST RAW REPLY:\n"+this.last).trim()}};
 /* ============================== CLAUDE ============================== */
 function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
 function errText(e){if(e&&e.name==="AbortError")return"";switch(e&&e.code){case"no_key":return"Add your Claude API key in Keys & voice.";case"bad_key":return"That Claude key didn't work.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Pick another in Keys & voice.";case"overloaded":return"The brain is busy. Try again in a moment.";case"network":return"No internet connection.";default:return(e&&e.message)||"He mumbled something nobody understood."}}
@@ -441,7 +443,7 @@ let elWarned=0;function elFail(e){if(now()-elWarned>20000){elWarned=now();toast(
 
 /* Sequential voice queue: lines are sent to ElevenLabs the moment they are complete, played in order */
 const VQ={q:[],gen:0,playing:false,ac:null,onIdle:null,
-  push(my,en){const gen=this.gen;const ctrl=new AbortController();this.ac=ctrl;const p=elReady()?elTTS(my,ctrl.signal).catch(e=>{if(e.name!=="AbortError")elFail(e);return null}):Promise.resolve(null);this.q.push({p,my,en,gen});this.pump()},
+  push(my,en){my=String(my||"").trim();if(!my)return;const gen=this.gen;const ctrl=new AbortController();this.ac=ctrl;const p=elReady()?elTTS(my,ctrl.signal).catch(e=>{if(e.name!=="AbortError")elFail(e);return null}):Promise.resolve(null);this.q.push({p,my,en,gen});this.pump()},
   async pump(){if(this.playing)return;this.playing=true;setTalk(true);
     while(this.q.length){const it=this.q.shift();if(it.gen!==this.gen)continue;const url=await it.p;if(it.gen!==this.gen)continue;
       if(url)await playUrl(url);else await synthSay(elReady()?it.en||it.my:it.en||it.my)}
@@ -466,7 +468,11 @@ async function listenStart(){if(listening||busy)return;
     if(elReady()&&!busy){VQ.stop();VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"");reacted=true}
     const fd=new FormData();fd.append("file",blob,"speech."+((rec.mimeType||"").includes("webm")?"webm":"m4a"));fd.append("model_id","scribe_v1");fd.append("language_code","mya");
     $("#mic").classList.add("busy");
-    try{let j;try{j=await (await elApi("/v1/speech-to-text",{method:"POST",body:fd})).json()}catch(e){if(e.status===400||e.status===422){fd.delete("language_code");j=await (await elApi("/v1/speech-to-text",{method:"POST",body:fd})).json()}else throw e}
+    try{let j;const codes=[st.get("sttLang","mya"),"my",""].filter((x,i,a)=>a.indexOf(x)===i);
+      for(let i=0;i<codes.length;i++){fd.delete("language_code");if(codes[i])fd.append("language_code",codes[i]);
+        try{j=await (await elApi("/v1/speech-to-text",{method:"POST",body:fd})).json();st.set("sttLang",codes[i]);break}
+        catch(e){if((e.status===400||e.status===422)&&i<codes.length-1)continue;throw e}}
+      DBG.note("heard: "+JSON.stringify(j).slice(0,300));
       const t=String(j.text||"").trim();if(t)ask(t,{reacted});else toast("Didn't catch that.");reacted=false}
     catch(e){toast((e&&e.message)||"Couldn't understand that.")}finally{$("#mic").classList.remove("busy")}};
   rec.start(250)}
@@ -519,10 +525,12 @@ const DIRECTIONS={go:"[Jamie signals: keep going. Add one more thought or joke o
 
 /* ============================== ASK UNCLE ============================== */
 let busy=false,abortCtl=null;
-function parseStream(full){const lines=full.split("\n");const done=lines.slice(0,-1),cur=lines[lines.length-1];const my=[],en=[];
-  for(const l of done){const m=l.match(/^\s*MY\s*[:：]\s*(.+)$/i);if(m)my.push(m[1].trim());const e=l.match(/^\s*EN\s*[:：]\s*(.+)$/i);if(e)en.push(e[1].trim())}
-  const cm=cur.match(/^\s*MY\s*[:：]\s*(.+)$/i),ce=cur.match(/^\s*EN\s*[:：]\s*(.+)$/i);
-  return{my,en:en.join(" ")+(ce?ce[1].trim():""),partial:cm?cm[1].trim():""}}
+const TAG=/^[\s*\-•>#]*(?:(MY|EN|Uncle|ဦးလေး|Burmese|English)\s*[:：]\s*)?\**\s*/i;
+function tagOf(l){const m=l.match(TAG);const tag=(m&&m[1]||"").toLowerCase();const text=l.replace(TAG,"").replace(/\**\s*$/,"").trim();
+  if(!text)return null;if(tag==="en"||tag==="english")return{k:"en",text};if(tag)return{k:"my",text};return{k:MY.test(text)?"my":"en",text}}
+function parseStream(full){const lines=full.split(/\r?\n/);const done=lines.slice(0,-1),cur=lines[lines.length-1];const my=[],en=[];
+  for(const l of done){const t=tagOf(l);if(!t)continue;(t.k==="my"?my:en).push(t.text)}
+  const c=tagOf(cur);return{my,en:en.join(" ")+(c&&c.k==="en"?c.text:""),partial:c&&c.k==="my"?c.text:""}}
 async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)return;busy=true;unlock();
   const direction=!!opt.direction,shown=opt.label||text;
   if(!direction){addBubble("j",text,"");transcript.push({who:"j",my:text,en:text,t:now()-showStart});advancePtr(text)}
@@ -531,13 +539,16 @@ async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)retu
   abortCtl=new AbortController();let spoken=0,last=null;
   const msg=buildMsg((direction?text:`[${S.name} → Uncle] ${text}`)+`\n(nickname available this reply: "${pickNick()}")`);
   try{
-    const full=await claudeStream(stableSys(),[{role:"user",content:msg}],600,f=>{const p=parseStream(f);
+    let full=await claudeStream(stableSys(),[{role:"user",content:msg}],600,f=>{const p=parseStream(f);
       if(p.my.length||p.partial){bub.classList.remove("think");setBubble(bub,p.my.concat(p.partial?[p.partial]:[]).join(" "),p.en)}
       while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}last=p},abortCtl.signal);
+    if(!full.trim()){DBG.note("stream came back empty; retrying without streaming");full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}
+    DBG.last=full;
     const p=parseStream(full+"\n");while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}
-    let my=p.my.join(" "),en=p.en;if(!my){my=full.replace(/^(MY|EN)\s*[:：]\s*/gim,"").trim();VQ.push(my,en)}
+    let my=p.my.join(" "),en=p.en;if(!my&&!en){my=full.trim();VQ.push(my,"")}else if(!my){my=en;VQ.push(en,en)}
+    if(!my){DBG.note("empty reply from the model");toast("Uncle said nothing. Try again.")}
     bub.classList.remove("think");setBubble(bub,my,en);transcript.push({who:"u",my,en,t:now()-showStart});
-  }catch(e){bub.classList.remove("think");if(e&&e.name==="AbortError"){const m=bub.querySelector(".m");if(m.textContent==="…")bub.remove();else{m.textContent=m.textContent.replace(/[။…]*$/,"")+"…";const en=bub.querySelector(".e");if(en&&en.textContent)en.textContent+=" (stopped)"}}else{setBubble(bub,"…","");bub.remove();toast(errText(e))}}
+  }catch(e){DBG.note("error: "+((e&&e.message)||e));bub.classList.remove("think");if(e&&e.name==="AbortError"){const m=bub.querySelector(".m");if(m.textContent==="…")bub.remove();else{m.textContent=m.textContent.replace(/[။…]*$/,"")+"…";const en=bub.querySelector(".e");if(en&&en.textContent)en.textContent+=" (stopped)"}}else{setBubble(bub,"…","");bub.remove();toast(errText(e))}}
   finally{busy=false;abortCtl=null;$("#uncle").classList.remove("think")}}
 function stopUncle(){if(abortCtl)abortCtl.abort();VQ.stop();busy=false;$("#uncle").classList.remove("think")}
 
@@ -585,7 +596,7 @@ function goLive(){S.show=$("#showName").value.trim()||"Jamie & Friends";S.topic=
   if(!elReady())toast(EKEY?"Uncle's voice isn't linked yet; using the phone voice.":"No ElevenLabs key: Uncle will use the phone voice.");
   warmReactions();
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock("landscape").catch(()=>{})}catch(e){}}
-function endShow(){stopUncle();listenStop();clearInterval(clockT);$("#live").classList.add("hidden");$("#setup").classList.remove("hidden");if(transcript.length)showNotes()}
+function endShow(){stopUncle();listenStop();clearInterval(clockT);const e=$("#dbg");if(e)e.textContent=DBG.text();$("#live").classList.add("hidden");$("#setup").classList.remove("hidden");if(transcript.length)showNotes()}
 
 /* ============================== WIRING ============================== */
 function fillSetup(){$("#showName").value=S.show;$("#topic").value=S.topic;$("#script").value=S.script;$("#akey").value=AKEY;$("#ekey").value=EKEY;$("#model").value=S.model;$("#vname").value=S.vname;
@@ -626,6 +637,7 @@ mic.addEventListener("pointercancel",e=>e.preventDefault());
 let spaceDown=false;
 document.addEventListener("keydown",e=>{if($("#live").classList.contains("hidden"))return;if(e.code==="Space"&&document.activeElement!==$("#say")&&!spaceDown){spaceDown=true;e.preventDefault();unlock();if(!busy)listenStart()}if(e.key==="Escape")stopUncle()});
 document.addEventListener("keyup",e=>{if(e.code==="Space"&&spaceDown){spaceDown=false;listenStop()}});
+$("#copyDbg").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(DBG.text()).then(()=>toast("Copied")).catch(()=>toast("Select and copy the text"))};
 $("#copyNotes").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($("#notesPre").textContent).then(()=>toast("Copied")).catch(()=>toast("Select and copy the text"))};
 $("#closeNotes").onclick=()=>$("#notes").classList.add("hidden");
 fillSetup();
