@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title>
+<title>Uncle Live</title><!-- v1.1 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -91,7 +91,8 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 .bar{display:flex;gap:.8cqw;align-items:center;padding-right:5.5cqw}
 .bar input{flex:1;min-width:0;border:0;border-radius:1cqw;padding:.9cqw 1.1cqw;font:600 1.4cqw Nunito,var(--my);background:#fff7e6;color:#2a1d14}
 .bar button{border:0;border-radius:1cqw;padding:0 1.2cqw;height:3.4cqw;font:800 1.25cqw Nunito;background:#ffe7b5;color:#3a2416}
-#mic{width:4.4cqw;height:4.4cqw;border-radius:50%;background:var(--gold);border:.3cqw solid #fff3d6;font-size:2cqw;display:grid;place-items:center;box-shadow:0 0 0 .4cqw rgba(255,207,107,.25);user-select:none;-webkit-user-select:none;touch-action:none;padding:0}
+#mic{width:4.4cqw;height:4.4cqw;border-radius:50%;background:var(--gold);border:.3cqw solid #fff3d6;font-size:2cqw;display:grid;place-items:center;box-shadow:0 0 0 .4cqw rgba(255,207,107,.25);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;padding:0}
+#ctl,#ctl *{-webkit-touch-callout:none}
 #mic.on{background:var(--red);animation:pulse .8s infinite}
 @keyframes pulse{50%{transform:scale(1.12)}}
 #mic.busy{background:#888;animation:none}
@@ -193,7 +194,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- smirk -->
 <path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
 </g>
-</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air.</p></div></div>
+</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.1</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -410,7 +411,8 @@ async function claude(sys,messages,max=900,signal){
   return (j.content||[]).map(c=>c.type==="text"?c.text:"").join("")}
 async function claudeStream(sys,messages,max,onText,signal){
   if(!AKEY){const e=new Error("no key");e.code="no_key";throw e}
-  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"x-api-key":AKEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages,stream:true})})}catch(e){if(e.name==="AbortError")throw e;const x=new Error("net");x.code="network";throw x}
+  const system=Array.isArray(sys)?sys:[{type:"text",text:sys,cache_control:{type:"ephemeral"}}];
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"x-api-key":AKEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system,messages,stream:true})})}catch(e){if(e.name==="AbortError")throw e;const x=new Error("net");x.code="network";throw x}
   if(!r.ok){const j=await r.json().catch(()=>({}));throw apiErr(r.status,j)}
   const rd=r.body.getReader(),dec=new TextDecoder();let buf="",full="";
   for(;;){const {value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});
@@ -452,19 +454,20 @@ const REACT=["ဟမ်…","ကဲ…","အေးပါ…","ဟား…","ဟ
 async function warmReactions(){if(!elReady())return;for(const r of REACT){try{await elTTS(r)}catch(e){break}}}
 
 /* ============================== LISTEN (hold to talk) ============================== */
-let stream=null,rec=null,chunks=[],listening=false;
+let stream=null,rec=null,chunks=[],listening=false,reacted=false;
 async function listenStart(){if(listening||busy)return;
   if(!EKEY){toast("Add your ElevenLabs key to talk by voice, or type instead.");return}
   try{if(!stream||stream.getTracks().every(t=>t.readyState==="ended"))stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast("Microphone is blocked. Allow it in Settings.");return}
   try{rec=new MediaRecorder(stream)}catch(e){toast("Recording isn't supported here. Type instead.");return}
-  chunks=[];listening=true;$("#mic").classList.add("on");$("#micHint").classList.remove("hidden");
+  chunks=[];listening=true;$("#mic").classList.add("on");$("#micHint").textContent="● listening…";$("#micHint").classList.remove("hidden");
   rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   rec.onstop=async()=>{listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden");
-    if(!chunks.length)return;const blob=new Blob(chunks,{type:rec.mimeType||"audio/mp4"});if(blob.size<2000)return;
+    if(!chunks.length)return;const blob=new Blob(chunks,{type:rec.mimeType||"audio/mp4"});if(blob.size<2000){toast("Too short. Hold 🎙 while you talk, or tap once to start and again to stop.");return}
+    if(elReady()&&!busy){VQ.stop();VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"");reacted=true}
     const fd=new FormData();fd.append("file",blob,"speech."+((rec.mimeType||"").includes("webm")?"webm":"m4a"));fd.append("model_id","scribe_v1");fd.append("language_code","mya");
     $("#mic").classList.add("busy");
     try{let j;try{j=await (await elApi("/v1/speech-to-text",{method:"POST",body:fd})).json()}catch(e){if(e.status===400||e.status===422){fd.delete("language_code");j=await (await elApi("/v1/speech-to-text",{method:"POST",body:fd})).json()}else throw e}
-      const t=String(j.text||"").trim();if(t)ask(t);else toast("Didn't catch that.")}
+      const t=String(j.text||"").trim();if(t)ask(t,{reacted});else toast("Didn't catch that.");reacted=false}
     catch(e){toast((e&&e.message)||"Couldn't understand that.")}finally{$("#mic").classList.remove("busy")}};
   rec.start(250)}
 function listenStop(){if(!listening||!rec)return;try{rec.stop()}catch(e){listening=false}}
@@ -481,7 +484,7 @@ function pickNick(){const fresh=NICKS.filter(n=>!usedNicks.includes(n));const n=
 function sysPrompt(){const n=S.name,show=S.show||"Jamie & Friends";
 return `You are "Uncle" (ဦးလေး), ${n}'s co-host on the Burmese podcast "${show}", recorded for YouTube. You sit in your 1960s living room: white gaung baung, round glasses, dark taikpon jacket, striped silk longyi, a book always in your hand, a brass gramophone and a rotary phone beside you.
 
-PERSONALITY: a condescending, know-it-all old Burmese tea-shop uncle. Mean, sharp, dry and sarcastic, but secretly fond of ${n}. You roast ${n} constantly: money, taxes, sending money home, his love life, being lonely with his computer, Costco, his haircut. Call him by a playful nickname sometimes (this reply, if you use one: "${pickNick()}"); never insult his race or looks beyond the haircut gag. Dad jokes and puns are your weakness: you tell one and act like it is genius. Everything was better in your day. You mock ${n} whenever he says "မင်္ဂလာပါ" (too many greetings).
+PERSONALITY: a condescending, know-it-all old Burmese tea-shop uncle. Mean, sharp, dry and sarcastic, but secretly fond of ${n}. You roast ${n} constantly: money, taxes, sending money home, his love life, being lonely with his computer, Costco, his haircut. Call him by a playful nickname sometimes (the current message names one you may use); never insult his race or looks beyond the haircut gag. Dad jokes and puns are your weakness: you tell one and act like it is genius. Everything was better in your day. You mock ${n} whenever he says "မင်္ဂလာပါ" (too many greetings).
 BACKSTORY (reveal gradually, never dump it all): your "PhD" is a photo from a photo studio where you rented the gown; you are an "army veteran" who actually polished officers' shoes and bought their milk ("the supply division"); your medals came from Bogyoke Market, three for five thousand kyat, and one is a bottle cap; 30 years at a tea-shop register. Catchphrases, used sparingly: "ငါ တစ်ခါပဲ ရှင်းပြတယ်။" (I explain only one time), "ထိုင်။ ဦးလေး စကားပြောနေတယ်။" (Sit down, Uncle is talking), "ကဲ… သေချာနားထောင်။".
 CO-HOST JOB: keep the show moving. React to what ${n} just said, add ONE sharp take, fact or joke, and often end by pushing back or firing a pointed question at ${n}. Short turns: 1 to 3 spoken sentences, under 45 words total. Never lecture, never list, never summarize the script, never repeat what ${n} said back to him. Stay on the current topic unless ${n} moves it.
 SCRIPT AWARENESS: ${n} has a prepared script and notes (below, when present). Use them to know where the show is, what was planned next, and what jokes were prepared. If ${n} brings you in at a random point, work out from his last line which part of the show you are in and continue naturally from there. Do NOT recite the script word for word unless ${n} explicitly asks you to read your line.
@@ -491,8 +494,9 @@ HEAVY TOPIC RULE: when the current subject involves real victims, deaths, war, d
 ALWAYS: no slurs; no jokes about ethnic groups, religions or anyone's race; no sexual jokes about real named people; no mocking of real victims. The junta and generals as a system are fair game.
 LANGUAGE: THINK AND WRITE IN BURMESE. Natural, everyday Yangon spoken Burmese, the way a funny old uncle really talks on a podcast, with the normal sprinkle of English words people actually use (Costco, TikTok, tax, Facebook). Never textbook or news-reader Burmese, never word-for-word translation, never invented words. Keep "${n}" and "Jamie & Friends" in Latin letters.
 FORMAT: reply ONLY in this exact plain-text format, nothing else, no quotes, no markdown:
-MY: <one short spoken Burmese sentence>
-MY: <next sentence, optional, up to 3 MY lines>
+MY: <a 2-5 word instant reaction, e.g. ကဲ… Costco Prince။ or ဟား၊ ဒါတောင် မသိဘူးလား။>
+MY: <your real line, one short spoken Burmese sentence>
+MY: <next sentence, optional, up to 3 MY lines after the reaction>
 EN: <one-line English subtitle of everything you said>`}
 function scriptLines(){return String(S.script||"").split("\n").map(x=>x.trim()).filter(Boolean)}
 function lineWho(l){const m=l.match(/^(uncle|ဦးလေး|jamie|me|ကျွန်တော်)\s*[:：]\s*([\s\S]*)$/i);if(!m)return null;return{who:/^(uncle|ဦးလေး)/i.test(m[1])?"u":"j",text:m[2].trim()}}
@@ -502,14 +506,15 @@ function advancePtr(said){const L=scriptLines();const sw=new Set(wordsOf(said));
   for(let i=ptr;i<Math.min(L.length,ptr+12);i++){const lw=lineWho(L[i]);if(!lw||lw.who!=="j")continue;const w=wordsOf(lw.text.split("|")[0]);if(w.length<2)continue;let k=0;w.forEach(x=>{if(sw.has(x))k++});const s=k/w.length;if(s>bs){bs=s;best=i}}
   if(best>=0&&bs>=0.45)ptr=best+1}
 function scriptContext(){const L=scriptLines();if(!L.length)return"";const full=L.join("\n");
-  let out="JAMIE'S SCRIPT & NOTES FOR THIS EPISODE:\n"+(full.length>7000?full.slice(0,7000)+"\n…(trimmed)":full);
-  if(L.some(l=>lineWho(l))){const a=Math.max(0,ptr-3),b=Math.min(L.length,ptr+6);out+="\n\nCURRENT SPOT IN THE SCRIPT (best guess; the line marked >> is the next planned line):\n"+L.slice(a,b).map((l,i)=>(a+i===ptr?">> ":"   ")+l).join("\n")}
-  return out}
+  return "JAMIE'S SCRIPT & NOTES FOR THIS EPISODE:\n"+(full.length>7000?full.slice(0,7000)+"\n…(trimmed)":full)}
+function spotContext(){const L=scriptLines();if(!L.some(l=>lineWho(l)))return"";const a=Math.max(0,ptr-3),b=Math.min(L.length,ptr+6);
+  return "CURRENT SPOT IN THE SCRIPT (best guess; the line marked >> is the next planned line):\n"+L.slice(a,b).map((l,i)=>(a+i===ptr?">> ":"   ")+l).join("\n")}
 function prepContext(){const p=S.prep;if(!p||!p.points)return"";return"UNCLE'S PREPARED ANGLES (use when they fit, don't force them):\n"+p.points.map((x,i)=>`${i+1}. ${x.t} · take: ${x.hot} · ask Jamie: ${x.ask} · joke: ${x.joke}`).join("\n")}
 function memoryContext(){if(!EPS.length)return"";return"PAST EPISODES (for callbacks, keep it light):\n"+EPS.slice(-3).map(e=>`- ${e.date}: ${e.summary}`).join("\n")}
 let transcript=[],showStart=0,marks=[];
 function recentContext(){const r=transcript.slice(-10);if(!r.length)return"";return"JUST NOW ON THE SHOW:\n"+r.map(x=>(x.who==="j"?S.name:"Uncle")+": "+(x.en||x.my)).join("\n")}
-function buildMsg(user){const parts=[`EPISODE: "${S.show||"Jamie & Friends"}" · topic: ${S.topic||"(none given)"} · spice: ${S.spice}`,memoryContext(),scriptContext(),prepContext(),recentContext(),user].filter(Boolean);return parts.join("\n\n")}
+function buildMsg(user){const parts=[spotContext(),recentContext(),user].filter(Boolean);return parts.join("\n\n")}
+function stableSys(){return [sysPrompt(),`EPISODE: "${S.show||"Jamie & Friends"}" · topic: ${S.topic||"(none given)"} · spice: ${S.spice}`,memoryContext(),scriptContext(),prepContext()].filter(Boolean).join("\n\n")}
 const DIRECTIONS={go:"[Jamie signals: keep going. Add one more thought or joke on what you were just saying, then stop.]",argue:"[Jamie signals: argue the other side. Disagree with the last point made, yours or his, and make the opposite case with one sharp reason.]",history:"[Jamie signals: give the history or background behind this topic, one or two real, well-known facts, in your voice.]",funny:"[Jamie signals: make it funny. One dad joke or sharp roast about the current subject, then a one-line kicker.]",wrap:"[Jamie signals: wrap up this segment. One-line summary in your voice, one last jab, then hand it back to Jamie.]"};
 
 /* ============================== ASK UNCLE ============================== */
@@ -522,17 +527,17 @@ async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)retu
   const direction=!!opt.direction,shown=opt.label||text;
   if(!direction){addBubble("j",text,"");transcript.push({who:"j",my:text,en:text,t:now()-showStart});advancePtr(text)}
   const bub=addBubble("u","…","");bub.classList.add("think");$("#uncle").classList.add("think");
-  VQ.stop();if(elReady()&&!opt.quiet)VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"");
+  if(!opt.reacted){VQ.stop();if(elReady()&&!opt.quiet)VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"")}
   abortCtl=new AbortController();let spoken=0,last=null;
-  const msg=buildMsg(direction?text:`[${S.name} → Uncle] ${text}`);
+  const msg=buildMsg((direction?text:`[${S.name} → Uncle] ${text}`)+`\n(nickname available this reply: "${pickNick()}")`);
   try{
-    const full=await claudeStream(sysPrompt(),[{role:"user",content:msg}],600,f=>{const p=parseStream(f);
+    const full=await claudeStream(stableSys(),[{role:"user",content:msg}],600,f=>{const p=parseStream(f);
       if(p.my.length||p.partial){bub.classList.remove("think");setBubble(bub,p.my.concat(p.partial?[p.partial]:[]).join(" "),p.en)}
       while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}last=p},abortCtl.signal);
     const p=parseStream(full+"\n");while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}
     let my=p.my.join(" "),en=p.en;if(!my){my=full.replace(/^(MY|EN)\s*[:：]\s*/gim,"").trim();VQ.push(my,en)}
     bub.classList.remove("think");setBubble(bub,my,en);transcript.push({who:"u",my,en,t:now()-showStart});
-  }catch(e){bub.classList.remove("think");if(e&&e.name==="AbortError"){if(bub.querySelector(".m").textContent==="…")bub.remove()}else{setBubble(bub,"…","");bub.remove();toast(errText(e))}}
+  }catch(e){bub.classList.remove("think");if(e&&e.name==="AbortError"){const m=bub.querySelector(".m");if(m.textContent==="…")bub.remove();else{m.textContent=m.textContent.replace(/[။…]*$/,"")+"…";const en=bub.querySelector(".e");if(en&&en.textContent)en.textContent+=" (stopped)"}}else{setBubble(bub,"…","");bub.remove();toast(errText(e))}}
   finally{busy=false;abortCtl=null;$("#uncle").classList.remove("think")}}
 function stopUncle(){if(abortCtl)abortCtl.abort();VQ.stop();busy=false;$("#uncle").classList.remove("think")}
 
@@ -549,7 +554,7 @@ async function coldOpen(){const p=S.prep;if(!p||!p.cold_my){toast("Let Uncle pre
 /* ============================== PREP & NOTES ============================== */
 async function prep(){if(!S.topic&&!S.script){toast("Give him a topic or a script first.");return}const b=$("#prepBtn");b.disabled=true;b.textContent="Uncle is reading…";
   const sys=sysPrompt()+`\n\nPREP TASK OVERRIDE: ignore the MY/EN format for this task. Return ONLY JSON: {"cold_my":"...","cold_en":"...","points":[{"t":"...","hot":"...","ask":"...","joke":"..."}]}. cold_my: a 2-3 sentence Burmese cold open for the episode in your voice (mock Jamie, tease the topic). cold_en: its English subtitle. points: 4 to 6 talking points from the topic/script; t = point title in Burmese, hot = your sharp take (Burmese), ask = a pointed question for Jamie (Burmese), joke = a dad joke or roast ready to use (Burmese). Keep each field short.`;
-  try{const t=await claude(sys,[{role:"user",content:buildMsg("[Prep the episode now.]")}],1800);const o=pj(t);if(!o.points)throw new Error("bad");S.prep=o;saveS();renderPrep();toast("Uncle is ready")}
+  try{const t=await claude(stableSys()+"\n\n"+sys.slice(sysPrompt().length),[{role:"user",content:"[Prep the episode now.]"}],1800);const o=pj(t);if(!o.points)throw new Error("bad");S.prep=o;saveS();renderPrep();toast("Uncle is ready")}
   catch(e){toast(errText(e)||"He couldn't prep. Try again.")}finally{b.disabled=false;b.textContent="🧠 Let Uncle prep the episode"}}
 function renderPrep(){const o=$("#prepOut");o.innerHTML="";const p=S.prep;if(!p)return;
   if(p.cold_my){const d=document.createElement("div");d.className="pt";d.innerHTML=`<b>🎬 Cold open</b><small>${esc(p.cold_my)}<br><i>${esc(p.cold_en||"")}</i></small>`;o.appendChild(d)}
@@ -612,8 +617,12 @@ $("#stopBtn").onclick=stopUncle;$("#cueBtn").onclick=cueNext;$("#coldBtn").oncli
 $("#markBtn").onclick=()=>{marks.push(now()-showStart);toast("⭐ Clip marked at "+mmss(now()-showStart))};
 $("#send").onclick=()=>{const v=$("#say").value;$("#say").value="";ask(v)};
 $("#say").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#send").click()}});
-const mic=$("#mic");mic.addEventListener("pointerdown",e=>{e.preventDefault();unlock();if(busy){toast("Let him finish, or tap ⏹.");return}listenStart()});
-["pointerup","pointercancel","pointerleave"].forEach(ev=>mic.addEventListener(ev,()=>listenStop()));
+const mic=$("#mic");let micDown=0,micTimer=null;
+mic.addEventListener("contextmenu",e=>e.preventDefault());
+mic.addEventListener("pointerdown",e=>{e.preventDefault();unlock();if(listening){listenStop();micDown=0;return}if(busy){toast("Let him finish, or tap ⏹.");return}micDown=now();listenStart();clearTimeout(micTimer);micTimer=setTimeout(()=>{if(listening){listenStop();toast("20 seconds is enough, Costco Prince.")}},20000)});
+mic.addEventListener("pointerup",e=>{e.preventDefault();if(!listening||!micDown)return;if(now()-micDown<500){$("#micHint").textContent="● listening… tap 🎙 again to send";return}listenStop()});
+/* pointercancel comes from iPhone's long-press menu: ignore it, keep recording */
+mic.addEventListener("pointercancel",e=>e.preventDefault());
 let spaceDown=false;
 document.addEventListener("keydown",e=>{if($("#live").classList.contains("hidden"))return;if(e.code==="Space"&&document.activeElement!==$("#say")&&!spaceDown){spaceDown=true;e.preventDefault();unlock();if(!busy)listenStart()}if(e.key==="Escape")stopUncle()});
 document.addEventListener("keyup",e=>{if(e.code==="Space"&&spaceDown){spaceDown=false;listenStop()}});
