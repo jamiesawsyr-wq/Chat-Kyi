@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v1.7 -->
+<title>Uncle Live</title><!-- v1.8 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -194,7 +194,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- smirk -->
 <path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
 </g>
-</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.7</span></p></div></div>
+</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.8</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -495,7 +495,12 @@ async function listenStart(){if(listening||busy)return;
 function listenStop(){if(!listening||!rec)return;if(rec.state!=="recording"){listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden");return}try{rec.stop()}catch(e){listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden")}}
 
 /* ============================== UNCLE'S BRAIN ============================== */
-const NICKS=["Costco Prince","Honda Civic","Slipper Assassin","Plastic Bag Collector","Tiger Mom's Biggest Disappointment","Boba Boy","Rice Cooker","Coupon King","Free Sample Hunter","Instant Noodle Chef","Family IT Department","Unpaid Translator","Leftover Lord","Thermos Boy","Wi-Fi Password Keeper","Kumon Dropout","Future Doctor (Not Really)","Karaoke Champion"];
+const NICKS_BY={
+ family:["ဟေ့ကောင်","သားကြီး","သားသား","ငါ့တူ","ကောင်လေး","ဘဲကြီး","မြို့သား","ဗိုလ်ကြီး","ဒေါ်လာသူဌေး","ငွေလွှဲစက်","Costco မင်းသား"],
+ spicy:["ငတုံး","အူကြောင်ကြောင်","ကြောင်ကြီး","လူပြိန်း","ကျွဲ","ဖုန်းရူး","အမေ့ချစ်သား","ဗိုက်ပူ","ပိန်ကပ်ကပ်","ဆင်းရဲသား","ဘွဲ့ရ ငတုံး","မိသားစုရဲ့ အကြီးဆုံး စိတ်ပျက်စရာ"],
+ uncut:["ချီးထုပ်","ငပိန်း","ဖင်ပြဲ","ခွေးကောင်"]};
+function nickPool(){const lv=S.spice==="uncut"?["family","spicy","uncut"]:S.spice==="spicy"?["family","spicy"]:["family"];return lv.flatMap(k=>NICKS_BY[k])}
+const NICKS=nickPool();
 const SPICE={
  family:"CLEAN MODE: roasts and dad jokes only. No innuendo, no swearing, no crude or gross-out humor.",
  spicy:"SPICY MODE: properly mean roasts, dry sarcasm, petty insults, gross-out and light innuendo are allowed. No swearing.",
@@ -503,11 +508,11 @@ const SPICE={
 const MODEL_NAMES={"claude-sonnet-5-5":"Sonnet","claude-haiku-4-5-20251001":"Haiku"};function modelName(m){return MODEL_NAMES[m]||m}function otherModel(){return S.model==="claude-haiku-4-5-20251001"?"claude-sonnet-5-5":"claude-haiku-4-5-20251001"}
 const SPICE_HINT={family:"Roasts and dad jokes only. Safe for aunties and monetized YouTube.",spicy:"Meaner roasts, gross-out jokes, light innuendo. Heavy topics turn clean on their own.",uncut:"Crude, dark, adult innuendo, the odd mild swear at Jamie. Heavy topics still turn clean on their own."};
 let usedNicks=[];
-function pickNick(){const fresh=NICKS.filter(n=>!usedNicks.includes(n));const n=(fresh.length?fresh:NICKS)[Math.floor(Math.random()*(fresh.length?fresh:NICKS).length)];usedNicks.push(n);if(usedNicks.length>6)usedNicks.shift();return n}
+function pickNick(){const pool=nickPool();const fresh=pool.filter(n=>!usedNicks.includes(n));const src=fresh.length?fresh:pool;const n=src[Math.floor(Math.random()*src.length)];usedNicks.push(n);if(usedNicks.length>6)usedNicks.shift();return n}
 function sysPrompt(){const n=S.name,show=S.show||"Jamie & Friends";
 return `You are "Uncle" (ဦးလေး), ${n}'s co-host on the Burmese podcast "${show}", recorded for YouTube. You sit in your 1960s living room: white gaung baung, round glasses, dark taikpon jacket, striped silk longyi, a book always in your hand, a brass gramophone and a rotary phone beside you.
 
-PERSONALITY: a condescending, know-it-all old Burmese tea-shop uncle. Mean, sharp, dry and sarcastic, but secretly fond of ${n}. You roast ${n} constantly: money, taxes, sending money home, his love life, being lonely with his computer, Costco, his haircut. Call him by a playful nickname sometimes (the current message names one you may use); never insult his race or looks beyond the haircut gag. Dad jokes and puns are your weakness: you tell one and act like it is genius. Everything was better in your day. You mock ${n} whenever he says "မင်္ဂလာပါ" (too many greetings).
+PERSONALITY: a condescending, know-it-all old Burmese tea-shop uncle. Mean, sharp, dry and sarcastic, but secretly fond of ${n}. You roast ${n} constantly: money, taxes, sending money home, his love life, being lonely with his computer, Costco, his haircut. NAMES: call ${n} by a Burmese nickname in most replies, never an English one (the current message offers one; use it or another from your own tea-shop vocabulary at the same heat level). "ဟေ့ကောင်" and "သားကြီး" also work as openers ("ဟေ့ကောင်၊ သေချာနားထောင်"). Never insult his race or looks beyond the haircut and belly gags. Dad jokes and puns are your weakness: you tell one and act like it is genius. Everything was better in your day. You mock ${n} whenever he says "မင်္ဂလာပါ" (too many greetings).
 BACKSTORY (reveal gradually, never dump it all): your "PhD" is a photo from a photo studio where you rented the gown; you are an "army veteran" who actually polished officers' shoes and bought their milk ("the supply division"); your medals came from Bogyoke Market, three for five thousand kyat, and one is a bottle cap; 30 years at a tea-shop register. Catchphrases, used sparingly: "ငါ တစ်ခါပဲ ရှင်းပြတယ်။" (I explain only one time), "ထိုင်။ ဦးလေး စကားပြောနေတယ်။" (Sit down, Uncle is talking), "ကဲ… သေချာနားထောင်။".
 CO-HOST JOB: keep the show moving. React to what ${n} just said, add ONE sharp take, fact or joke, and often end by pushing back or firing a pointed question at ${n}. Short turns: 1 to 3 spoken sentences, under 45 words total. Every sentence must be complete and end with ။ ! or ?; never trail off. Never lecture, never list, never summarize the script, never repeat what ${n} said back to him. Stay on the current topic unless ${n} moves it.
 SCRIPT AWARENESS: ${n} has a prepared script and notes (below, when present). Use them to know where the show is, what was planned next, and what jokes were prepared. If ${n} brings you in at a random point, work out from his last line which part of the show you are in and continue naturally from there. Do NOT recite the script word for word unless ${n} explicitly asks you to read your line.
@@ -557,7 +562,7 @@ async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)retu
     bub=addBubble("u","…","");bub.classList.add("think");$("#uncle").classList.add("think");
     if(!opt.reacted){VQ.stop();if(elReady()&&!opt.quiet)VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"")}
     abortCtl=new AbortController();
-    const msg=buildMsg((direction?text:`[${S.name} → Uncle] ${text}`)+`\n(nickname available this reply: "${pickNick()}")`);
+    const msg=buildMsg((direction?text:`[${S.name} → Uncle] ${text}`)+`\n(Burmese nickname available this reply: "${pickNick()}")`);
     try{
       full=await claudeStream(stableSys(),[{role:"user",content:msg}],1400,f=>{const p=parseStream(f);
         if(p.my.length||p.partial){bub.classList.remove("think");setBubble(bub,p.my.concat(p.partial?[p.partial]:[]).join(" "),p.en)}
