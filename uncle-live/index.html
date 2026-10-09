@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v1.5 -->
+<title>Uncle Live</title><!-- v1.6 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -194,7 +194,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- smirk -->
 <path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
 </g>
-</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.5</span></p></div></div>
+</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.6</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -406,7 +406,7 @@ function now(){return Date.now()}
 const DBG={last:"",log:[],note(t){this.log.push(new Date().toLocaleTimeString()+" "+t);if(this.log.length>30)this.log.shift();const e=$("#dbg");if(e)e.textContent=this.text()},text(){return (this.log.join("\n")+"\n\nLAST RAW REPLY:\n"+this.last).trim()}};
 /* ============================== CLAUDE ============================== */
 function apiErr(status,j){const e=new Error((j&&j.error&&j.error.message)||status);e.code=status===401?"bad_key":status===429?"rate_limited":status===404?"bad_model":status===529?"overloaded":"api_error";return e}
-function errText(e){if(e&&e.name==="AbortError")return"";switch(e&&e.code){case"no_key":return"Add your Claude API key in Keys & voice.";case"bad_key":return"That Claude key didn't work.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Pick another in Keys & voice.";case"overloaded":return"The brain is busy. Try again in a moment.";case"refusal":return"The model declined that one. Try the Spicy level, or switch to Sonnet in Keys & voice.";case"network":return"No internet connection.";default:return(e&&e.message)||"He mumbled something nobody understood."}}
+function errText(e){if(e&&e.name==="AbortError")return"";switch(e&&e.code){case"no_key":return"Add your Claude API key in Keys & voice.";case"bad_key":return"That Claude key didn't work.";case"rate_limited":return"Too many questions. Let him finish his tea.";case"bad_model":return"That model isn't on your key. Pick another in Keys & voice.";case"overloaded":return"The brain is busy. Try again in a moment.";case"refusal":return"The model declined that one. Try the Spicy level, or switch to Sonnet in Keys & voice.";case"stall":return"The connection stalled. Try again.";case"network":return"No internet connection.";default:return(e&&e.message)||"He mumbled something nobody understood."}}
 async function claude(sys,messages,max=900,signal){
   if(!AKEY){const e=new Error("no key");e.code="no_key";throw e}
   let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"x-api-key":AKEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system:sys,messages})})}catch(e){if(e.name==="AbortError")throw e;const x=new Error("net");x.code="network";throw x}
@@ -421,7 +421,8 @@ async function claudeStream(sys,messages,max,onText,signal){
   let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"x-api-key":AKEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:S.model,max_tokens:max,system,messages,stream:true})})}catch(e){if(e.name==="AbortError")throw e;const x=new Error("net");x.code="network";throw x}
   if(!r.ok){const j=await r.json().catch(()=>({}));throw apiErr(r.status,j)}
   const rd=r.body.getReader(),dec=new TextDecoder();let buf="",full="",seen=[],rawHead="";
-  for(;;){const {value,done}=await rd.read();if(done)break;const chunk=dec.decode(value,{stream:true});if(rawHead.length<600)rawHead+=chunk;buf+=chunk;
+  const readWithTimeout=()=>new Promise((res,rej)=>{const t=setTimeout(()=>{try{rd.cancel()}catch(e){}const e=new Error("stall");e.code="stall";rej(e)},12000);rd.read().then(v=>{clearTimeout(t);res(v)},e=>{clearTimeout(t);rej(e)})});
+  for(;;){const {value,done}=await readWithTimeout();if(done)break;const chunk=dec.decode(value,{stream:true});if(rawHead.length<600)rawHead+=chunk;buf+=chunk;
     let i;while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith("data:"))continue;
       let ev;try{ev=JSON.parse(line.slice(5))}catch(e){continue}
       if(seen.length<12&&!seen.includes(ev.type))seen.push(ev.type);if(ev.type==="message_delta"&&ev.delta)seen.push("stop="+ev.delta.stop_reason);
@@ -546,7 +547,8 @@ function tagOf(l){const m=l.match(TAG);const tag=(m&&m[1]||"").toLowerCase();con
   if(!text)return null;if(tag==="en"||tag==="english")return{k:"en",text};if(tag)return{k:"my",text};return{k:MY.test(text)?"my":"en",text}}
 function parseStream(full){const lines=full.split(/\r?\n/);const done=lines.slice(0,-1),cur=lines[lines.length-1];const my=[],en=[];
   for(const l of done){const t=tagOf(l);if(!t)continue;(t.k==="my"?my:en).push(t.text)}
-  const c=tagOf(cur);return{my,en:en.join(" ")+(c&&c.k==="en"?c.text:""),partial:c&&c.k==="my"?c.text:""}}
+  const c=tagOf(cur),tagged=/^[\s*\-•>#]*(MY|EN|Uncle|ဦးလေး|Burmese|English)\s*[:：]/i.test(cur);
+  return{my,en:en.join(" ")+(c&&c.k==="en"&&tagged?c.text:""),partial:c&&c.k==="my"&&(tagged||MY.test(c.text))?c.text:""}}
 let busySince=0;setInterval(()=>{if(busy&&busySince&&now()-busySince>60000){DBG.note("watchdog: reset a stuck turn");stopUncle();busy=false}},5000);
 async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)return;busy=true;busySince=now();setMicBusy(true);
   const direction=!!opt.direction;let bub=null,full="",spoken=0;
@@ -562,11 +564,13 @@ async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)retu
         while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}},abortCtl.signal);
       if(!full.trim()){DBG.note("stream came back empty; retrying without streaming");full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}
       if(!full.trim()){const other=otherModel();DBG.note("still empty; retrying with "+other);toast("No answer from "+modelName(S.model)+", trying "+modelName(other)+"…");const keep=S.model;S.model=other;try{full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}finally{S.model=keep}}
-    }catch(e0){if(!(e0&&e0.code==="refusal"&&S.spice==="uncut"))throw e0;
-      DBG.note("model declined at Uncut; retrying this line at Spicy");toast("Too spicy for the model, retrying milder…");
-      const keep=S.spice;S.spice="spicy";try{full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}finally{S.spice=keep}}
+    }catch(e0){if(e0&&e0.name==="AbortError")throw e0;
+      if(e0&&e0.code==="stall"){DBG.note("stream stalled; retrying without streaming");toast("Slow connection, retrying…");bub.classList.add("think");spoken=0;VQ.stop();full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}
+      else if(e0&&e0.code==="refusal"&&S.spice==="uncut"){DBG.note("model declined at Uncut; retrying this line at Spicy");toast("Too spicy for the model, retrying milder…");bub.classList.add("think");spoken=0;VQ.stop();
+        const keep=S.spice;S.spice="spicy";try{full=await claude(stableSys(),[{role:"user",content:msg}],600,abortCtl.signal)}finally{S.spice=keep}}
+      else throw e0}
     DBG.last=full;
-    const p=parseStream(full+"\n");while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}
+    const p=parseStream(full+"\n");if(spoken>p.my.length)spoken=0;while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}
     let my=p.my.join(" "),en=p.en;if(!my&&!en){my=full.trim();VQ.push(my,"")}else if(!my){my=en;VQ.push(en,en)}
     if(!my){DBG.note("empty reply from the model");toast("Uncle said nothing. Try again.")}
     bub.classList.remove("think");setBubble(bub,my,en);transcript.push({who:"u",my,en,t:now()-showStart});
