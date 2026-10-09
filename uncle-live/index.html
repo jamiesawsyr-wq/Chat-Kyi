@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v1.2 -->
+<title>Uncle Live</title><!-- v1.3 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -194,7 +194,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- smirk -->
 <path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
 </g>
-</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.2</span></p></div></div>
+</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.3</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -438,17 +438,22 @@ async function elTTS(text,signal){const ck=S.vid+"|"+S.stab+"|"+text;if(ttsCache
   const url=URL.createObjectURL(await r.blob());S.chars=(S.chars||0)+text.length;saveS();ttsCache.set(ck,url);
   if(ttsCache.size>120){const k=ttsCache.keys().next().value;try{URL.revokeObjectURL(ttsCache.get(k))}catch(e){}ttsCache.delete(k)}return url}
 function playUrl(url){return new Promise(res=>{let d=false;const f=()=>{if(!d){d=true;res()}};elAudio.onended=f;elAudio.onerror=f;elAudio.src=url;const p=elAudio.play();if(p&&p.catch)p.catch(f);setTimeout(f,60000)})}
-function synthSay(text){return new Promise(res=>{if(!window.speechSynthesis||!text){res();return}const u=new SpeechSynthesisUtterance(text);u.lang=MY.test(text)?"my-MM":"en-US";u.rate=0.95;let d=false;const f=()=>{if(!d){d=true;res()}};u.onend=f;u.onerror=f;speechSynthesis.speak(u);setTimeout(f,20000)})}
+function synthSay(text){return new Promise(res=>{if(!window.speechSynthesis||!text){res();return}const u=new SpeechSynthesisUtterance(text);u.lang=MY.test(text)?"my-MM":"en-US";u.rate=0.95;let d=false;const f=()=>{if(!d){d=true;res()}};u.onend=f;u.onerror=f;speechSynthesis.speak(u);const iv=setInterval(()=>{if(!speechSynthesis.speaking&&!speechSynthesis.pending){clearInterval(iv);f()}},300);setTimeout(()=>{clearInterval(iv);f()},20000)})}
 let elWarned=0;function elFail(e){if(now()-elWarned>20000){elWarned=now();toast(((e&&e.message)||"ElevenLabs failed")+". Using the phone voice.")}}
 
 /* Sequential voice queue: lines are sent to ElevenLabs the moment they are complete, played in order */
-const VQ={q:[],gen:0,playing:false,ac:null,onIdle:null,
-  push(my,en){my=String(my||"").trim();if(!my)return;const gen=this.gen;const ctrl=new AbortController();this.ac=ctrl;const p=elReady()?elTTS(my,ctrl.signal).catch(e=>{if(e.name!=="AbortError")elFail(e);return null}):Promise.resolve(null);this.q.push({p,my,en,gen});this.pump()},
+const VQ={q:[],gen:0,playing:false,cur:null,onIdle:null,
+  push(my,en){my=String(my||"").trim();if(!my)return;const gen=this.gen;const ctrl=new AbortController();
+    const p=elReady()?elTTS(my,ctrl.signal).catch(e=>{if(e.name!=="AbortError")elFail(e);return null}):Promise.resolve(null);
+    this.q.push({p,my,en,gen,ctrl});if(!this.playing)this.pump()},
   async pump(){if(this.playing)return;this.playing=true;setTalk(true);
-    while(this.q.length){const it=this.q.shift();if(it.gen!==this.gen)continue;const url=await it.p;if(it.gen!==this.gen)continue;
-      if(url)await playUrl(url);else await synthSay(elReady()?it.en||it.my:it.en||it.my)}
-    this.playing=false;setTalk(false);if(this.onIdle)this.onIdle()},
-  stop(){this.gen++;this.q=[];try{elAudio.pause();elAudio.currentTime=0}catch(e){}if(window.speechSynthesis)speechSynthesis.cancel();this.playing=false;setTalk(false)}};
+    try{while(this.q.length){const it=this.q.shift();if(it.gen!==this.gen)continue;let url=null;try{url=await it.p}catch(e){}
+      if(it.gen!==this.gen)continue;if(url)await this.play(url);else await synthSay(it.en||it.my)}}
+    finally{this.playing=false;setTalk(false);const f=this.onIdle;this.onIdle=null;if(f)f()}},
+  play(url){return new Promise(res=>{let d=false;const f=()=>{if(d)return;d=true;if(this.cur===f)this.cur=null;res()};this.cur=f;
+    elAudio.onended=f;elAudio.onerror=f;elAudio.src=url;const p=elAudio.play();if(p&&p.catch)p.catch(f);setTimeout(f,60000)})},
+  stop(){this.gen++;this.q.forEach(it=>{try{it.ctrl.abort()}catch(e){}});this.q=[];try{elAudio.pause();elAudio.currentTime=0}catch(e){}
+    if(window.speechSynthesis)speechSynthesis.cancel();if(this.cur)this.cur()}};
 function setTalk(on){const u=$("#uncle");if(!u)return;u.classList.toggle("talk",on);if(on)u.classList.remove("think")}
 
 /* instant reactions while the real reply loads */
@@ -459,11 +464,14 @@ async function warmReactions(){if(!elReady())return;for(const r of REACT){try{aw
 let stream=null,rec=null,chunks=[],listening=false,reacted=false;
 async function listenStart(){if(listening||busy)return;
   if(!EKEY){toast("Add your ElevenLabs key to talk by voice, or type instead.");return}
-  try{if(!stream||stream.getTracks().every(t=>t.readyState==="ended"))stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast("Microphone is blocked. Allow it in Settings.");return}
-  try{rec=new MediaRecorder(stream)}catch(e){toast("Recording isn't supported here. Type instead.");return}
+  try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){DBG.note("mic error: "+e.message);toast("Microphone is blocked. Allow it in Settings.");return}
+  const mime=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m));
+  try{rec=new MediaRecorder(stream,mime?{mimeType:mime}:undefined)}catch(e){try{rec=new MediaRecorder(stream)}catch(e2){toast("Recording isn't supported here. Type instead.");return}}
+  const myStream=stream;
   chunks=[];listening=true;$("#mic").classList.add("on");$("#micHint").textContent="● listening…";$("#micHint").classList.remove("hidden");
   rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-  rec.onstop=async()=>{listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden");
+  rec.onstop=async()=>{listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden");try{myStream.getTracks().forEach(t=>t.stop())}catch(e){}
+    DBG.note("recorded "+chunks.length+" chunks, "+chunks.reduce((a,c)=>a+c.size,0)+" bytes, "+(rec.mimeType||"?"));
     if(!chunks.length)return;const blob=new Blob(chunks,{type:rec.mimeType||"audio/mp4"});if(blob.size<2000){toast("Too short. Hold 🎙 while you talk, or tap once to start and again to stop.");return}
     if(elReady()&&!busy){VQ.stop();VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"");reacted=true}
     const fd=new FormData();fd.append("file",blob,"speech."+((rec.mimeType||"").includes("webm")?"webm":"m4a"));fd.append("model_id","scribe_v1");fd.append("language_code","mya");
@@ -476,7 +484,7 @@ async function listenStart(){if(listening||busy)return;
       const t=String(j.text||"").trim();if(t)ask(t,{reacted});else toast("Didn't catch that.");reacted=false}
     catch(e){toast((e&&e.message)||"Couldn't understand that.")}finally{$("#mic").classList.remove("busy")}};
   rec.start(250)}
-function listenStop(){if(!listening||!rec)return;try{rec.stop()}catch(e){listening=false}}
+function listenStop(){if(!listening||!rec)return;if(rec.state!=="recording"){listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden");return}try{rec.stop()}catch(e){listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden")}}
 
 /* ============================== UNCLE'S BRAIN ============================== */
 const NICKS=["Costco Prince","Honda Civic","Slipper Assassin","Plastic Bag Collector","Tiger Mom's Biggest Disappointment","Boba Boy","Rice Cooker","Coupon King","Free Sample Hunter","Instant Noodle Chef","Family IT Department","Unpaid Translator","Leftover Lord","Thermos Boy","Wi-Fi Password Keeper","Kumon Dropout","Future Doctor (Not Really)","Karaoke Champion"];
@@ -531,14 +539,16 @@ function tagOf(l){const m=l.match(TAG);const tag=(m&&m[1]||"").toLowerCase();con
 function parseStream(full){const lines=full.split(/\r?\n/);const done=lines.slice(0,-1),cur=lines[lines.length-1];const my=[],en=[];
   for(const l of done){const t=tagOf(l);if(!t)continue;(t.k==="my"?my:en).push(t.text)}
   const c=tagOf(cur);return{my,en:en.join(" ")+(c&&c.k==="en"?c.text:""),partial:c&&c.k==="my"?c.text:""}}
-async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)return;busy=true;unlock();
-  const direction=!!opt.direction,shown=opt.label||text;
+let busySince=0;setInterval(()=>{if(busy&&busySince&&now()-busySince>60000){DBG.note("watchdog: reset a stuck turn");stopUncle();busy=false}},5000);
+async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)return;busy=true;busySince=now();setMicBusy(true);
+  const direction=!!opt.direction;let bub=null;
+  try{unlock();
   if(!direction){addBubble("j",text,"");transcript.push({who:"j",my:text,en:text,t:now()-showStart});advancePtr(text)}
-  const bub=addBubble("u","…","");bub.classList.add("think");$("#uncle").classList.add("think");
+  bub=addBubble("u","…","");bub.classList.add("think");$("#uncle").classList.add("think");
   if(!opt.reacted){VQ.stop();if(elReady()&&!opt.quiet)VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"")}
   abortCtl=new AbortController();let spoken=0,last=null;
   const msg=buildMsg((direction?text:`[${S.name} → Uncle] ${text}`)+`\n(nickname available this reply: "${pickNick()}")`);
-  try{
+  
     let full=await claudeStream(stableSys(),[{role:"user",content:msg}],600,f=>{const p=parseStream(f);
       if(p.my.length||p.partial){bub.classList.remove("think");setBubble(bub,p.my.concat(p.partial?[p.partial]:[]).join(" "),p.en)}
       while(spoken<p.my.length){VQ.push(p.my[spoken],"");spoken++}last=p},abortCtl.signal);
@@ -548,18 +558,20 @@ async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)retu
     let my=p.my.join(" "),en=p.en;if(!my&&!en){my=full.trim();VQ.push(my,"")}else if(!my){my=en;VQ.push(en,en)}
     if(!my){DBG.note("empty reply from the model");toast("Uncle said nothing. Try again.")}
     bub.classList.remove("think");setBubble(bub,my,en);transcript.push({who:"u",my,en,t:now()-showStart});
-  }catch(e){DBG.note("error: "+((e&&e.message)||e));bub.classList.remove("think");if(e&&e.name==="AbortError"){const m=bub.querySelector(".m");if(m.textContent==="…")bub.remove();else{m.textContent=m.textContent.replace(/[။…]*$/,"")+"…";const en=bub.querySelector(".e");if(en&&en.textContent)en.textContent+=" (stopped)"}}else{setBubble(bub,"…","");bub.remove();toast(errText(e))}}
-  finally{busy=false;abortCtl=null;$("#uncle").classList.remove("think")}}
-function stopUncle(){if(abortCtl)abortCtl.abort();VQ.stop();busy=false;$("#uncle").classList.remove("think")}
+  }catch(e){DBG.note("error: "+((e&&e.message)||e));if(!bub){toast(errText(e));return}bub.classList.remove("think");if(e&&e.name==="AbortError"){const m=bub.querySelector(".m");if(m.textContent==="…")bub.remove();else{m.textContent=m.textContent.replace(/[။…]*$/,"")+"…";const en=bub.querySelector(".e");if(en&&en.textContent)en.textContent+=" (stopped)"}}else{setBubble(bub,"…","");bub.remove();toast(errText(e))}}
+  finally{busy=false;busySince=0;setMicBusy(false);abortCtl=null;$("#uncle").classList.remove("think")}}
+function stopUncle(){if(abortCtl)abortCtl.abort();VQ.stop();busy=false;busySince=0;setMicBusy(false);$("#uncle").classList.remove("think")}
+function setMicBusy(on){const m=$("#mic");if(m&&!listening)m.classList.toggle("busy",on)}
 
 /* scripted cue: next "Uncle:" line from the script, spoken word for word */
 async function cueNext(){if(busy){toast("Let him finish.");return}const L=scriptLines();let i=ptr;while(i<L.length){const lw=lineWho(L[i]);if(lw&&lw.who==="u")break;i++}
   if(i>=L.length){toast("No more Uncle lines in the script.");return}
   const lw=lineWho(L[i]);ptr=i+1;const pr=lw.text.split("|").map(x=>x.trim());const my=pr[0],en=pr[1]||(MY.test(my)?"":my);
   await perform(my,en)}
-async function perform(my,en){busy=true;unlock();VQ.stop();const bub=addBubble("u",my,en);transcript.push({who:"u",my,en,t:now()-showStart,scripted:true});
+async function perform(my,en){busy=true;busySince=now();setMicBusy(true);try{unlock();VQ.stop();const bub=addBubble("u",my,en);transcript.push({who:"u",my,en,t:now()-showStart,scripted:true});
   const sents=(my.match(/[^။!?…]+[။!?…]*/g)||[my]).map(x=>x.trim()).filter(Boolean);
-  await new Promise(res=>{VQ.onIdle=()=>{VQ.onIdle=null;res()};sents.forEach(s=>VQ.push(s,""));if(!sents.length)res()});busy=false}
+  await new Promise(res=>{let d=false;const f=()=>{if(!d){d=true;res()}};VQ.onIdle=f;sents.forEach(s=>VQ.push(s,""));if(!sents.length||!VQ.playing)f();setTimeout(f,45000)})}
+  finally{busy=false;busySince=0;setMicBusy(false)}}
 async function coldOpen(){const p=S.prep;if(!p||!p.cold_my){toast("Let Uncle prep first, on the setup screen.");return}if(busy){toast("Let him finish.");return}await perform(p.cold_my,p.cold_en||"")}
 
 /* ============================== PREP & NOTES ============================== */
