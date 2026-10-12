@@ -153,6 +153,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 .co small{font:700 .8cqw Nunito;letter-spacing:.04em;opacity:.55}
 .co.busy i{background:#ffd36b;box-shadow:0 0 .8cqw #ffd36b}.co:active{transform:translateY(.15cqw)}
 .rb{width:4.2cqw;height:4.2cqw;border-radius:50%;font-size:1.9cqw;display:grid;place-items:center;background:var(--rbbg);border:.1cqw solid var(--line2);padding:0}
+.rb.plain{background:#0b0b0d;border:.16cqw solid #3a3a44;box-shadow:0 0 0 .3cqw rgba(255,255,255,.06)}.rb.plain:active{transform:translateY(.15cqw)}
 .rb.set{width:3.4cqw;height:3.4cqw;font-size:1.6cqw;color:var(--mut2);margin-left:1.2cqw}
 #stage:not(.ctlon) .b .tag{display:none}
 .b .tag{background:#3a4a6a!important}
@@ -257,7 +258,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
     <div id="micHint" class="hidden">● listening…</div>
     <div id="ctl">
       <div id="nextLine"></div>
-      <div class="bar2"><button id="coBtn" class="co" aria-label="Co-host"><i></i>CO-HOST<small>Space · clicker</small></button><button id="roastAud" class="rb" aria-label="Roast the audience" title="Roast the audience">👥</button><button id="roastMe" class="rb" aria-label="Roast me" title="Roast me">👤</button><button id="setBtn" class="rb set" aria-label="Settings" title="Settings">⋯</button></div>
+      <div class="bar2"><button id="coBtn" class="co" aria-label="Co-host"><i></i>CO-HOST<small>Space · clicker</small></button><button id="playBtn" class="rb plain" aria-label="Play next script line"></button><button id="roastAud" class="rb" aria-label="Roast the audience" title="Roast the audience">👥</button><button id="roastMe" class="rb" aria-label="Roast me" title="Roast me">👤</button><button id="setBtn" class="rb set" aria-label="Settings" title="Settings">⋯</button></div>
     </div>
     <div id="panel" class="hidden">
       <div class="ph"><b>Settings</b><button id="panelX" aria-label="Close">✕</button></div>
@@ -749,6 +750,7 @@ document.querySelectorAll("#autoSeg button").forEach(b=>b.onclick=()=>{S.auto=Nu
 ["#orbSel","#orbSel2"].forEach(id=>$(id).onchange=e=>{S.orb=e.target.value;saveS();fillLookSelects();applyLook()});
 ["#bgSel","#bgSel2"].forEach(id=>$(id).onchange=e=>{S.bg=e.target.value;saveS();fillLookSelects();applyLook()});
 $("#coBtn").onclick=()=>coHost("button");
+$("#playBtn").onclick=()=>{unlock();earReset();cueNext()};
 $("#roastAud").onclick=()=>{if(busy){toast("Let him finish, or press Esc.");return}ask(DIRECTIONS.roastAud,{direction:true,utag:"👥 ROAST"})};
 $("#roastMe").onclick=()=>{if(busy){toast("Let him finish, or press Esc.");return}ask(DIRECTIONS.roastMe,{direction:true,utag:"👤 ROAST"})};
 $("#setBtn").onclick=()=>{const p=$("#panel");p.classList.toggle("hidden");if(!p.classList.contains("hidden")){fillLookSelects();renderStrip()}};
