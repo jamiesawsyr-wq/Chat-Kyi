@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v2.1 -->
+<title>Uncle Live</title><!-- v2.2 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -118,6 +118,9 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 #stage.ctlon #chat{bottom:27.5%;top:18.5%}
 /* ===== v2.0 orb stage ===== */
 #stage{background:var(--stagebg,#0e0e10)!important}
+#space{position:absolute;inset:0;display:none;pointer-events:none;z-index:0}#stage.space #space{display:block}#stage.space #beam{opacity:0!important}
+#space canvas{position:absolute;inset:-4%;width:108%;height:108%}#starsA{animation:sdrift 140s linear infinite alternate}#starsB{animation:twk 4s ease-in-out infinite alternate,sdrift 90s linear infinite alternate-reverse}
+@keyframes twk{from{opacity:.25}to{opacity:1}}@keyframes sdrift{from{transform:translate(0,0)}to{transform:translate(-2.5%,1.5%)}}
 #bg{display:none}
 #beam{position:absolute;left:0;top:-8%;width:44%;height:120%;pointer-events:none;opacity:0;transition:opacity .4s}
 #stage.dark #beam{opacity:1}
@@ -198,7 +201,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup">
-  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.1</span></p></div></div>
+  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.2</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -256,7 +259,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- ===== LIVE STAGE ===== -->
 <div id="live" class="hidden">
   <div id="stage" class="dark">
-    <div id="beam"></div>
+    <div id="beam"></div><div id="space"><canvas id="starsA"></canvas><canvas id="starsB"></canvas></div>
     <div id="uncle" class="orbx"><div class="orbhalo"></div><div class="wave"></div><div class="wave w2"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div>
       <svg class="rings" viewBox="0 0 760 760"><g transform="rotate(-16 380 380)" fill="none"><ellipse cx="380" cy="380" rx="330" ry="108" stroke="var(--ring)" stroke-opacity=".3" stroke-width="2" stroke-dasharray="6 12"/><ellipse cx="380" cy="380" rx="236" ry="64" stroke="var(--ring)" stroke-opacity=".85" stroke-width="3.5"/><circle cx="146" cy="380" r="7" fill="var(--ring)"/><circle cx="690" cy="330" r="5" fill="var(--ring2)"/></g></svg>
       <svg class="dots" viewBox="0 0 100 100"><circle cx="50" cy="4" r="3" fill="#fff"/><circle cx="90" cy="70" r="3" fill="#fff" opacity=".6"/><circle cx="10" cy="70" r="3" fill="#fff" opacity=".3"/></svg></div>
@@ -341,7 +344,7 @@ const ORBS={
  "Pearl":{core:jewel(["#ffffff","#e6e9ff","#b0b6cc","#f2f2f8","#c8ccdc","#6a6e7e"]),g1:"rgba(255,255,255,.4)",g2:"rgba(200,208,255,.2)",ring:"#ffffff",ring2:"#c8d0ff"},
  "Midnight Rainbow":{core:jewel(["#ff5ad1","#3fd8ff","#ffb46b","#5a3bd6","#1a0f4a","#05030f"]),g1:"rgba(150,100,255,.45)",g2:"rgba(63,216,255,.2)",ring:"#ff5ad1",ring2:"#3fd8ff"}};
 const BGS={
- "Matte Black":{css:"#0e0e10",dark:1},"Graphite":{css:"#1a1b1f",dark:1},"Midnight Navy":{css:"#0a1020",dark:1},
+ "Matte Black":{css:"#0e0e10",dark:1},"Deep Space":{css:"#000",dark:1,space:1},"Deep Space Nebula":{css:"#000",dark:1,space:2},"Graphite":{css:"#1a1b1f",dark:1},"Midnight Navy":{css:"#0a1020",dark:1},
  "Blue-black Vignette":{css:"radial-gradient(ellipse at 22% 45%,#10203f 0,#070b16 45%,#030407 100%)",dark:1},
  "Carbon Grid":{css:"repeating-linear-gradient(0deg,rgba(80,140,255,.06) 0 1px,transparent 1px 2.2cqw),repeating-linear-gradient(90deg,rgba(80,140,255,.06) 0 1px,transparent 1px 2.2cqw),#0b0d12",dark:1},
  "Charcoal":{css:"#1f1b1d",dark:1},
@@ -349,8 +352,16 @@ const BGS={
  "Dusk Gradient":{css:"linear-gradient(160deg,#1a1033,#3a1838 55%,#5a2a2a)",dark:1},"Teal Night":{css:"radial-gradient(ellipse at 22% 45%,#0e3a3a 0,#071a1c 50%,#030808 100%)",dark:1},
  "Parchment":{css:"#f3e9d6"},"Warm Taupe":{css:"#e8ddd0"},"Mint Fog":{css:"#e3f2ec"},"Lilac Mist":{css:"#efe8f6"},"Sunset Gradient":{css:"linear-gradient(160deg,#fde2c8,#f6c2c8 55%,#d8c2ec)"},"Sand":{css:"#efe4cf"},"Cream":{css:"#f7f1e3"},"Blush":{css:"#f9e4ec"},"Sage":{css:"#e9f0e3"},"Sky":{css:"#e2eef9"},"Lavender":{css:"#ebe6f8"},"Peach":{css:"#fbe9e1"}};
 function fillLookSelects(){[["#orbSel","#orbSel2",ORBS,"orb"],["#bgSel","#bgSel2",BGS,"bg"]].forEach(([a,b,src,k])=>{[a,b].forEach(id=>{const el=$(id);if(!el)return;if(!el.options.length)Object.keys(src).forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=(k==="orb"?"Orb: ":"Background: ")+n;el.appendChild(o)});el.value=S[k]})})}
+function drawSpace(kind){if(drawSpace.k===kind)return;drawSpace.k=kind;let seed=7;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const W=1920,H=1080;[["#starsA",900,0],["#starsB",140,1]].forEach(([id,n,big])=>{const c=$(id);if(!c)return;c.width=W;c.height=H;const x=c.getContext("2d");x.clearRect(0,0,W,H);
+   if(!big){x.fillStyle="#000";x.fillRect(0,0,W,H);
+    if(kind===2){[[.22,.3,"rgba(90,40,160,.22)"],[.78,.65,"rgba(20,70,170,.20)"],[.6,.2,"rgba(160,40,110,.12)"]].forEach(([px,py,col])=>{const g=x.createRadialGradient(px*W,py*H,0,px*W,py*H,W*.45);g.addColorStop(0,col);g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(0,0,W,H)})}
+    const mw=x.createLinearGradient(0,H,W,0);mw.addColorStop(0,"rgba(255,255,255,0)");mw.addColorStop(.5,"rgba(170,190,255,.05)");mw.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=mw;x.fillRect(0,0,W,H)}
+   for(let i=0;i<n;i++){const px=r()*W,py=r()*H,s=big?1+r()*1.6:r()*1.1+.2,t=r();const col=t<.12?"200,215,255":t<.2?"255,225,190":"255,255,255";
+    x.fillStyle=`rgba(${col},${big?.95:.35+r()*.5})`;x.beginPath();x.arc(px,py,s,0,7);x.fill();
+    if(big&&s>2){const g=x.createRadialGradient(px,py,0,px,py,s*5);g.addColorStop(0,`rgba(${col},.35)`);g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(px-s*5,py-s*5,s*10,s*10)}}})}
 function applyLook(){const o=ORBS[S.orb]||ORBS["Arc Reactor"],b=BGS[S.bg]||BGS["Matte Black"],stg=$("#stage");if(!stg)return;
-  stg.style.setProperty("--stagebg",b.css);stg.classList.toggle("dark",!!b.dark);
+  stg.style.setProperty("--stagebg",b.css);stg.classList.toggle("dark",!!b.dark);stg.classList.toggle("space",!!b.space);if(b.space)drawSpace(b.space);
   [stg,document.documentElement].forEach(e=>{e.style.setProperty("--ring",o.ring);e.style.setProperty("--ring2",o.ring2);e.style.setProperty("--g1",o.g1)});
   document.querySelectorAll(".orbcore").forEach(e=>{e.style.background=o.core;e.style.boxShadow=e.closest("#uncle")?`0 0 3cqw .6cqw ${o.g1},0 0 8cqw 2cqw ${o.g2}`:`0 0 14px 3px ${o.g1},0 0 34px 8px ${o.g2}`});
   const sw=o.sw||[o.ring,o.ring2];document.querySelectorAll(".orbcore .swirl").forEach(e=>{e.style.background=`conic-gradient(from 0deg,${sw[0]},rgba(0,0,0,0) 30%,${sw[1]} 55%,rgba(0,0,0,0) 80%,${sw[0]})`});
