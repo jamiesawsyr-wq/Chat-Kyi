@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v1.9 -->
+<title>Uncle Live</title><!-- v2.0 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -116,97 +116,77 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 .quick button.chime{background:#8e44ad;color:#fff;font-family:Nunito}
 .b .tag{position:absolute;right:1.3cqw;top:1.1cqw;font:800 .9cqw Nunito;letter-spacing:.08em;padding:.25cqw .6cqw;border-radius:.4cqw;background:#8e44ad;color:#fff}
 #stage.ctlon #chat{bottom:27.5%;top:18.5%}
+/* ===== v2.0 orb stage ===== */
+#stage{background:var(--stagebg,#0e0e10)!important}
+#bg{display:none}
+#beam{position:absolute;left:0;top:-8%;width:44%;height:120%;pointer-events:none;opacity:0;transition:opacity .4s}
+#stage.dark #beam{opacity:1}
+.orbx{position:absolute;border-radius:50%}
+.orbx .orbhalo{position:absolute;inset:-45%;border-radius:50%;filter:blur(1.2cqw);transition:transform .35s,opacity .35s}
+.orbx .orbcore{position:absolute;inset:0;border-radius:50%;transition:filter .35s}
+.orbx .rings{position:absolute;left:-50%;top:-50%;width:200%!important;height:200%!important}
+.orbx .dots{position:absolute;left:-12%;top:-12%;width:124%!important;height:124%!important;display:none;animation:orbit 2.6s linear infinite}
+.orbx .wave{position:absolute;inset:-14%;border-radius:50%;border:.18cqw solid var(--ring);opacity:0;pointer-events:none}
+.orbx .wave.w2{inset:-30%;opacity:0}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{filter:brightness(1.3) saturate(1.15)}}
+@keyframes ripple{0%{transform:scale(.85);opacity:.7}100%{transform:scale(1.25);opacity:0}}
+#uncle{left:21.6%!important;top:44%!important;width:19.8cqw!important;height:19.8cqw!important;transform:translate(-50%,-50%)!important;animation:none!important}
+#uncle.talk .orbcore{animation:pulse .9s ease-in-out infinite}
+#uncle.talk .orbhalo{transform:scale(1.15)}
+#uncle.talk .wave{animation:ripple 1.4s ease-out infinite}#uncle.talk .wave.w2{animation-delay:.5s}
+#uncle.think .orbcore{filter:brightness(.62) saturate(.6)}#uncle.think .orbhalo{opacity:.45}#uncle .dots{display:none!important}#uncle.think .dots{display:block!important}
+#ulbl{position:absolute;left:21.6%;top:67%;transform:translateX(-50%);font:800 1.1cqw Nunito;letter-spacing:.32em;color:var(--mut2);display:flex;align-items:center;gap:.6cqw;z-index:3}
+#ulbl i{width:.6cqw;height:.6cqw;border-radius:50%;background:var(--ring);box-shadow:0 0 .6cqw var(--ring)}
+#top{background:transparent!important;left:43.2%!important;right:3.6%!important}
+#show{color:var(--ink2)!important;text-shadow:var(--glow2)!important}#topic2{color:var(--mut2)!important}
+#stage.ctlon #chat,#chat{top:11%!important}
+#stage.ctlon #chat{bottom:17%!important}
+#clock,#exit,#hot{color:var(--mut2)!important;opacity:.6}
+#hot{font-size:1.6cqw}
+#ctl{background:linear-gradient(transparent,var(--barbg) 45%)!important;padding:.6cqw 1.5cqw 1cqw!important}
+#nextLine{font:700 1.15cqw/1.4 var(--my);color:var(--mut2);border:.08cqw dashed var(--line2);border-radius:.8cqw;padding:.45cqw .9cqw;margin:0 3.6% 0 43.2%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--nextbg)}
+#nextLine:empty{display:none}#nextLine b{font:800 .9cqw Nunito;color:var(--ring);margin-right:.5cqw;letter-spacing:.06em}
+.bar2{display:flex;align-items:center;justify-content:center;gap:1.1cqw;position:relative}
+.co{display:flex;align-items:center;gap:.9cqw;font:900 1.65cqw Nunito;letter-spacing:.14em;padding:1.05cqw 2.3cqw;border-radius:99cqw;background:#0b0b0d;color:#fff;border:.16cqw solid #3a3a44;box-shadow:0 0 0 .3cqw rgba(255,255,255,.06),0 .5cqw 1.4cqw rgba(0,0,0,.55);-webkit-touch-callout:none;user-select:none}
+.co i{width:1cqw;height:1cqw;border-radius:50%;background:#ff5a5a;box-shadow:0 0 .8cqw #ff5a5a}
+.co small{font:700 .8cqw Nunito;letter-spacing:.04em;opacity:.55}
+.co.busy i{background:#ffd36b;box-shadow:0 0 .8cqw #ffd36b}.co:active{transform:translateY(.15cqw)}
+.rb{width:4.2cqw;height:4.2cqw;border-radius:50%;font-size:1.9cqw;display:grid;place-items:center;background:var(--rbbg);border:.1cqw solid var(--line2);padding:0}
+.rb.set{width:3.4cqw;height:3.4cqw;font-size:1.6cqw;color:var(--mut2);margin-left:1.2cqw}
+#stage:not(.ctlon) .b .tag{display:none}
+.b .tag{background:#3a4a6a!important}
+#stage.dark .b.u .n{background:#2e5bd6}
+#stage.dark .b.u:last-child{box-shadow:0 .4cqw 0 rgba(0,0,0,.35),0 0 2cqw var(--g1)}
+/* settings panel */
+#panel{position:absolute;right:1.6%;top:9%;bottom:15%;width:37%;background:var(--panelbg);border:.1cqw solid var(--line2);border-radius:1.2cqw;padding:1cqw 1.3cqw;z-index:8;overflow:auto;color:var(--ink2);font-size:1.05cqw}
+#panel .ph{display:flex;justify-content:space-between;align-items:center;font:800 1.3cqw Nunito}
+#panel .ph button{border:0;background:transparent;color:var(--mut2);font-size:1.4cqw}
+#panel .pk{font:800 .8cqw Nunito;letter-spacing:.12em;text-transform:uppercase;color:var(--mut2);margin:1cqw 0 .4cqw}
+#panel .prow{display:flex;gap:.6cqw}#panel select{flex:1;font:700 1cqw Nunito;padding:.4cqw;border-radius:.6cqw;border:.1cqw solid var(--line2);background:#fff;color:#222}
+#slist{max-height:13cqw;overflow:auto;border:.1cqw solid var(--line2);border-radius:.8cqw;padding:.3cqw .5cqw;font:700 .95cqw/1.6 var(--my)}
+#slist div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:.1cqw .4cqw;border-radius:.4cqw;cursor:pointer}
+#slist div.u{opacity:.65}#slist div.h{opacity:.5;font-family:Nunito;font-weight:800}#slist div.cur{background:rgba(60,140,255,.35);opacity:1}
+#panel #ear{position:static!important;display:flex!important;flex-wrap:wrap;gap:.4cqw;margin-top:.6cqw}
+#panel #ear span{font:800 .8cqw Nunito;padding:.25cqw .6cqw}
+#panel .quick{justify-content:flex-start;gap:.4cqw}#panel .quick button{font-size:.95cqw;padding:.4cqw .8cqw}
+#panel .bar{padding-right:0!important;margin-top:.8cqw;gap:.5cqw}#panel .bar input{font-size:1cqw;padding:.6cqw .8cqw}#panel .bar button{height:2.6cqw;font-size:.95cqw}
+#panel #mic{width:2.8cqw;height:2.8cqw;font-size:1.3cqw}
+#panel .phint{font:600 .8cqw/1.4 Nunito;color:var(--mut2);margin-top:.6cqw}
+/* light vs dark sets */
+#stage{--ink2:#3b1d1a;--mut2:#7a5a52;--line2:rgba(120,90,60,.35);--barbg:rgba(0,0,0,.06);--rbbg:#fff;--nextbg:rgba(255,255,255,.55);--panelbg:rgba(255,250,240,.97);--glow2:none}
+#stage.dark{--ink2:#cfe3ff;--mut2:#8fa8cc;--line2:rgba(110,180,255,.45);--barbg:rgba(0,0,0,.6);--rbbg:rgba(30,60,140,.5);--nextbg:rgba(30,60,140,.3);--panelbg:rgba(10,16,32,.97);--glow2:0 0 .6cqw rgba(80,150,255,.6)}
+/* setup avatar orb */
+.brand .av{width:72px!important;height:72px!important;background:transparent!important;overflow:visible!important;position:relative}
+.brand .av .orbx{inset:8px}.brand .av .orbhalo{filter:blur(6px)}
+#setup select{width:100%}
 </style>
 </head>
 <body>
 
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup">
-  <div class="brand"><div class="av"><svg xmlns="http://www.w3.org/2000/svg" viewBox="30 -24 250 574" ><defs>
-<radialGradient id="iris" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#8a5a32"/><stop offset=".6" stop-color="#4a2a16"/><stop offset="1" stop-color="#1e120a"/></radialGradient>
-<pattern id="silk" width="18" height="10" patternUnits="userSpaceOnUse"><rect width="18" height="10" fill="#f3f1ea"/><rect x="2" width="2" height="10" fill="#cfccc2"/><rect x="7" width="1" height="10" fill="#b5b2a8"/><rect x="12" width="3" height="10" fill="#e2dfd5"/></pattern>
-<linearGradient id="fold" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".3" stop-color="#000" stop-opacity="0"/><stop offset=".75" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient></defs>
-<g stroke="#1a1418" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
-<!-- socks + lace-up shoes -->
-<path d="M110,500 L136,500 L136,522 L110,522 Z M164,500 L190,500 L190,522 L164,522 Z" fill="#3a3a42"/>
-<path d="M104,520 L138,518 Q158,522 160,540 L100,540 Q98,528 104,520 Z" fill="#141416"/>
-<path d="M162,518 L196,520 Q202,528 200,540 L140,540 Q142,522 162,518 Z" fill="#141416"/>
-<path d="M120,522 L130,528 M126,520 L134,526 M174,520 L184,526 M180,522 L188,528" stroke="#55555f" stroke-width="1.6"/>
-<path d="M140,532 Q150,530 156,534 M106,530 Q112,528 118,530" stroke="#9aa2b2" stroke-width="2" fill="none"/>
-<!-- silk longyi -->
-<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#silk)"/>
-<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#fold)" stroke="none"/>
-<path d="M164,350 Q186,420 180,506 L210,506 L214,346 Z" fill="url(#silk)"/>
-<path d="M164,350 Q186,420 180,506" fill="none"/>
-<path d="M120,352 L114,506 M140,352 L138,506 M196,360 L198,504" stroke="#a8a59c" stroke-width="1.4" opacity=".7" fill="none"/>
-<path d="M158,340 Q176,334 190,344 Q194,360 180,368 Q164,370 158,356 Z" fill="url(#silk)"/>
-<!-- left arm + book -->
-<path d="M96,212 L74,334 L98,340 L114,238 Z" fill="#26262e"/>
-<path d="M72,330 L98,336 L96,346 L70,340 Z" fill="#f4f1e8"/>
-<path d="M66,346 L102,346 L102,404 L66,404 Z" fill="#7a4a2a"/><path d="M66,346 L72,346 L72,404 L66,404 Z" fill="#5a3418"/>
-<path d="M70,340 Q66,356 80,360 Q96,360 98,346 Z" fill="#f2c9a6"/>
-<!-- right arm -->
-<path d="M204,212 L226,334 L202,340 L188,238 Z" fill="#26262e"/>
-<path d="M228,330 L202,336 L204,346 L230,340 Z" fill="#f4f1e8"/>
-<path d="M204,344 Q202,362 214,366 Q228,364 230,342 Z" fill="#f2c9a6"/>
-<path d="M210,352 L210,362 M218,352 L218,363" stroke="#c98f6e" stroke-width="1.3"/>
-<!-- jacket (taikpon) -->
-<path d="M94,212 Q100,196 137,190 L163,190 Q200,196 206,212 L216,352 L84,352 Z" fill="#26262e"/>
-<path d="M190,214 L206,352 L186,352 L182,230 Z" fill="#34343e" stroke="none"/>
-<g fill="#7c7c8a" stroke-width="1.2"><rect x="138" y="226" width="26" height="5" rx="2.5"/><rect x="138" y="256" width="26" height="5" rx="2.5"/><rect x="138" y="286" width="26" height="5" rx="2.5"/><rect x="138" y="316" width="26" height="5" rx="2.5"/></g>
-<path d="M150,200 L150,350" stroke="#3e3e4a" stroke-width="1.6" fill="none"/>
-<path d="M98,292 L134,292 L134,336 L98,336 Z M166,292 L202,292 L202,336 L166,336 Z M166,236 L196,236 L196,264 L166,264 Z" fill="none" stroke="#4a4a58" stroke-width="2"/>
-<path d="M174,240 L174,224 M182,240 L182,226" stroke="#c9ced8" stroke-width="3"/>
-<circle cx="120" cy="244" r="7" fill="#f4f1e8" stroke-width="1.6"/>
-<!-- neck + collar -->
-<path d="M138,166 L162,166 L163,194 L137,194 Z" fill="#f2c9a6"/>
-<path d="M134,186 Q150,196 166,186 L168,200 Q150,210 132,200 Z" fill="#f4f1e8"/>
-<g transform="translate(150,190) scale(1.2) translate(-150,-190)"><!-- ears -->
-<path d="M110,104 Q100,104 102,118 Q104,134 114,134 Z" fill="#f2c9a6"/>
-<path d="M190,104 Q200,104 198,118 Q196,134 186,134 Z" fill="#f2c9a6"/>
-<!-- face -->
-<path d="M111,92 C110,138 124,164 150,176 C176,164 190,138 189,92 C189,74 172,62 150,62 C128,62 111,74 111,92 Z" fill="#f2c9a6"/>
-<path d="M176,100 C186,130 178,156 158,172 C176,160 188,138 189,104 Z" fill="#e2b18f" stroke="none"/>
-<!-- hair: slicked back, greying -->
-<path d="M106,108 C96,62 122,34 156,34 C190,34 206,60 194,108 C192,86 184,74 168,70 C150,66 128,68 116,82 C110,90 108,98 106,108 Z" fill="#3b3c44"/>
-<path d="M120,60 Q146,44 178,52 M118,72 Q146,56 186,66 M132,46 Q158,40 184,48" stroke="#a9afbb" stroke-width="2.4" fill="none"/>
-<path d="M162,36 Q150,52 140,70" stroke="#23242a" stroke-width="2" fill="none"/>
-<path d="M108,104 Q106,96 110,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
-<path d="M192,104 Q194,96 190,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
-<path d="M104,98 Q96,52 150,38 Q206,48 198,98 Q190,80 150,76 Q114,78 104,98 Z" fill="#f4f1e8"/>
-<path d="M110,84 Q150,62 194,82 M114,70 Q152,50 190,66 M124,56 Q154,42 182,52" stroke="#c9c4b4" stroke-width="2" fill="none"/>
-<path d="M112,74 Q84,52 62,62 Q70,72 66,84 Q88,80 110,88 Z" fill="#f4f1e8"/>
-<path d="M70,66 Q88,70 106,80 M68,78 Q88,80 108,86" stroke="#c9c4b4" stroke-width="1.6" fill="none"/>
-<!-- brows: thick, condescending -->
-<path d="M119,93 L142,99" stroke-width="5.5"/>
-<path d="M158,99 L181,93" stroke-width="5.5"/>
-<!-- eyes: half-lidded, smug -->
-<path d="M121,114 Q133,108 146,114 Q134,123 121,114 Z" fill="#fff" stroke-width="1.6"/>
-<path d="M154,114 Q167,108 179,114 Q166,123 154,114 Z" fill="#fff" stroke-width="1.6"/>
-<circle cx="135" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
-<circle cx="167" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
-<circle cx="137" cy="114" r="1.8" fill="#fff" stroke="none"/>
-<circle cx="169" cy="114" r="1.8" fill="#fff" stroke="none"/>
-<path d="M118,112 Q133,105 147,112" stroke-width="4.2" fill="none"/>
-<path d="M153,112 Q167,105 182,112" stroke-width="4.2" fill="none"/>
-<path d="M124,112 Q134,109 144,113 L144,115 Q134,112 124,114 Z" fill="#e2b18f" stroke="none"/>
-<path d="M156,113 Q166,109 176,112 L176,114 Q166,112 156,115 Z" fill="#e2b18f" stroke="none"/>
-<path d="M124,121 Q132,124 140,122 M160,122 Q168,124 176,121" stroke="#c98f6e" stroke-width="1.3" fill="none"/>
-<ellipse cx="128" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/><ellipse cx="172" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/>
-<g fill="none" stroke="#1a1418" stroke-width="2.2"><circle cx="134" cy="116" r="13"/><circle cx="167" cy="116" r="13"/><path d="M147,114 Q150.5,110 154,114 M121,113 L106,108 M180,113 L194,108"/></g>
-<path d="M126,108 Q130,105 134,106" stroke="#fff" stroke-width="2" fill="none" opacity=".8"/>
-<!-- nose -->
-<path d="M151,120 L147,136 L153,137" stroke="#b97d5d" stroke-width="2" fill="none"/>
-<!-- smile lines -->
-<path d="M130,138 Q127,148 132,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
-<path d="M170,138 Q173,148 168,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
-<!-- mustache -->
-<path d="M135,146 Q150,138 165,146 Q160,152 150,149 Q140,152 135,146 Z" fill="#3b3c44" stroke-width="1.8"/>
-<path d="M142,145 Q150,142 158,145" stroke="#a9afbb" stroke-width="1.4" fill="none"/>
-<!-- smirk -->
-<path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
-</g>
-</g></svg></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v1.9</span></p></div></div>
+  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.0</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -222,11 +202,16 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
   <div class="seg" id="spice"><button data-v="family">🟢 Family</button><button data-v="spicy">🟠 Spicy</button><button data-v="uncut">🔴 Uncut</button></div>
   <p class="hint" id="spiceHint"></p>
 
-  <span class="lbl">Co-host ear (he hears your last 30 seconds without the mic button)</span>
+  <span class="lbl">Co-host ear (needed for the CO-HOST button to hear you)</span>
   <div class="seg" id="earSeg"><button data-v="0">Off</button><button data-v="1">👂 On</button></div>
   <span class="lbl">Uncle jumps in on his own (needs the ear)</span>
   <div class="seg" id="chimeSeg"><button data-v="off">Off</button><button data-v="rare">Rare</button><button data-v="often">Often</button></div>
   <p class="hint">With the ear on: press <b>R</b> (or a clicker's ▶) or say <b>“what do you think, Uncle?”</b> and he answers what you just said. Listening pauses while he talks. The wake phrase works best in Chrome on a Mac; on iPhone use 🎯 React. Rare = a one-liner every couple of minutes at most; he stays quiet when he has nothing good.</p>
+  <span class="lbl">Look on air</span>
+  <div class="row"><select id="orbSel" aria-label="Orb colour"></select><select id="bgSel" aria-label="Background"></select></div>
+  <p class="hint">Any orb works with any background. You can also change both on air from ⋯.</p>
+  <span class="lbl">Auto-play his script reply when I read my line</span>
+  <div class="seg" id="autoSeg"><button data-v="1">On</button><button data-v="0">Off</button></div>
   <span class="lbl">Pre-record his script lines when you go on air</span>
   <div class="seg" id="preSeg"><button data-v="1">On (instant ▶)</button><button data-v="0">Off</button></div>
   <p class="hint">Records every “Uncle:” line from your script in the first minute, so ▶ Script line plays with no wait. Saved lines are reused next time for free.</p>
@@ -258,146 +243,41 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 
 <!-- ===== LIVE STAGE ===== -->
 <div id="live" class="hidden">
-  <div id="stage">
-    <div id="bg"><svg  viewBox="0 0 1920 1080"><defs><pattern id="lp" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#6a452c"/><path d="M7,2 L12,7 L7,12 L2,7 Z" fill="#8c6440"/><circle cx="7" cy="7" r="1.4" fill="#c9a578"/><circle cx="0" cy="0" r="2" fill="#4a2f1e"/><circle cx="22" cy="22" r="2" fill="#4a2f1e"/></pattern>
-<pattern id="dm" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#cdbb8e"/><path d="M20,4 Q30,12 20,20 Q10,12 20,4 Z M20,20 Q30,28 20,36 Q10,28 20,20 Z" fill="#b6a273"/><circle cx="0" cy="20" r="4" fill="#b6a273"/><circle cx="40" cy="20" r="4" fill="#b6a273"/></pattern>
-<radialGradient id="brass" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#fff1b8"/><stop offset=".35" stop-color="#e2bb5e"/><stop offset=".75" stop-color="#a87a2a"/><stop offset="1" stop-color="#6b4a14"/></radialGradient>
-<linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#4a2414"/><stop offset=".5" stop-color="#7a3e22"/><stop offset="1" stop-color="#3a1c10"/></linearGradient>
-<radialGradient id="iris" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#8a5a32"/><stop offset=".6" stop-color="#4a2a16"/><stop offset="1" stop-color="#1e120a"/></radialGradient>
-<pattern id="wp" width="60" height="80" patternUnits="userSpaceOnUse"><rect width="60" height="80" fill="#6f7a5a"/><path d="M30,8 Q44,22 30,40 Q16,22 30,8 Z M30,40 Q44,58 30,76 Q16,58 30,40 Z" fill="#7d8866"/><circle cx="0" cy="40" r="5" fill="#7d8866"/><circle cx="60" cy="40" r="5" fill="#7d8866"/></pattern></defs>
-<rect  fill="url(#wp)"/><rect  fill="#3a2410" opacity=".25"/>
-<rect y="700" width="1920" height="40" fill="#5a3418"/><rect y="740" width="1920" height="200" fill="#6b4024"/>
-<g stroke="#3a1c10" stroke-width="3"><rect x="0" y="760" width="140" height="160" fill="none"/><rect x="160" y="760" width="140" height="160" fill="none"/><rect x="320" y="760" width="140" height="160" fill="none"/><rect x="480" y="760" width="140" height="160" fill="none"/><rect x="640" y="760" width="140" height="160" fill="none"/><rect x="800" y="760" width="140" height="160" fill="none"/><rect x="960" y="760" width="140" height="160" fill="none"/><rect x="1120" y="760" width="140" height="160" fill="none"/><rect x="1280" y="760" width="140" height="160" fill="none"/><rect x="1440" y="760" width="140" height="160" fill="none"/><rect x="1600" y="760" width="140" height="160" fill="none"/><rect x="1760" y="760" width="140" height="160" fill="none"/></g>
-<rect y="930" width="1920" height="150" fill="#4a2a16"/><rect x="0" y="930" width="4" height="150" fill="#3a1c10"/><rect x="120" y="930" width="4" height="150" fill="#3a1c10"/><rect x="240" y="930" width="4" height="150" fill="#3a1c10"/><rect x="360" y="930" width="4" height="150" fill="#3a1c10"/><rect x="480" y="930" width="4" height="150" fill="#3a1c10"/><rect x="600" y="930" width="4" height="150" fill="#3a1c10"/><rect x="720" y="930" width="4" height="150" fill="#3a1c10"/><rect x="840" y="930" width="4" height="150" fill="#3a1c10"/><rect x="960" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1080" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1200" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1320" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1440" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1560" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1680" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1800" y="930" width="4" height="150" fill="#3a1c10"/><rect x="1920" y="930" width="4" height="150" fill="#3a1c10"/>
-<g stroke="#1a1012" stroke-width="5" transform="translate(0,-60)"><rect x="60" y="150" width="190" height="240" fill="#c9a24a"/><rect x="78" y="168" width="154" height="204" fill="#e9d9b0"/></g>
-<path d="M155,190 L135,250 L120,300 L190,300 L175,250 Z" fill="#c9a24a" stroke="#1a1012" stroke-width="3"/><rect x="100" y="300" width="110" height="40" fill="#8a6a3a" stroke="#1a1012" stroke-width="3"/><path d="M155,176 L155,192" stroke="#1a1012" stroke-width="3"/>
-<g stroke="#1a1012" stroke-width="4"><path d="M690,940 L690,330" fill="none"/><path d="M650,950 L730,950 L720,935 L660,935 Z" fill="#2a1c12"/><path d="M630,330 L750,330 L720,240 L660,240 Z" fill="#e9c98a"/></g>
-<ellipse cx="690" cy="300" rx="120" ry="90" fill="#ffd98a" opacity=".2"/>
-<g transform="translate(-70,345)" stroke="#1a1012" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><!-- side table -->
-<path d="M214,612 L238,612 L242,700 Q252,720 240,740 L244,820 L210,820 L214,740 Q202,720 212,700 Z" fill="url(#wood)"/>
-<path d="M226,810 Q180,830 150,890 L166,894 Q196,846 226,834 Q256,846 286,894 L302,890 Q272,830 226,810 Z" fill="url(#wood)"/>
-<ellipse cx="226" cy="604" rx="132" ry="22" fill="#5a2c18"/><path d="M94,604 Q94,620 226,626 Q358,620 358,604" fill="#3a1c10"/>
-<!-- gramophone box -->
-<path d="M150,500 L304,500 L304,584 L150,584 Z" fill="url(#wood)"/>
-<path d="M150,500 L304,500 L304,512 L150,512 Z M150,572 L304,572 L304,584 L150,584 Z" fill="#3a1c10"/>
-<path d="M162,516 L162,568 M292,516 L292,568" stroke="#a86a3a" stroke-width="5"/>
-<path d="M304,540 L322,540" stroke-width="5"/><circle cx="324" cy="540" r="4" fill="#c9ced8"/>
-<ellipse cx="226" cy="498" rx="70" ry="9" fill="#1a1012"/>
-<path d="M268,494 Q258,470 234,474" stroke="#c9ced8" stroke-width="6" fill="none"/><path d="M268,494 Q258,470 234,474" stroke="#1a1012" stroke-width="1.6" fill="none"/>
-<!-- horn -->
-<path d="M262,474 Q278,440 268,410 Q258,384 236,362 L250,350 Q276,374 286,404 Q296,440 278,480 Z" fill="url(#brass)"/>
-<path d="M236,364 Q150,330 140,240 Q138,178 196,160 Q250,146 300,170 Q356,200 344,264 Q330,330 250,350 Z" fill="url(#brass)"/>
-<path d="M196,160 Q150,210 236,364 M250,152 Q236,240 244,356 M300,170 Q300,260 248,352 M344,264 Q300,300 250,350 M140,240 Q180,300 238,362" stroke="#8a6420" stroke-width="2" fill="none"/>
-<ellipse cx="248" cy="240" rx="70" ry="62" fill="#5a3a0e" opacity=".55" stroke="none"/><ellipse cx="252" cy="236" rx="30" ry="26" fill="#2a1a06" opacity=".7" stroke="none"/>
-<path d="M140,240 Q138,178 196,160 Q250,146 300,170 Q356,200 344,264" stroke="#fff4c4" stroke-width="2.4" fill="none" opacity=".7"/>
-<!-- rotary phone -->
-<path d="M120,594 L136,556 Q176,546 216,556 L232,594 Z" fill="#141414"/>
-<path d="M112,556 Q110,534 130,532 L222,532 Q242,534 240,556 L224,560 Q222,548 210,546 L142,546 Q130,548 128,560 Z" fill="#1e1e20"/>
-<circle cx="176" cy="574" r="15" fill="#2a2a2e"/><circle cx="176" cy="574" r="6" fill="#d9d9d9"/>
-<path d="M118,590 Q100,620 112,650 Q124,680 104,700" stroke="#141414" stroke-width="4" fill="none" stroke-dasharray="3 3"/>
-</g>
-</svg></div>
-    <div id="uncle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="30 -24 250 574" ><defs>
-<radialGradient id="iris" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#8a5a32"/><stop offset=".6" stop-color="#4a2a16"/><stop offset="1" stop-color="#1e120a"/></radialGradient>
-<pattern id="silk" width="18" height="10" patternUnits="userSpaceOnUse"><rect width="18" height="10" fill="#f3f1ea"/><rect x="2" width="2" height="10" fill="#cfccc2"/><rect x="7" width="1" height="10" fill="#b5b2a8"/><rect x="12" width="3" height="10" fill="#e2dfd5"/></pattern>
-<linearGradient id="fold" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".3" stop-color="#000" stop-opacity="0"/><stop offset=".75" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient></defs>
-<g stroke="#1a1418" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
-<!-- socks + lace-up shoes -->
-<path d="M110,500 L136,500 L136,522 L110,522 Z M164,500 L190,500 L190,522 L164,522 Z" fill="#3a3a42"/>
-<path d="M104,520 L138,518 Q158,522 160,540 L100,540 Q98,528 104,520 Z" fill="#141416"/>
-<path d="M162,518 L196,520 Q202,528 200,540 L140,540 Q142,522 162,518 Z" fill="#141416"/>
-<path d="M120,522 L130,528 M126,520 L134,526 M174,520 L184,526 M180,522 L188,528" stroke="#55555f" stroke-width="1.6"/>
-<path d="M140,532 Q150,530 156,534 M106,530 Q112,528 118,530" stroke="#9aa2b2" stroke-width="2" fill="none"/>
-<!-- silk longyi -->
-<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#silk)"/>
-<path d="M86,342 L214,342 L210,508 L90,508 Z" fill="url(#fold)" stroke="none"/>
-<path d="M164,350 Q186,420 180,506 L210,506 L214,346 Z" fill="url(#silk)"/>
-<path d="M164,350 Q186,420 180,506" fill="none"/>
-<path d="M120,352 L114,506 M140,352 L138,506 M196,360 L198,504" stroke="#a8a59c" stroke-width="1.4" opacity=".7" fill="none"/>
-<path d="M158,340 Q176,334 190,344 Q194,360 180,368 Q164,370 158,356 Z" fill="url(#silk)"/>
-<!-- left arm + book -->
-<path d="M96,212 L74,334 L98,340 L114,238 Z" fill="#26262e"/>
-<path d="M72,330 L98,336 L96,346 L70,340 Z" fill="#f4f1e8"/>
-<path d="M66,346 L102,346 L102,404 L66,404 Z" fill="#7a4a2a"/><path d="M66,346 L72,346 L72,404 L66,404 Z" fill="#5a3418"/>
-<path d="M70,340 Q66,356 80,360 Q96,360 98,346 Z" fill="#f2c9a6"/>
-<!-- right arm -->
-<path d="M204,212 L226,334 L202,340 L188,238 Z" fill="#26262e"/>
-<path d="M228,330 L202,336 L204,346 L230,340 Z" fill="#f4f1e8"/>
-<path d="M204,344 Q202,362 214,366 Q228,364 230,342 Z" fill="#f2c9a6"/>
-<path d="M210,352 L210,362 M218,352 L218,363" stroke="#c98f6e" stroke-width="1.3"/>
-<!-- jacket (taikpon) -->
-<path d="M94,212 Q100,196 137,190 L163,190 Q200,196 206,212 L216,352 L84,352 Z" fill="#26262e"/>
-<path d="M190,214 L206,352 L186,352 L182,230 Z" fill="#34343e" stroke="none"/>
-<g fill="#7c7c8a" stroke-width="1.2"><rect x="138" y="226" width="26" height="5" rx="2.5"/><rect x="138" y="256" width="26" height="5" rx="2.5"/><rect x="138" y="286" width="26" height="5" rx="2.5"/><rect x="138" y="316" width="26" height="5" rx="2.5"/></g>
-<path d="M150,200 L150,350" stroke="#3e3e4a" stroke-width="1.6" fill="none"/>
-<path d="M98,292 L134,292 L134,336 L98,336 Z M166,292 L202,292 L202,336 L166,336 Z M166,236 L196,236 L196,264 L166,264 Z" fill="none" stroke="#4a4a58" stroke-width="2"/>
-<path d="M174,240 L174,224 M182,240 L182,226" stroke="#c9ced8" stroke-width="3"/>
-<circle cx="120" cy="244" r="7" fill="#f4f1e8" stroke-width="1.6"/>
-<!-- neck + collar -->
-<path d="M138,166 L162,166 L163,194 L137,194 Z" fill="#f2c9a6"/>
-<path d="M134,186 Q150,196 166,186 L168,200 Q150,210 132,200 Z" fill="#f4f1e8"/>
-<g transform="translate(150,190) scale(1.2) translate(-150,-190)"><!-- ears -->
-<path d="M110,104 Q100,104 102,118 Q104,134 114,134 Z" fill="#f2c9a6"/>
-<path d="M190,104 Q200,104 198,118 Q196,134 186,134 Z" fill="#f2c9a6"/>
-<!-- face -->
-<path d="M111,92 C110,138 124,164 150,176 C176,164 190,138 189,92 C189,74 172,62 150,62 C128,62 111,74 111,92 Z" fill="#f2c9a6"/>
-<path d="M176,100 C186,130 178,156 158,172 C176,160 188,138 189,104 Z" fill="#e2b18f" stroke="none"/>
-<!-- hair: slicked back, greying -->
-<path d="M106,108 C96,62 122,34 156,34 C190,34 206,60 194,108 C192,86 184,74 168,70 C150,66 128,68 116,82 C110,90 108,98 106,108 Z" fill="#3b3c44"/>
-<path d="M120,60 Q146,44 178,52 M118,72 Q146,56 186,66 M132,46 Q158,40 184,48" stroke="#a9afbb" stroke-width="2.4" fill="none"/>
-<path d="M162,36 Q150,52 140,70" stroke="#23242a" stroke-width="2" fill="none"/>
-<path d="M108,104 Q106,96 110,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
-<path d="M192,104 Q194,96 190,90" stroke="#a9afbb" stroke-width="2.2" fill="none"/>
-<path d="M104,98 Q96,52 150,38 Q206,48 198,98 Q190,80 150,76 Q114,78 104,98 Z" fill="#f4f1e8"/>
-<path d="M110,84 Q150,62 194,82 M114,70 Q152,50 190,66 M124,56 Q154,42 182,52" stroke="#c9c4b4" stroke-width="2" fill="none"/>
-<path d="M112,74 Q84,52 62,62 Q70,72 66,84 Q88,80 110,88 Z" fill="#f4f1e8"/>
-<path d="M70,66 Q88,70 106,80 M68,78 Q88,80 108,86" stroke="#c9c4b4" stroke-width="1.6" fill="none"/>
-<!-- brows: thick, condescending -->
-<path d="M119,93 L142,99" stroke-width="5.5"/>
-<path d="M158,99 L181,93" stroke-width="5.5"/>
-<!-- eyes: half-lidded, smug -->
-<path d="M121,114 Q133,108 146,114 Q134,123 121,114 Z" fill="#fff" stroke-width="1.6"/>
-<path d="M154,114 Q167,108 179,114 Q166,123 154,114 Z" fill="#fff" stroke-width="1.6"/>
-<circle cx="135" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
-<circle cx="167" cy="116" r="5.4" fill="url(#iris)" stroke="none"/>
-<circle cx="137" cy="114" r="1.8" fill="#fff" stroke="none"/>
-<circle cx="169" cy="114" r="1.8" fill="#fff" stroke="none"/>
-<path d="M118,112 Q133,105 147,112" stroke-width="4.2" fill="none"/>
-<path d="M153,112 Q167,105 182,112" stroke-width="4.2" fill="none"/>
-<path d="M124,112 Q134,109 144,113 L144,115 Q134,112 124,114 Z" fill="#e2b18f" stroke="none"/>
-<path d="M156,113 Q166,109 176,112 L176,114 Q166,112 156,115 Z" fill="#e2b18f" stroke="none"/>
-<path d="M124,121 Q132,124 140,122 M160,122 Q168,124 176,121" stroke="#c98f6e" stroke-width="1.3" fill="none"/>
-<ellipse cx="128" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/><ellipse cx="172" cy="132" rx="8" ry="3.5" fill="#f19c8c" opacity=".45" stroke="none"/>
-<g fill="none" stroke="#1a1418" stroke-width="2.2"><circle cx="134" cy="116" r="13"/><circle cx="167" cy="116" r="13"/><path d="M147,114 Q150.5,110 154,114 M121,113 L106,108 M180,113 L194,108"/></g>
-<path d="M126,108 Q130,105 134,106" stroke="#fff" stroke-width="2" fill="none" opacity=".8"/>
-<!-- nose -->
-<path d="M151,120 L147,136 L153,137" stroke="#b97d5d" stroke-width="2" fill="none"/>
-<!-- smile lines -->
-<path d="M130,138 Q127,148 132,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
-<path d="M170,138 Q173,148 168,156" stroke="#c98f6e" stroke-width="1.6" fill="none"/>
-<!-- mustache -->
-<path d="M135,146 Q150,138 165,146 Q160,152 150,149 Q140,152 135,146 Z" fill="#3b3c44" stroke-width="1.8"/>
-<path d="M142,145 Q150,142 158,145" stroke="#a9afbb" stroke-width="1.4" fill="none"/>
-<!-- smirk -->
-<path d="M141,157 Q153,161 163,152" stroke-width="2.4" fill="none"/>
-</g>
-</g></svg></div>
+  <div id="stage" class="dark">
+    <div id="beam"></div>
+    <div id="uncle" class="orbx"><div class="orbhalo"></div><div class="wave"></div><div class="wave w2"></div><div class="orbcore"></div>
+      <svg class="rings" viewBox="0 0 760 760"><g transform="rotate(-16 380 380)" fill="none"><ellipse cx="380" cy="380" rx="330" ry="108" stroke="var(--ring)" stroke-opacity=".3" stroke-width="2" stroke-dasharray="6 12"/><ellipse cx="380" cy="380" rx="236" ry="64" stroke="var(--ring)" stroke-opacity=".85" stroke-width="3.5"/><circle cx="146" cy="380" r="7" fill="var(--ring)"/><circle cx="690" cy="330" r="5" fill="var(--ring2)"/></g></svg>
+      <svg class="dots" viewBox="0 0 100 100"><circle cx="50" cy="4" r="3" fill="#fff"/><circle cx="90" cy="70" r="3" fill="#fff" opacity=".6"/><circle cx="10" cy="70" r="3" fill="#fff" opacity=".3"/></svg></div>
+    <div id="ulbl"><i></i><span id="pname">UNCLE</span></div>
     <div id="top"><span id="show">JAMIE &amp; FRIENDS</span><span id="topic2"></span><span id="air">● ON AIR</span></div>
-    <div id="ear"><span id="earPill"></span><span id="wakePill"></span><span id="segPill"></span><span id="prePill"></span><span id="costPill" class="cost"></span></div>
     <div id="chat"></div>
     <button id="exit" aria-label="End show">✕</button>
-    <button id="hot" aria-label="Controls">⋯</button>
+    <button id="hot" aria-label="Hide or show controls" title="Hide or show controls (H)">◐</button>
     <div id="clock">00:00</div>
     <div id="micHint" class="hidden">● listening…</div>
     <div id="ctl">
+      <div id="nextLine"></div>
+      <div class="bar2"><button id="coBtn" class="co" aria-label="Co-host"><i></i>CO-HOST<small>Space · clicker</small></button><button id="roastAud" class="rb" aria-label="Roast the audience" title="Roast the audience">👥</button><button id="roastMe" class="rb" aria-label="Roast me" title="Roast me">👤</button><button id="setBtn" class="rb set" aria-label="Settings" title="Settings">⋯</button></div>
+    </div>
+    <div id="panel" class="hidden">
+      <div class="ph"><b>Settings</b><button id="panelX" aria-label="Close">✕</button></div>
+      <div id="ear"><span id="earPill"></span><span id="wakePill"></span><span id="segPill"></span><span id="prePill"></span><span id="costPill" class="cost"></span></div>
+      <div class="pk">Look</div>
+      <div class="prow"><select id="orbSel2" aria-label="Orb"></select><select id="bgSel2" aria-label="Background"></select></div>
+      <div class="pk">Script · tap a line to jump there</div>
+      <div id="slist"></div>
+      <div class="pk">More</div>
       <div class="quick">
-        <button class="react" id="reactBtn">🎯 React</button><button class="chime" id="chimeBtn">💬 Chime off</button><button data-q="go">ဆက်ပြော</button><button data-q="argue">ငြင်းစမ်း</button><button data-q="history">သမိုင်း</button><button data-q="funny">ရယ်စရာ</button><button data-q="wrap">အနှစ်ချုပ်</button>
-        <button class="cue" id="modelBtn" style="background:#5a3b8a">🧠 Sonnet</button><button class="cue" id="cueBtn">▶ Script line</button><button class="cue" id="segBtn">⏭ Segment</button><button class="cue" id="coldBtn">🎬 Cold open</button><button class="mark" id="markBtn">⭐ Clip</button><button class="stop" id="stopBtn">⏹ ရပ်</button>
+        <button class="cue" id="cueBtn">▶ Script line</button><button class="cue" id="segBtn">⏭ Segment</button><button class="react" id="reactBtn">🎯 React</button><button class="chime" id="chimeBtn">💬 Chime off</button>
+        <button data-q="go">ဆက်ပြော</button><button data-q="argue">ငြင်းစမ်း</button><button data-q="history">သမိုင်း</button><button data-q="funny">ရယ်စရာ</button><button data-q="wrap">အနှစ်ချုပ်</button>
+        <button class="cue" id="modelBtn" style="background:#5a3b8a">🧠 Sonnet</button><button class="cue" id="coldBtn">🎬 Cold open</button><button class="mark" id="markBtn">⭐ Clip</button><button class="stop" id="stopBtn">⏹ ရပ်</button>
       </div>
-      <div class="bar"><button id="mic" aria-label="Hold to talk">🎙</button><input id="say" placeholder="Type to Uncle… · Space talk · R react · S script line · N next segment" autocomplete="off"><button id="send">Send</button></div>
+      <div class="bar"><button id="mic" aria-label="Hold to talk">🎙</button><input id="say" placeholder="Type to the co-host…" autocomplete="off"><button id="send">Send</button></div>
+      <div class="phint">Keys: Space / R / clicker ▶ = CO-HOST · S = script line · N = next segment · H = hide controls · Esc = stop</div>
     </div>
   </div>
 </div>
+
 
 <!-- ===== SHOW NOTES ===== -->
 <div id="notes" class="hidden"><div class="pane"><h2 style="margin:0 0 8px;color:var(--gold)">Show notes</h2><div id="notesBody" class="hint">Uncle is writing the notes…</div><pre id="notesPre" class="hidden"></pre><div class="row"><button class="btn sec" id="copyNotes">Copy</button><button class="btn sec" id="closeNotes">Done</button></div></div></div>
@@ -410,7 +290,7 @@ const $=s=>document.querySelector(s);
 const st={get(k,d){try{const v=localStorage.getItem("ul_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ul_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
 const raw=(k)=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const MY=/[က-႟ꩠ-ꩿ]/;
-let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:0,chime:"off",pre:1},st.get("s",{}));
+let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:1,chime:"off",pre:1,orb:"Arc Reactor",bg:"Matte Black",auto:1,pname:"UNCLE"},st.get("s",{}));
 const saveS=()=>st.set("s",S);
 let AKEY=st.get("akey",""),EKEY=st.get("ekey","");
 let EPS=st.get("eps",[]);
@@ -421,6 +301,34 @@ try{
   if(!S.vid){const cs=JSON.parse(raw("ck_settings")||"{}");if(cs.el&&cs.el.ids&&cs.el.ids.kyi)S.vid=cs.el.ids.kyi;
     if(!S.vid){const b=JSON.parse(raw("bmp_ids")||"{}");if(b.u)S.vid=b.u}if(S.vid)saveS()}
 }catch(e){}
+/* ============================== LOOKS ============================== */
+const jewel=(c)=>`radial-gradient(circle at 34% 28%,rgba(255,250,235,.95) 0,rgba(255,240,210,.5) 7%,rgba(255,240,210,0) 27%),radial-gradient(circle at 50% 50%,rgba(255,255,255,0) 54%,rgba(0,0,0,.4) 78%,rgba(0,0,0,.88) 100%),radial-gradient(circle at 28% 72%,${c[0]} 0,rgba(0,0,0,0) 48%),radial-gradient(circle at 76% 30%,${c[1]} 0,rgba(0,0,0,0) 48%),radial-gradient(circle at 62% 86%,${c[2]} 0,rgba(0,0,0,0) 44%),linear-gradient(140deg,${c[3]} 0%,${c[4]} 58%,${c[5]} 100%)`;
+const ORBS={
+ "Arc Reactor":{core:"radial-gradient(circle at 50% 50%,#ffffff 0,#bff4ff 7%,rgba(60,200,255,.9) 16%,rgba(20,90,200,.5) 34%,rgba(0,0,0,0) 50%),repeating-radial-gradient(circle at 50% 50%,rgba(120,220,255,0) 0 8.5%,rgba(120,220,255,.35) 9% 10%,rgba(120,220,255,0) 10.5% 16%),radial-gradient(circle at 50% 50%,rgba(0,0,0,0) 58%,#000 100%),linear-gradient(140deg,#0a1f4a,#020711)",g1:"rgba(60,200,255,.5)",g2:"rgba(20,60,200,.22)",ring:"#5fb4ff",ring2:"#bfe6ff"},
+ "Navy Core":{core:"radial-gradient(circle at 50% 50%,#eaf6ff 0,#7cc4ff 9%,rgba(40,110,255,.85) 24%,rgba(14,40,140,.55) 46%,rgba(0,0,0,0) 62%),radial-gradient(circle at 34% 28%,rgba(180,220,255,.45) 0,rgba(180,220,255,0) 22%),radial-gradient(circle at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,10,.7) 82%,#000 100%),linear-gradient(140deg,#0e2a6e 0%,#06163f 60%,#01040e 100%)",g1:"rgba(40,110,255,.5)",g2:"rgba(20,60,200,.22)",ring:"#5fb4ff",ring2:"#bfe6ff"},
+ "Deep Space":{core:"radial-gradient(circle at 34% 30%,rgba(140,190,255,.55) 0,rgba(140,190,255,0) 26%),radial-gradient(circle at 70% 70%,rgba(90,60,220,.55) 0,rgba(90,60,220,0) 40%),radial-gradient(circle at 30% 75%,rgba(30,120,255,.6) 0,rgba(30,120,255,0) 40%),radial-gradient(circle at 50% 50%,rgba(0,0,0,0) 54%,#000 100%),linear-gradient(140deg,#13245e,#050a24 60%,#000)",g1:"rgba(70,90,255,.45)",g2:"rgba(90,60,220,.2)",ring:"#8fa4ff",ring2:"#c9b8ff"},
+ "Hologram":{core:"repeating-linear-gradient(0deg,rgba(110,190,255,.55) 0 1.5%,rgba(110,190,255,0) 1.5% 5%),radial-gradient(circle at 50% 50%,rgba(40,120,255,.4) 0,rgba(10,30,90,.6) 60%,rgba(0,0,0,.85) 100%)",g1:"rgba(100,190,255,.45)",g2:"rgba(20,80,200,.2)",ring:"#6fc8ff",ring2:"#d6f0ff"},
+ "Eclipse Blue":{core:"radial-gradient(circle at 45% 40%,#0c1430 0,#03060f 62%,#000 100%)",g1:"rgba(60,140,255,.7)",g2:"rgba(40,120,255,.3)",ring:"#5fb4ff",ring2:"#bfe6ff"},
+ "Ruby":{core:jewel(["#e8304a","#f5c25a","#7a0616","#c62b3a","#5a0a16","#0b0205"]),g1:"rgba(215,38,61,.42)",g2:"rgba(242,184,75,.24)",ring:"#f5c25a",ring2:"#ff5a7a"},
+ "Jade":{core:jewel(["#3fd9a0","#d9c36a","#0b5a44","#1f9a72","#0b4a3a","#02140f"]),g1:"rgba(40,180,130,.42)",g2:"rgba(217,195,106,.24)",ring:"#d9c36a",ring2:"#3fd9a0"},
+ "Sapphire":{core:jewel(["#3f8cff","#9fd8ff","#14246e","#2f5bd6","#10206a","#030612"]),g1:"rgba(60,120,255,.42)",g2:"rgba(150,210,255,.24)",ring:"#9fd8ff",ring2:"#3f8cff"},
+ "Amethyst":{core:jewel(["#b45cff","#ff8ad8","#3a0e6e","#7c3ad6","#2e0f5e","#08030f"]),g1:"rgba(160,90,255,.42)",g2:"rgba(255,138,216,.22)",ring:"#ff8ad8",ring2:"#b45cff"},
+ "Gold":{core:jewel(["#ffd36b","#fff0b0","#8a5a10","#e0a530","#7a4a0c","#1a0e02"]),g1:"rgba(240,180,60,.45)",g2:"rgba(255,230,150,.26)",ring:"#ffd36b",ring2:"#fff0b0"},
+ "Onyx":{core:jewel(["#6a6a78","#e8c88a","#1a1a22","#3a3a46","#16161c","#000000"]),g1:"rgba(60,60,80,.35)",g2:"rgba(232,200,138,.22)",ring:"#e8c88a",ring2:"#9a9aaa"}};
+const BGS={
+ "Matte Black":{css:"#0e0e10",dark:1},"Graphite":{css:"#1a1b1f",dark:1},"Midnight Navy":{css:"#0a1020",dark:1},
+ "Blue-black Vignette":{css:"radial-gradient(ellipse at 22% 45%,#10203f 0,#070b16 45%,#030407 100%)",dark:1},
+ "Carbon Grid":{css:"repeating-linear-gradient(0deg,rgba(80,140,255,.06) 0 1px,transparent 1px 2.2cqw),repeating-linear-gradient(90deg,rgba(80,140,255,.06) 0 1px,transparent 1px 2.2cqw),#0b0d12",dark:1},
+ "Charcoal":{css:"#1f1b1d",dark:1},
+ "Parchment":{css:"#f3e9d6"},"Cream":{css:"#f7f1e3"},"Blush":{css:"#f9e4ec"},"Sage":{css:"#e9f0e3"},"Sky":{css:"#e2eef9"},"Lavender":{css:"#ebe6f8"},"Peach":{css:"#fbe9e1"}};
+function fillLookSelects(){[["#orbSel","#orbSel2",ORBS,"orb"],["#bgSel","#bgSel2",BGS,"bg"]].forEach(([a,b,src,k])=>{[a,b].forEach(id=>{const el=$(id);if(!el)return;if(!el.options.length)Object.keys(src).forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=(k==="orb"?"Orb: ":"Background: ")+n;el.appendChild(o)});el.value=S[k]})})}
+function applyLook(){const o=ORBS[S.orb]||ORBS["Arc Reactor"],b=BGS[S.bg]||BGS["Matte Black"],stg=$("#stage");if(!stg)return;
+  stg.style.setProperty("--stagebg",b.css);stg.classList.toggle("dark",!!b.dark);
+  [stg,document.documentElement].forEach(e=>{e.style.setProperty("--ring",o.ring);e.style.setProperty("--ring2",o.ring2);e.style.setProperty("--g1",o.g1)});
+  document.querySelectorAll(".orbcore").forEach(e=>{e.style.background=o.core;e.style.boxShadow=e.closest("#uncle")?`0 0 3cqw .6cqw ${o.g1},0 0 8cqw 2cqw ${o.g2}`:`0 0 14px 3px ${o.g1},0 0 34px 8px ${o.g2}`});
+  document.querySelectorAll(".orbhalo").forEach(e=>{e.style.background=`radial-gradient(circle,${o.g1} 0,${o.g2} 36%,rgba(0,0,0,0) 70%)`});
+  const bm=$("#beam");if(bm)bm.style.background=`radial-gradient(ellipse at 50% 8%,${o.g2} 0,rgba(0,0,0,0) 65%)`;
+  const pn=$("#pname");if(pn)pn.textContent=S.pname||"UNCLE"}
 let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),3200)}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 function now(){return Date.now()}
@@ -571,9 +479,16 @@ function scriptLines(){return String(S.script||"").split("\n").map(x=>x.trim()).
 function lineWho(l){const m=l.match(/^(uncle|ဦးလေး|jamie|me|ကျွန်တော်)\s*[:：]\s*([\s\S]*)$/i);if(!m)return null;return{who:/^(uncle|ဦးလေး)/i.test(m[1])?"u":"j",text:m[2].trim()}}
 let ptr=0;
 function wordsOf(t){return String(t).toLowerCase().replace(/[.,!?;:"'“”‘’()\-၊။|]/g," ").split(/\s+/).filter(w=>w.length>=2)}
-function advancePtr(said){const L=scriptLines();const sw=new Set(wordsOf(said));if(!sw.size)return;let best=-1,bs=0;
-  for(let i=ptr;i<Math.min(L.length,ptr+12);i++){const lw=lineWho(L[i]);if(!lw||lw.who!=="j")continue;const w=wordsOf(lw.text.split("|")[0]);if(w.length<2)continue;let k=0;w.forEach(x=>{if(sw.has(x))k++});const s=k/w.length;if(s>bs){bs=s;best=i}}
-  if(best>=0&&bs>=0.45)ptr=best+1}
+function grams(t){const c=String(t).toLowerCase().replace(/[\s.,!?;:"'“”‘’()\-၊။|…]/g,"");const g=new Set();for(let i=0;i<c.length-1;i++)g.add(c.slice(i,i+2));return g}
+function lineScore(lineGrams,saidGrams){if(lineGrams.size<3)return 0;let k=0;lineGrams.forEach(x=>{if(saidGrams.has(x))k++});return k/lineGrams.size}
+/* find which "Jamie:" line was just said, anywhere in the script; prefers the furthest match near the bookmark */
+function findLine(said){const L=scriptLines(),sg=grams(said);if(sg.size<3)return -1;const hits=[];
+  L.forEach((l,i)=>{const lw=lineWho(l);if(!lw||lw.who!=="j")return;const sc=lineScore(grams(lw.text.split("|")[0]),sg);if(sc>=0.55)hits.push({i,sc})});
+  if(!hits.length)return -1;const near=hits.filter(h=>h.i>=ptr-1&&h.i<=ptr+16);
+  if(near.length)return Math.max(...near.map(h=>h.i));
+  const top=Math.max(...hits.map(h=>h.sc));const best=hits.filter(h=>h.sc>=top-0.05);return Math.max(...best.map(h=>h.i))}
+function advancePtr(said){const m=findLine(said);if(m>=0){ptr=m+1;return true}return false}
+function nextUncleIdx(){const L=scriptLines();for(let i=ptr;i<L.length;i++){const lw=lineWho(L[i]);if(lw&&lw.who==="u")return i}return -1}
 function scriptContext(){const L=scriptLines();if(!L.length)return"";const full=L.join("\n");
   return "JAMIE'S SCRIPT & NOTES FOR THIS EPISODE:\n"+(full.length>7000?full.slice(0,7000)+"\n…(trimmed)":full)}
 function spotContext(){const L=scriptLines();if(!L.some(l=>lineWho(l)))return"";const a=Math.max(0,ptr-3),b=Math.min(L.length,ptr+6);const sg=curSeg();
@@ -584,7 +499,7 @@ let transcript=[],showStart=0,marks=[];
 function recentContext(){const r=transcript.slice(-10);if(!r.length)return"";return"JUST NOW ON THE SHOW:\n"+r.map(x=>(x.who==="j"?S.name:"Uncle")+": "+(x.en||x.my)).join("\n")}
 function buildMsg(user){const parts=[spotContext(),recentContext(),user].filter(Boolean);return parts.join("\n\n")}
 function stableSys(){return [sysPrompt(),`EPISODE: "${S.show||"Jamie & Friends"}" · topic: ${S.topic||"(none given)"} · spice: ${S.spice}`,memoryContext(),scriptContext(),prepContext()].filter(Boolean).join("\n\n")}
-const DIRECTIONS={go:"[Jamie signals: keep going. Add one more thought or joke on what you were just saying, then stop.]",argue:"[Jamie signals: argue the other side. Disagree with the last point made, yours or his, and make the opposite case with one sharp reason.]",history:"[Jamie signals: give the history or background behind this topic, one or two real, well-known facts, in your voice.]",funny:"[Jamie signals: make it funny. One dad joke or sharp roast about the current subject, then a one-line kicker.]",wrap:"[Jamie signals: wrap up this segment. One-line summary in your voice, one last jab, then hand it back to Jamie.]"};
+const DIRECTIONS={roastAud:"[Jamie taps the 👥 button: roast the AUDIENCE watching the show. One or two short, sharp Burmese sentences mocking the viewers (watching at work, lurking without subscribing, typing essays in the comments), tied to the current topic if it fits. Stay neutral on political parties.]",roastMe:"[Jamie taps the 👤 button: roast JAMIE. One or two short, sharp Burmese sentences roasting Jamie, tied to the current topic or the last thing he said. Stay neutral on political parties.]",go:"[Jamie signals: keep going. Add one more thought or joke on what you were just saying, then stop.]",argue:"[Jamie signals: argue the other side. Disagree with the last point made, yours or his, and make the opposite case with one sharp reason.]",history:"[Jamie signals: give the history or background behind this topic, one or two real, well-known facts, in your voice.]",funny:"[Jamie signals: make it funny. One dad joke or sharp roast about the current subject, then a one-line kicker.]",wrap:"[Jamie signals: wrap up this segment. One-line summary in your voice, one last jab, then hand it back to Jamie.]"};
 
 /* ============================== ASK UNCLE ============================== */
 let busy=false,abortCtl=null;
@@ -596,11 +511,14 @@ function parseStream(full){const lines=full.split(/\r?\n/);const done=lines.slic
   const c=tagOf(cur),tagged=/^[\s*\-•>#]*(MY|EN|Uncle|ဦးလေး|Burmese|English)\s*[:：]/i.test(cur);
   return{my,en:en.join(" ")+(c&&c.k==="en"&&tagged?c.text:""),partial:c&&c.k==="my"&&(tagged||MY.test(c.text))?c.text:""}}
 let busySince=0;setInterval(()=>{if(busy&&busySince&&now()-busySince>60000){DBG.note("watchdog: reset a stuck turn");stopUncle();busy=false}},5000);
-async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)return;busy=true;busySince=now();setMicBusy(true);
+async function ask(text,opt={}){text=String(text||"").trim();if(!text||busy)return;
+  if(!opt.direction&&!opt.adlib&&Number(S.auto)!==0){const m=findLine(text);if(m>=0){ptr=m+1;addBubble("j",text,"",opt.label||"SCRIPT ✓");transcript.push({who:"j",my:text,en:text,t:now()-showStart});earReset();
+      if(nextUncleIdx()>=0){if(opt.reacted)VQ.stop();await cueNext()}else renderStrip();return}}
+  busy=true;busySince=now();setMicBusy(true);
   const direction=!!opt.direction;let bub=null,full="",spoken=0;
   try{unlock();
-    if(!direction){addBubble("j",text,"",opt.label);transcript.push({who:"j",my:text,en:text,t:now()-showStart});advancePtr(text);earReset()}
-    bub=addBubble("u","…","");bub.classList.add("think");$("#uncle").classList.add("think");
+    if(!direction){addBubble("j",text,"",opt.label);transcript.push({who:"j",my:text,en:text,t:now()-showStart});if(!opt.adlib)advancePtr(text);earReset()}
+    bub=addBubble("u","…","",opt.utag||(direction?"":"AD-LIB"));bub.classList.add("think");$("#uncle").classList.add("think");
     if(!opt.reacted){VQ.stop();if(elReady()&&!opt.quiet)VQ.push(REACT[Math.floor(Math.random()*REACT.length)],"")}
     abortCtl=new AbortController();
     const msg=buildMsg((direction?text:`[${S.name} → Uncle] ${text}`)+`\n(Burmese nickname available this reply: "${pickNick()}")`);
@@ -634,7 +552,7 @@ async function cueNext(){if(busy){toast("Let him finish.");return}const L=script
   const lw=lineWho(L[i]);ptr=i+1;const pr=lw.text.split("|").map(x=>x.trim());const my=pr[0],en=pr[1]||(MY.test(my)?"":my);
   await perform(my,en)}
 function sentsOf(my){return (String(my).match(/[^။!?…]+[။!?…]*/g)||[my]).map(x=>x.trim()).filter(Boolean)}
-async function perform(my,en){busy=true;busySince=now();setMicBusy(true);try{unlock();VQ.stop();earReset();const bub=addBubble("u",my,en);transcript.push({who:"u",my,en,t:now()-showStart,scripted:true});
+async function perform(my,en){busy=true;busySince=now();setMicBusy(true);try{unlock();VQ.stop();earReset();const bub=addBubble("u",my,en,"SCRIPT");transcript.push({who:"u",my,en,t:now()-showStart,scripted:true});
   const sents=sentsOf(my);
   await new Promise(res=>{let d=false;const f=()=>{if(!d){d=true;res()}};VQ.onIdle=f;sents.forEach(s=>VQ.push(s,""));if(!sents.length||!VQ.playing)f();setTimeout(f,45000)})}
   finally{busy=false;busySince=0;setMicBusy(false);renderStrip()}}
@@ -706,6 +624,34 @@ async function earReact(src){if($("#live").classList.contains("hidden"))return;
     reacting=false;$("#uncle").classList.remove("think");if(!text){toast("Didn't catch that.");return}await ask(text,{reacted:true,label:"LAST 30s"})}
   catch(e){toast((e&&e.message)||"Couldn't hear that.")}finally{reacting=false;$("#uncle").classList.remove("think");renderStrip()}}
 
+/* ============================== v2.0: CO-HOST BUTTON ============================== */
+let coBusy=false;
+async function coHost(src){if($("#live").classList.contains("hidden"))return;unlock();
+  if(busy||reacting||chiming||coBusy||listening){toast("Let him finish, or press Esc.");return}
+  const t=EAR.on?earTake():null;
+  if(!t||t.voiced<0.4){DBG.note("co-host ("+src+"): nothing new heard, next script line");if(nextUncleIdx()<0){toast(EAR.on?"No more script lines. Say something first, then press CO-HOST.":"Turn the ear on in ⋯ so the co-host can hear you.");return}return cueNext()}
+  coBusy=true;$("#coBtn").classList.add("busy");$("#uncle").classList.add("think");let text="";
+  try{COST.sttSec+=t.sec;text=stripWake(await stt(t.wav,"ear.wav"));DBG.note(`co-host (${src}): heard ${t.sec.toFixed(1)}s → `+text.slice(0,120))}
+  catch(e){toast((e&&e.message)||"Couldn't hear that.")}
+  finally{coBusy=false;$("#coBtn").classList.remove("busy");$("#uncle").classList.remove("think")}
+  if(!text){if(nextUncleIdx()>=0)return cueNext();toast("Didn't catch that.");return}
+  const m=findLine(text);
+  if(m>=0){ptr=m+1;addBubble("j",text,"","SCRIPT ✓");transcript.push({who:"j",my:text,en:text,t:now()-showStart});if(nextUncleIdx()>=0)return cueNext();renderStrip();toast("That was your last scripted line.");return}
+  return ask(text,{label:"LAST 30s",adlib:true,utag:"AD-LIB"})}
+
+/* ============================== v2.0: NEXT LINE + SCRIPT LIST ============================== */
+function renderNext(){const e=$("#nextLine");if(!e)return;
+  if(PRE.active){e.innerHTML=`<b>VOICE</b> Recording script lines ${PRE.done}/${PRE.total}…`;return}
+  const i=nextUncleIdx();if(i<0){e.innerHTML=scriptLines().some(l=>lineWho(l))?"<b>NEXT</b> (end of script: CO-HOST answers live)":"";return}
+  const txt=lineWho(scriptLines()[i]).text.split("|")[0].trim();e.innerHTML="<b>NEXT ▶</b> ";e.appendChild(document.createTextNode(txt))}
+function renderList(){const box=$("#slist");if(!box||$("#panel").classList.contains("hidden"))return;box.innerHTML="";const L=scriptLines();const nu=nextUncleIdx();
+  L.forEach((l,i)=>{const lw=lineWho(l),sg=l.match(SEGRX);if(!lw&&!sg)return;const d=document.createElement("div");
+    if(sg){d.className="h";d.textContent=(sg[1]||sg[2]||sg[3]||"").trim();d.onclick=()=>{ptr=i+1;afterJump()}}
+    else{d.className=lw.who==="u"?"u":"j";d.textContent=(lw.who==="u"?"U: ":"J: ")+lw.text.split("|")[0].trim();
+      if(i===nu)d.classList.add("cur");d.onclick=()=>{ptr=lw.who==="u"?i:i+1;afterJump()}}
+    box.appendChild(d)});const c=box.querySelector(".cur");if(c)c.scrollIntoView({block:"center"})}
+function afterJump(){earReset();renderStrip();toast("Bookmark moved")}
+
 /* ============================== v1.9: CHIME-IN ============================== */
 const CHIME={rare:{talk:30,gap:100},often:{talk:14,gap:45}};
 function chimeTick(){if(!EAR.on||!CHIME[S.chime]||$("#live").classList.contains("hidden"))return;if(busy||reacting||chiming||listening||uncleTalking())return;
@@ -724,7 +670,7 @@ async function chime(){const t=earTake();if(!t)return;chiming=true;
   catch(e){DBG.note("chime error: "+((e&&e.message)||e))}finally{chiming=false;renderStrip()}}
 
 /* ============================== v1.9: STATUS STRIP ============================== */
-function renderStrip(){const e=$("#earPill");if(!e)return;
+function renderStrip(){renderNext();renderList();const e=$("#earPill");if(!e)return;
   e.textContent=EAR.on?"● Ear on · last 30s":"👂 Ear off · tap to turn on";e.className=EAR.on?"on":"";
   $("#wakePill").textContent=EAR.on?(EAR.wake==="on"?"Say “what do you think, Uncle?” · R":EAR.wake==="no"?"Press R to react":""):"";
   const sg=curSeg();$("#segPill").textContent=sg?"⏭ "+(sg.name.replace(/\s*\(.*?\)\s*$/,"").replace(/^SEGMENT\s*/i,"SEG ").slice(0,36)):"";
@@ -768,12 +714,12 @@ function goLive(){S.show=$("#showName").value.trim()||"Jamie & Friends";S.topic=
   $("#ctl").classList.remove("off");$("#stage").classList.add("ctlon");$("#cueBtn").disabled=!scriptLines().some(l=>{const w=lineWho(l);return w&&w.who==="u"});$("#coldBtn").disabled=!(S.prep&&S.prep.cold_my);
   fillModelBtn();clearInterval(clockT);clockT=setInterval(()=>{$("#clock").textContent=mmss(now()-showStart)},1000);
   if(!elReady())toast(EKEY?"Uncle's voice isn't linked yet; using the phone voice.":"No ElevenLabs key: Uncle will use the phone voice.");
-  Object.assign(COST,{usd:0,chars:0,sttSec:0});lastUncleAt=now();EAR.wantReact=false;
+  Object.assign(COST,{usd:0,chars:0,sttSec:0});lastUncleAt=now();EAR.wantReact=false;applyLook();$("#panel").classList.add("hidden");
   warmReactions().then(preRender);
   if(Number(S.ear))earStart();
   renderStrip();
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock("landscape").catch(()=>{})}catch(e){}}
-function endShow(){stopUncle();listenStop();earStop();PRE.run++;PRE.active=false;clearInterval(clockT);const e=$("#dbg");if(e)e.textContent=DBG.text();$("#live").classList.add("hidden");$("#setup").classList.remove("hidden");if(transcript.length)showNotes()}
+function endShow(){stopUncle();listenStop();earStop();$("#panel").classList.add("hidden");PRE.run++;PRE.active=false;clearInterval(clockT);const e=$("#dbg");if(e)e.textContent=DBG.text();$("#live").classList.add("hidden");$("#setup").classList.remove("hidden");if(transcript.length)showNotes()}
 
 /* ============================== WIRING ============================== */
 function fillSetup(){$("#showName").value=S.show;$("#topic").value=S.topic;$("#script").value=S.script;$("#akey").value=AKEY;$("#ekey").value=EKEY;$("#model").value=S.model;$("#vname").value=S.vname;
@@ -782,6 +728,8 @@ function fillSetup(){$("#showName").value=S.show;$("#topic").value=S.topic;$("#s
   document.querySelectorAll("#earSeg button").forEach(b=>b.classList.toggle("on",Number(b.dataset.v)===Number(S.ear)));
   document.querySelectorAll("#chimeSeg button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.chime));
   document.querySelectorAll("#preSeg button").forEach(b=>b.classList.toggle("on",Number(b.dataset.v)===Number(S.pre)));
+  document.querySelectorAll("#autoSeg button").forEach(b=>b.classList.toggle("on",Number(b.dataset.v)===Number(S.auto)));
+  fillLookSelects();applyLook();
   vstat();$("#elStat").textContent=`Characters sent to ElevenLabs from this browser: ${(S.chars||0).toLocaleString()}`;renderPrep();renderEps()}
 function vstat(){const v=$("#vstat");if(S.vid){v.textContent="✓ Linked · voice ID "+S.vid;v.className="stat ok"}else{v.textContent=EKEY?"Not linked yet. Tap Find voice.":"Add your ElevenLabs key, then Find voice.";v.className="stat bad"}}
 function renderEps(){const e=$("#eps");e.innerHTML=EPS.length?"":"<div>No episodes yet.</div>";EPS.slice().reverse().forEach(x=>{const d=document.createElement("div");d.textContent=`${x.date} · ${x.topic||"(no topic)"} · ${x.summary}`;e.appendChild(d)})}
@@ -797,6 +745,14 @@ document.querySelectorAll("#stab button").forEach(b=>b.onclick=()=>{S.stab=Numbe
 document.querySelectorAll("#earSeg button").forEach(b=>b.onclick=()=>{S.ear=Number(b.dataset.v);if(!S.ear)S.chime="off";saveS();fillSetup()});
 document.querySelectorAll("#chimeSeg button").forEach(b=>b.onclick=()=>{S.chime=b.dataset.v;if(S.chime!=="off")S.ear=1;saveS();fillSetup()});
 document.querySelectorAll("#preSeg button").forEach(b=>b.onclick=()=>{S.pre=Number(b.dataset.v);saveS();fillSetup()});
+document.querySelectorAll("#autoSeg button").forEach(b=>b.onclick=()=>{S.auto=Number(b.dataset.v);saveS();fillSetup()});
+["#orbSel","#orbSel2"].forEach(id=>$(id).onchange=e=>{S.orb=e.target.value;saveS();fillLookSelects();applyLook()});
+["#bgSel","#bgSel2"].forEach(id=>$(id).onchange=e=>{S.bg=e.target.value;saveS();fillLookSelects();applyLook()});
+$("#coBtn").onclick=()=>coHost("button");
+$("#roastAud").onclick=()=>{if(busy){toast("Let him finish, or press Esc.");return}ask(DIRECTIONS.roastAud,{direction:true,utag:"👥 ROAST"})};
+$("#roastMe").onclick=()=>{if(busy){toast("Let him finish, or press Esc.");return}ask(DIRECTIONS.roastMe,{direction:true,utag:"👤 ROAST"})};
+$("#setBtn").onclick=()=>{const p=$("#panel");p.classList.toggle("hidden");if(!p.classList.contains("hidden")){fillLookSelects();renderStrip()}};
+$("#panelX").onclick=()=>$("#panel").classList.add("hidden");
 async function findVoice(quiet){if(!EKEY){toast("Paste your ElevenLabs key first");return}const want=String(S.vname||"Zayar").toLowerCase();
   try{const j=await (await elApi("/v1/voices")).json(),vs=j.voices||[];const hit=vs.find(v=>(v.name||"").toLowerCase()===want)||vs.find(v=>(v.name||"").toLowerCase().startsWith(want))||vs.find(v=>(v.name||"").toLowerCase().includes(want));
     if(hit){S.vid=hit.voice_id;saveS();vstat();if(!quiet)toast("Voice linked: "+hit.name)}else if(!quiet)toast(`No voice called "${S.vname}" in My Voices on ElevenLabs.`)}
@@ -806,7 +762,8 @@ $("#testBtn").onclick=async()=>{unlock();if(!elReady()){toast("Link the voice fi
 $("#brainBtn").onclick=async()=>{const o=$("#brainOut");o.textContent="Asking "+modelName(S.model)+"…";try{const t=await claude("Reply with one short Burmese sentence greeting Jamie.",[{role:"user",content:"hi"}],100);o.textContent=t.trim()?("✓ "+modelName(S.model)+": "+t.trim()):"✗ "+modelName(S.model)+" returned nothing. See Debug below.";o.className="stat "+(t.trim()?"ok":"bad")}catch(e){o.textContent="✗ "+errText(e);o.className="stat bad"}};
 $("#prepBtn").onclick=prep;$("#startBtn").onclick=goLive;$("#exit").onclick=endShow;
 $("#clearEps").onclick=()=>{EPS=[];st.set("eps",EPS);renderEps();toast("Uncle forgot everything. Suspicious.")};
-$("#hot").onclick=()=>{$("#ctl").classList.toggle("off");$("#stage").classList.toggle("ctlon",!$("#ctl").classList.contains("off"))};
+function toggleCtl(){$("#ctl").classList.toggle("off");const on=!$("#ctl").classList.contains("off");$("#stage").classList.toggle("ctlon",on);if(!on)$("#panel").classList.add("hidden")}
+$("#hot").onclick=toggleCtl;
 document.querySelectorAll(".quick button[data-q]").forEach(b=>b.onclick=()=>{if(busy){toast("Let him finish, or tap ⏹.");return}ask(DIRECTIONS[b.dataset.q],{direction:true})});
 $("#modelBtn").onclick=()=>{S.model=otherModel();saveS();fillModelBtn();$("#model").value=S.model;toast("Burmese now written by "+modelName(S.model))};function fillModelBtn(){const b=$("#modelBtn");if(b)b.textContent="🧠 "+modelName(S.model)}
 $("#stopBtn").onclick=stopUncle;$("#cueBtn").onclick=cueNext;$("#segBtn").onclick=()=>jumpSeg(1);
@@ -825,11 +782,12 @@ mic.addEventListener("pointercancel",e=>e.preventDefault());
 let spaceDown=false;
 document.addEventListener("keydown",e=>{if($("#live").classList.contains("hidden"))return;
   if(document.activeElement!==$("#say")&&!e.repeat&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
-    if(e.key==="r"||e.key==="R"||e.key==="PageDown"||e.key==="ArrowRight"){e.preventDefault();earReact("key");return}
+    if(e.key==="r"||e.key==="R"||e.key==="PageDown"||e.key==="ArrowRight"||e.code==="Space"){e.preventDefault();coHost("key");return}
+    if(e.key==="h"||e.key==="H"){e.preventDefault();toggleCtl();return}
     if(e.key==="s"||e.key==="S"||e.key==="PageUp"||e.key==="ArrowLeft"){e.preventDefault();cueNext();return}
     if(e.key==="n"){e.preventDefault();jumpSeg(1);return}
-    if(e.key==="N"){e.preventDefault();jumpSeg(-1);return}}if(e.code==="Space"&&document.activeElement!==$("#say")&&!spaceDown){spaceDown=true;e.preventDefault();unlock();if(!busy)listenStart()}if(e.key==="Escape")stopUncle()});
-document.addEventListener("keyup",e=>{if(e.code==="Space"&&spaceDown){spaceDown=false;listenStop()}});
+    if(e.key==="N"){e.preventDefault();jumpSeg(-1);return}}if(e.key==="Escape")stopUncle()});
+
 $("#copyDbg").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(DBG.text()).then(()=>toast("Copied")).catch(()=>toast("Select and copy the text"))};
 $("#copyNotes").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($("#notesPre").textContent).then(()=>toast("Copied")).catch(()=>toast("Select and copy the text"))};
 $("#closeNotes").onclick=()=>$("#notes").classList.add("hidden");
