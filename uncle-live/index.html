@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v2.4 -->
+<title>Uncle Live</title><!-- v2.5 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -207,6 +207,9 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 #stage.mesh #uncle .orbhalo{display:none!important}
 #stage.mesh #uncle.hit canvas.mesh{filter:brightness(1.8)}
 #stage.mesh #uncle .dots{display:none!important}#stage:not(.mesh) #uncle canvas.mesh{display:none!important}
+#ripples{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+#ripples i{position:absolute;border-radius:50%;border:.22cqw solid var(--c);box-shadow:0 0 1.4cqw var(--c),inset 0 0 1.4cqw var(--c);opacity:0;will-change:transform,opacity}
+.lwrap{display:none!important}
 .rb.set{width:3.4cqw;height:3.4cqw;font-size:1.6cqw;color:var(--mut2);margin-left:1.2cqw}
 #stage:not(.ctlon) .b .tag{display:none}
 .b .tag{background:#3a4a6a!important}
@@ -240,7 +243,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup">
-  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.4</span></p></div></div>
+  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.5</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -298,7 +301,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 <!-- ===== LIVE STAGE ===== -->
 <div id="live" class="hidden">
   <div id="stage" class="dark">
-    <div id="beam"></div><div id="heard"></div><div id="space"><canvas id="starsA"></canvas><canvas id="starsB"></canvas></div>
+    <div id="beam"></div><div id="heard"></div><div id="space"><canvas id="starsA"></canvas><canvas id="starsB"></canvas></div><div id="ripples"></div>
     <div id="uncle" class="orbx"><div class="orbhalo"></div><div class="lwrap"><i class="lring"></i><i class="lring"></i><i class="lring"></i></div><div class="wave"></div><div class="wave w2"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div>
       <svg class="rings" viewBox="0 0 760 760"><g transform="rotate(-16 380 380)" fill="none"><ellipse cx="380" cy="380" rx="330" ry="108" stroke="var(--ring)" stroke-opacity=".3" stroke-width="2" stroke-dasharray="6 12"/><ellipse cx="380" cy="380" rx="236" ry="64" stroke="var(--ring)" stroke-opacity=".85" stroke-width="3.5"/><circle cx="146" cy="380" r="7" fill="var(--ring)"/><circle cx="690" cy="330" r="5" fill="var(--ring2)"/></g></svg>
       <svg class="dots" viewBox="0 0 100 100"><circle cx="50" cy="4" r="3" fill="#fff"/><circle cx="90" cy="70" r="3" fill="#fff" opacity=".6"/><circle cx="10" cy="70" r="3" fill="#fff" opacity=".3"/></svg></div>
@@ -316,7 +319,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
     <div id="panel" class="hidden">
       <div class="ph"><b>Settings</b><button id="panelX" aria-label="Close">✕</button></div>
       <div id="ear"><span id="earPill"></span><span id="wakePill"></span><span id="segPill"></span><span id="prePill"></span><span id="costPill" class="cost"></span></div>
-      <div class="pk">Mode</div><label class="tog"><input type="checkbox" id="coMode"><i></i><b>Co-host mode</b><small>Adds the CO-HOST button · Uncle follows your script</small></label><label class="tog"><input type="checkbox" id="swMode"><i></i><b>Swoosh sound</b><small>Plays when you finish asking</small></label><div class="pk">Look</div>
+      <div class="pk">Mode</div><label class="tog"><input type="checkbox" id="coMode"><i></i><b>Co-host mode</b><small>Adds the CO-HOST button · Uncle follows your script</small></label><label class="tog"><input type="checkbox" id="boltMode"><i></i><b>Lightning core</b><small>Lightning inside the sphere</small></label><label class="tog"><input type="checkbox" id="swMode"><i></i><b>Swoosh sound</b><small>Plays when you finish asking</small></label><div class="pk">Look</div>
       <div class="prow"><select id="sphSel2" aria-label="Sphere"></select></div><div class="prow"><select id="orbSel2" aria-label="Orb"></select><select id="bgSel2" aria-label="Background"></select></div>
       <div class="pk">Script · tap a line to jump there</div>
       <div id="slist"></div>
@@ -344,7 +347,7 @@ const $=s=>document.querySelector(s);
 const st={get(k,d){try{const v=localStorage.getItem("ul_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ul_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
 const raw=(k)=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const MY=/[က-႟ꩠ-ꩿ]/;
-let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:1,chime:"off",pre:1,orb:"Arc Reactor",bg:"Matte Black",auto:1,pname:"UNCLE",comode:0,swoosh:1,sphere:"1"},st.get("s",{}));
+let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:1,chime:"off",pre:1,orb:"Arc Reactor",bg:"Matte Black",auto:1,pname:"UNCLE",comode:0,swoosh:1,sphere:"1",bolt:1},st.get("s",{}));
 const saveS=()=>st.set("s",S);
 let AKEY=st.get("akey",""),EKEY=st.get("ekey","");
 let EPS=st.get("eps",[]);
@@ -852,18 +855,18 @@ const FX={ctx:null,
 
 FX.show=b=>{if(!b)return;b.classList.remove("think");if(b.classList.contains("pend")){b.classList.remove("pend");$("#askBtn")&&$("#askBtn").classList.remove("proc");try{FX.bubbleIn(b)}catch(e){}}};
 function applyMode(){const st=$("#stage");if(!st)return;const co=Number(S.comode)===1;st.classList.toggle("comode",co);const a=$("#askBtn");if(a)a.classList.toggle("big",!co);
-  const c=$("#coMode");if(c)c.checked=co;const w=$("#swMode");if(w)w.checked=Number(S.swoosh)!==0}
+  const c=$("#coMode");if(c)c.checked=co;const w=$("#swMode");if(w)w.checked=Number(S.swoosh)!==0;const bm=$("#boltMode");if(bm)bm.checked=Number(S.bolt)!==0}
 /* realtime speech-to-text (ElevenLabs Scribe v2 Realtime): live words while you talk; falls back to the normal clip upload */
-const RT={ws:null,live:false,off:false,ready:false,q:[],sr:0,done:"",part:"",wait:null,
+const RT={maxPart:"",ws:null,live:false,off:false,ready:false,q:[],sr:0,done:"",part:"",wait:null,
  RATES:[8000,16000,22050,24000,44100,48000],
- async start(){this.done="";this.part="";this.q=[];this.ready=false;this.live=false;if(this.off||!EKEY||!EAR.ctx)return;
+ async start(){this.done="";this.part="";this.maxPart="";this.q=[];this.ready=false;this.live=false;if(this.off||!EKEY||!EAR.ctx)return;
   const sr=EAR.ctx.sampleRate;if(!this.RATES.includes(sr)){this.off=true;DBG.note("realtime STT: sample rate "+sr+" not supported");return}this.sr=sr;this.live=true;
   try{const j=await (await elApi("/v1/single-use-token/realtime_scribe",{method:"POST"})).json();if(!this.live)return;
    const u=`wss://api.elevenlabs.io/v1/speech-to-text/realtime?model_id=scribe_v2_realtime&token=${encodeURIComponent(j.token)}&audio_format=pcm_${sr}&language_code=my&commit_strategy=manual`;
    const ws=new WebSocket(u);this.ws=ws;
    ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}const t=m.message_type;
     if(t==="session_started"){this.ready=true;this.q.forEach(c=>ws.send(c));this.q=[]}
-    else if(t==="partial_transcript"){this.part=m.text||"";ASK.caption()}
+    else if(t==="partial_transcript"){this.part=m.text||"";if(this.part.length>this.maxPart.length)this.maxPart=this.part;ASK.caption()}
     else if(t==="committed_transcript"||t==="committed_transcript_with_timestamps"){if(t==="committed_transcript"){this.done=(this.done+" "+(m.text||"")).trim();this.part="";ASK.caption();if(this.wait)this.wait()}}
     else if(t&&t!=="warning"&&/error|exceeded|limited|invalid|unaccepted|exhausted|overflow/.test(t)){DBG.note("realtime STT "+t+": "+(m.error||""));if(/auth|invalid|unaccepted|input/.test(t))this.off=true;this.stop()}};
    ws.onerror=()=>{DBG.note("realtime STT: connection error");this.stop()};ws.onclose=()=>{this.live=false;if(this.wait)this.wait()}}
@@ -873,7 +876,7 @@ const RT={ws:null,live:false,off:false,ready:false,q:[],sr:0,done:"",part:"",wai
   return JSON.stringify({message_type:"input_audio_chunk",audio_base_64:btoa(str),commit:!!commit,sample_rate:this.sr})},
  feed(x){if(!this.live)return;const c=this.chunk(x,false);if(this.ready&&this.ws&&this.ws.readyState===1)this.ws.send(c);else if(this.q.length<400)this.q.push(c)},
  async finish(){if(!this.live||!this.ws||!this.ready){const d=this.done;this.stop();return d}
-  const got=new Promise(r=>{this.wait=r;setTimeout(r,1600)});try{this.ws.send(this.chunk(new Float32Array(Math.round(this.sr*.05)),true))}catch(e){}
+  const got=new Promise(r=>{this.wait=r;setTimeout(r,1800)});try{this.ws.send(this.chunk(new Float32Array(Math.round(this.sr*.05)),true))}catch(e){}
   await got;this.wait=null;const d=this.done;this.stop();return d},
  stop(){this.live=false;this.ready=false;this.q=[];try{this.ws&&this.ws.close()}catch(e){}this.ws=null}};
 const ASK={on:false,busy:false,raf:0,lv:0,t0:0,
@@ -888,18 +891,38 @@ async function askPress(src){if($("#live").classList.contains("hidden"))return;u
     if(!EAR.on){const ok=await earStart();if(!ok)return}
     VQ.stop();earReset();ASK.on=true;ASK.t0=now();ASK.lv=0;ASK.ui(true);ASK.meter();DBG.note("ask ("+src+"): listening");RT.start();return}
   ASK.on=false;cancelAnimationFrame(ASK.raf);ASK.ui(false);$("#uncle").style.setProperty("--lv","0");
-  const t=earTake();if(!t||(t.voiced<0.3&&!RT.done)){RT.stop();toast("Didn't hear a question. Press ASK, talk, then press ASK again.");return}
+  if(EAR.voiced<0.3&&!RT.done&&!RT.part){RT.stop();earReset();toast("Didn't hear a question. Press ASK, talk, then press ASK again.");return}
   ASK.busy=true;const b=$("#askBtn");b.classList.add("proc");try{FX.send()}catch(e){}$("#uncle").classList.add("think");
+  await new Promise(r=>setTimeout(r,400));const t=earTake();if(!t){ASK.busy=false;RT.stop();b.classList.remove("proc");$("#uncle").classList.remove("think");toast("Didn't catch that. Try again.");return}
   let text="",how="";
-  try{text=stripWake(await RT.finish());how="live";if(!text){COST.sttSec+=t.sec;text=stripWake(await stt(t.wav,"ask.wav"));how="clip"}else COST.sttSec+=t.sec;
+  try{const mp=RT.maxPart;text=stripWake(await RT.finish());how="live";if(/\uFFFD/.test(text)||(text&&mp.length>text.length*1.6)){DBG.note("live text looked cut off; using the clip instead: "+text.slice(0,80));text=""}if(!text){COST.sttSec+=t.sec;text=stripWake(await stt(t.wav,"ask.wav"));how="clip"}else COST.sttSec+=t.sec;
     DBG.note(`ask: heard ${t.sec.toFixed(1)}s (${how}) → `+text.slice(0,120))}
   catch(e){toast((e&&e.message)||"Couldn't hear that.")}
   ASK.busy=false;
   if(!text){b.classList.remove("proc");$("#uncle").classList.remove("think");toast("Didn't catch that. Try again.");return}
   try{await ask(text,{label:"ASK",utag:"ASK",adlib:true,pre:ASK_PRE.split("{N}").join(S.name)})}finally{b.classList.remove("proc")}}
 function askCancel(){ASK.on=false;cancelAnimationFrame(ASK.raf);ASK.ui(false);RT.stop();earReset();$("#uncle").style.setProperty("--lv","0")}
+
+/* v2.5: ripples that match the sphere colours and roll out across the whole screen while listening and thinking */
+const RIP={last:0,k:0,
+ color(){const st=String(S.sphere||"1");this.k++;
+  if($("#stage").classList.contains("mesh")){const t=MESH.t/1000;
+   if(MESH.style===1)return hslHex(((t*24)%360+(this.k%6)*60)%360,.95,.62);
+   if(MESH.style===2)return["#3d6bff","#8a3dff","#ff3ad2"][this.k%3];
+   return["#9fc8ff","#c9a8ff","#e07bff","#7ad8ff"][this.k%4]}
+  return getComputedStyle($("#stage")).getPropertyValue("--ring").trim()||"#5fb4ff"},
+ emit(strength){const box=$("#ripples"),u=$("#uncle");if(!box||!u)return;const o=FX.rel($("#stage").classList.contains("mesh")?u:($("#uncle .orbcore")||u)),d=Math.max(o.w,o.h)*.78;
+  const r=document.createElement("i");r.style.cssText=`left:${o.x-d/2}px;top:${o.y-d/2}px;width:${d}px;height:${d}px;--c:${this.color()}`;box.appendChild(r);
+  const sw=$("#stage").getBoundingClientRect(),far=Math.hypot(Math.max(o.x,sw.width-o.x),Math.max(o.y,sw.height-o.y))*2/d+.4;
+  const a=r.animate([{transform:"scale(1)",opacity:Math.min(.95,.45+strength*.5)},{offset:.25,opacity:Math.min(.8,.35+strength*.45)},{transform:`scale(${far.toFixed(2)})`,opacity:0}],{duration:3200,easing:"cubic-bezier(.2,.6,.35,1)",fill:"forwards"});a.onfinish=()=>r.remove();
+  while(box.children.length>14)box.firstElementChild.remove()},
+ tick(){const u=$("#uncle");if(!u||$("#live").classList.contains("hidden"))return;const n=now(),ls=u.classList.contains("listen"),th=u.classList.contains("think");
+  if(ls){const lv=parseFloat(u.style.getPropertyValue("--lv"))||0;if(n-this.last>(lv>.15?520-lv*220:1100)){this.last=n;this.emit(Math.max(.25,lv))}}
+  else if(th){if(n-this.last>850){this.last=n;this.emit(.55)}}}};
+setInterval(()=>RIP.tick(),90);
 $("#coMode").onchange=e=>{S.comode=e.target.checked?1:0;saveS();applyMode();renderStrip();toast(S.comode?"Co-host mode on: Space = CO-HOST":"Co-host mode off: Space = ASK")};
 $("#swMode").onchange=e=>{S.swoosh=e.target.checked?1:0;saveS()};
+$("#boltMode").onchange=e=>{S.bolt=e.target.checked?1:0;saveS()};
 applyMode();
 
 $("#roastAud").onclick=()=>{if(busy){toast("Let him finish, or press Esc.");return}ask(DIRECTIONS.roastAud,{direction:true,utag:"👥 ROAST"})};
@@ -947,8 +970,8 @@ $("#closeNotes").onclick=()=>$("#notes").classList.add("hidden");
 fillSetup();
 if(EKEY&&!S.vid)findVoice(true);
 if('serviceWorker' in navigator){/* no SW: keep it simple */}
-/* v2.4 mesh sphere: wireframe globe with moving ripples, drawn on a canvas */
-const MESH={style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,nm:90,a0:.05,warp:1.3,dust:2.4,rim:1}},bph:0,beats:[],cfg:{nl:54,nm:78,amp:1.7,dust:.5},fl:[],acc:0,seed:3,cv:null,ctx:null,off:null,oc:null,t:0,last:0,run:false,c1:"#2f6bff",c2:"#ff3fd8",amp:1,spin:1,lv:0,talk:0,hit:0,dust:null,
+/* v2.5 mesh sphere: wireframe globe with moving ripples, drawn on a canvas */
+const MESH={th:0,bolts:[],style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,nm:90,a0:.05,warp:1.3,dust:2.4,rim:1}},bph:0,beats:[],cfg:{nl:54,nm:78,amp:1.7,dust:.5},fl:[],acc:0,seed:3,cv:null,ctx:null,off:null,oc:null,t:0,last:0,run:false,c1:"#2f6bff",c2:"#ff3fd8",amp:1,spin:1,lv:0,talk:0,hit:0,dust:null,
  init(){const u=$("#uncle");if(!u||MESH.cv)return;const c=document.createElement("canvas");c.className="mesh";u.appendChild(c);MESH.cv=c;MESH.ctx=c.getContext("2d");MESH.off=document.createElement("canvas");MESH.oc=MESH.off.getContext("2d");
   let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647;MESH.dust=Array.from({length:900},()=>({th:r()*6.283,ph:Math.acos(2*r()-1),k:1.03+r()*.12,f:r()*6.28,z:.6+r()*1.4}));MESH.size()},
  size(){const c=MESH.cv;if(!c)return;const b=c.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1),w=Math.max(64,Math.round(b.width*d));if(c.width!==w){c.width=c.height=w;MESH.off.width=MESH.off.height=w}},
@@ -956,7 +979,7 @@ const MESH={style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,n
   const sat=d<.08?.0:.92;MESH.c1=hslHex((h-38+360)%360,sat,.6);MESH.c2=hslHex((h+38)%360,sat,.62);if(!sat){MESH.c1="#e8eef5";MESH.c2="#9aa6b8"}},
  frame(dt){const st=$("#uncle");if(!st||!MESH.cv)return;const lvH=$("#live");if(lvH&&lvH.classList.contains("hidden"))return;if((MESH.n=(MESH.n||0)+1)%30===0||MESH.cv.width<100)MESH.size();const cls=st.classList,th=cls.contains("think"),tk=cls.contains("talk"),ls=cls.contains("listen");
   const lv=parseFloat(getComputedStyle(st).getPropertyValue("--lv"))||0;
-  MESH.lv+=(lv-MESH.lv)*.25;MESH.talk+=((tk?1:0)-MESH.talk)*.1;const tsp=th?2.6:ls?1.4:1;MESH.spin+=(tsp-MESH.spin)*.05;
+  MESH.lv+=(lv-MESH.lv)*.25;MESH.talk+=((tk?1:0)-MESH.talk)*.1;MESH.th+=((th?1:0)-MESH.th)*.08;const tsp=th?2.6:ls?1.4:1;MESH.boltStep(dt);MESH.spin+=(tsp-MESH.spin)*.05;
   MESH.t+=dt*MESH.spin;MESH.step(dt);MESH.draw()},
  rnd(){return (MESH.seed=(MESH.seed*16807)%2147483647)/2147483647},
  step(dt){const per=MESH.talk>.5?1.05:MESH.lv>.2?1.3:1.8;const ob=MESH.bph;MESH.bph+=dt/1000/per;const tn=MESH.t;if(Math.floor(MESH.bph)>Math.floor(ob))MESH.beats.push({a:0,k:1});if((ob%1)<.2&&(MESH.bph%1)>=.2)MESH.beats.push({a:0,k:.6});for(const b of MESH.beats)b.a+=dt/1000;MESH.beats=MESH.beats.filter(b=>b.a<1.2);
@@ -984,7 +1007,7 @@ const MESH={style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,n
   o.globalCompositeOperation="source-in";let g;if(MESH.style===2){g=o.createLinearGradient(W*.25,W*.2,W*.72,W*.82);g.addColorStop(0,"#3d6bff");g.addColorStop(.45,"#8a3dff");g.addColorStop(1,"#ff3ad2")}else{const hu=(t*24)%360;g=o.createLinearGradient(W*.12,W*.12,W*.88,W*.88);for(let k=0;k<=6;k++)g.addColorStop(k/6,hslHex((hu+k*60)%360,.95,.62))}o.fillStyle=g;o.fillRect(0,0,W,W);
   x.setTransform(1,0,0,1,0,0);x.globalCompositeOperation="source-over";x.clearRect(0,0,W,W);
   const core=x.createRadialGradient(cx,cy,0,cx,cy,R*1.05);core.addColorStop(0,"rgba(0,0,0,0)");core.addColorStop(.7,"rgba(120,120,255,.04)");core.addColorStop(1,"rgba(255,255,255,.07)");x.fillStyle=core;x.beginPath();x.arc(cx,cy,R*1.02,0,7);x.fill();
-  x.globalCompositeOperation="lighter";x.filter=`blur(${Math.round(W/90)}px)`;x.globalAlpha=.9;x.drawImage(MESH.off,0,0);x.filter="none";x.globalAlpha=1;x.drawImage(MESH.off,0,0);
+  MESH.boltDraw(x,cx,cy,R);x.globalCompositeOperation="lighter";x.filter=`blur(${Math.round(W/90)}px)`;x.globalAlpha=.9;x.drawImage(MESH.off,0,0);x.filter="none";x.globalAlpha=1;x.drawImage(MESH.off,0,0);
   if(MESH.hit>0){x.globalAlpha=MESH.hit;x.drawImage(MESH.off,0,0);x.globalAlpha=1;MESH.hit=Math.max(0,MESH.hit-.06)}},
  drawGlass(){const c=MESH.cv,x=MESH.ctx,o=MESH.oc,W=c.width,t=MESH.t/1000;if(!W)return;
   const br=1+.04*Math.sin(t*1.26)+MESH.talk*.03*Math.abs(Math.sin(t*7.5)),R=W*.241*br,cx=W/2,cy=W/2,lv=MESH.lv,tk=MESH.talk;
@@ -1002,7 +1025,7 @@ const MESH={style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,n
   const cb=.75+lv*.4+tk*.35*Math.abs(Math.sin(t*7.5));
   for(const m of MESH.sm){const a=m.a+t*m.sp,px=cx+Math.cos(a)*m.d*R,py=cy+Math.sin(a*1.3)*m.d*R*.8,rs=R*m.s*(1+.15*Math.sin(t*1.7+m.f));const sg=x.createRadialGradient(px,py,0,px,py,rs);sg.addColorStop(0,`rgba(225,235,255,${(.3*cb).toFixed(3)})`);sg.addColorStop(.5,`rgba(150,170,255,${(.13*cb).toFixed(3)})`);sg.addColorStop(1,"rgba(80,90,255,0)");x.fillStyle=sg;x.fillRect(px-rs,py-rs,rs*2,rs*2)}
   g=x.createRadialGradient(cx-R*.1,cy-R*.08,0,cx,cy,R*.8);g.addColorStop(0,`rgba(255,255,255,${Math.min(1,.85*cb).toFixed(3)})`);g.addColorStop(.35,`rgba(200,220,255,${(.45*cb).toFixed(3)})`);g.addColorStop(1,"rgba(120,140,255,0)");x.fillStyle=g;x.fillRect(0,0,W,W);
-  /* dotted shell */
+  MESH.boltDraw(x,cx,cy,R*.92);x.globalCompositeOperation="lighter";/* dotted shell */
   o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation="source-over";o.clearRect(0,0,W,W);const ds=Math.max(1,W/520);
   for(const p of MESH.gp){const q=T(p[0],p[1],p[2]),e=1-Math.abs(q[2]),a=(q[2]>0?.42:.2)+e*e*.55;if(a<.05)continue;o.fillStyle=`rgba(255,255,255,${(a*(.6+.4*Math.sin(t*2+p[3]*20))).toFixed(3)})`;o.fillRect(q[0],q[1],ds,ds)}
   /* ribbons: bands of dotted strands sweeping round the inside of the shell */
@@ -1016,6 +1039,20 @@ const MESH={style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,n
   for(const p of MESH.sp){const a=p.a+t*.05,d=p.d+.03*Math.sin(t*.7+p.f),px=cx+Math.cos(a)*d*R,py=cy+Math.sin(a)*d*R,al=.25+.75*Math.abs(Math.sin(t*1.8+p.f));o.fillStyle=`rgba(255,255,255,${(al*(1.4-d)).toFixed(3)})`;const z=ds*1.5*p.z;o.fillRect(px-z/2,py-z/2,z,z)}
   o.globalCompositeOperation="source-in";g=o.createLinearGradient(W*.25,W*.2,W*.75,W*.8);g.addColorStop(0,"#c9a8ff");g.addColorStop(.35,"#9fc8ff");g.addColorStop(.6,"#7ad8ff");g.addColorStop(1,"#e07bff");o.fillStyle=g;o.fillRect(0,0,W,W);
   x.filter=`blur(${Math.round(W/160)}px)`;x.globalAlpha=.8;x.drawImage(MESH.off,0,0);x.filter="none";x.globalAlpha=1;x.drawImage(MESH.off,0,0);x.globalCompositeOperation="source-over"},
+ boltColor(){const t=MESH.t/1000;if(MESH.style===1)return hslHex(((t*24)%360+180)%360,.9,.66);if(MESH.style===2)return"#9a5cff";return"#8fb8ff"},
+ energy(){return .22+MESH.lv*.8+MESH.talk*.55*Math.abs(Math.sin(MESH.t/1000*7.5))+MESH.th*.75},
+ boltPath(a,len,rough,depth,sx,sy){let P=[[sx,sy],[sx+Math.cos(a)*len,sy+Math.sin(a)*len]],r=MESH.rnd;
+  for(let d=0;d<depth;d++){const Q=[P[0]];for(let i=1;i<P.length;i++){const p=P[i-1],q=P[i],mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2,dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy),o=(r()-.5)*L*rough;Q.push([mx-dy/L*o,my+dx/L*o],q)}P=Q;rough*=.92}return P},
+ boltNew(){const r=MESH.rnd,a=r()*6.283,len=.55+r()*.4,main=MESH.boltPath(a,len,.55,5,0,0),br=[];const nb=1+Math.floor(r()*4);
+  for(let k=0;k<nb;k++){const i=4+Math.floor(r()*(main.length-8)),p=main[i],ba=a+(r()<.5?-1:1)*(.35+r()*.8),bl=(len-Math.hypot(p[0],p[1]))*(.35+r()*.5);if(bl>.05)br.push(MESH.boltPath(ba,bl,.6,4,p[0],p[1]))}
+  return{main,br,life:0,max:.07+r()*.22,f:r()}},
+ boltStep(dt){if(Number(S.bolt)===0){MESH.bolts=[];return}const e=MESH.energy(),want=Math.round(1+e*9);for(const b of MESH.bolts)b.life+=dt/1000;MESH.bolts=MESH.bolts.filter(b=>b.life<b.max);
+  let n=0;while(MESH.bolts.length<want&&n++<4){if(MESH.rnd()<.35+e*.5)MESH.bolts.push(MESH.boltNew())}},
+ boltDraw(x,cx,cy,R){if(Number(S.bolt)===0)return;const e=MESH.energy(),col=MESH.boltColor(),t=MESH.t/1000,fl=.85+.15*Math.sin(t*37)*Math.sin(t*23);
+  x.globalCompositeOperation="lighter";const cr=R*(.2+e*.12)*fl;let g=x.createRadialGradient(cx,cy,0,cx,cy,cr*2.2);g.addColorStop(0,`rgba(255,255,255,${Math.min(1,.55+e*.4).toFixed(3)})`);g.addColorStop(.18,hexA(col,Math.min(.9,.45+e*.35)));g.addColorStop(.5,hexA(col,.18*fl));g.addColorStop(1,hexA(col,0));if(MESH.style!==3){x.fillStyle=g;x.beginPath();x.arc(cx,cy,cr*2.2,0,7);x.fill()}
+  x.lineCap="round";x.lineJoin="round";const W=x.canvas.width;
+  const pass=(lw,style,useBr,k)=>{x.lineWidth=lw;x.strokeStyle=style;x.beginPath();for(const b of MESH.bolts){const a=Math.pow(1-b.life/b.max,.5);if(a<.05)continue;const L=[b.main].concat(useBr?b.br:[]);for(const P of L){x.moveTo(cx+P[0][0]*R,cy+P[0][1]*R);for(let i=1;i<P.length;i++)x.lineTo(cx+P[i][0]*R,cy+P[i][1]*R)}}x.stroke()};
+  const al=Math.min(1,.5+e*.5);pass(W/95,hexA(col,.1*al),true);pass(W/260,hexA(col,.5*al),true);pass(W/700,`rgba(255,255,255,${(.85*al).toFixed(3)})`,true);x.globalCompositeOperation="source-over"},
  loop(ts){if(!MESH.run)return;const dt=Math.min(60,ts-(MESH.last||ts));MESH.last=ts;MESH.frame(dt);requestAnimationFrame(MESH.loop)},
  start(){MESH.init();if(MESH.run)return;MESH.run=true;MESH.last=0;requestAnimationFrame(MESH.loop)}};
 function hexRgb(h){h=String(h).trim();if(h.startsWith("rgb")){const m=h.match(/[\d.]+/g)||[0,0,0];return m.slice(0,3).map(Number)}h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");const n=parseInt(h.slice(0,6),16)||0;return[n>>16&255,n>>8&255,n&255]}
