@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v2.5 -->
+<title>Uncle Live</title><!-- v2.6 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -210,6 +210,18 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 #ripples{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
 #ripples i{position:absolute;border-radius:50%;border:.22cqw solid var(--c);box-shadow:0 0 1.4cqw var(--c),inset 0 0 1.4cqw var(--c);opacity:0;will-change:transform,opacity}
 .lwrap{display:none!important}
+#uncle{transition:left 1.8s cubic-bezier(.6,0,.3,1),top 1.8s cubic-bezier(.6,0,.3,1),width 1.8s cubic-bezier(.6,0,.3,1),height 1.8s cubic-bezier(.6,0,.3,1)}
+#ulbl{transition:left 1.8s cubic-bezier(.6,0,.3,1),top 1.8s cubic-bezier(.6,0,.3,1)}
+#chat{transition:opacity .9s,transform 1.4s cubic-bezier(.6,0,.3,1),bottom .3s}
+#stage.center #uncle{left:50%!important;top:45%!important;width:25cqw!important;height:25cqw!important}
+#stage.center #ulbl{left:50%;top:74%}
+#stage.center #chat{opacity:0;transform:translateX(8%);pointer-events:none}
+#stage.caption #uncle{left:50%!important;top:38%!important;width:21cqw!important;height:21cqw!important}
+#stage.caption #ulbl{left:50%;top:58.5%}
+#stage.caption #chat{left:16%!important;right:16%!important;top:62%!important;bottom:15%!important;-webkit-mask-image:none;mask-image:none}
+#stage.caption #chat .b:not(:last-child){display:none}
+#stage.caption #chat .b{text-align:center}
+#stage.caption .b.u:before{display:none}
 .rb.set{width:3.4cqw;height:3.4cqw;font-size:1.6cqw;color:var(--mut2);margin-left:1.2cqw}
 #stage:not(.ctlon) .b .tag{display:none}
 .b .tag{background:#3a4a6a!important}
@@ -243,7 +255,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup">
-  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.5</span></p></div></div>
+  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.6</span></p></div></div>
 
   <label class="lbl" for="showName">Show name</label>
   <input type="text" id="showName" placeholder="Jamie & Friends">
@@ -319,7 +331,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
     <div id="panel" class="hidden">
       <div class="ph"><b>Settings</b><button id="panelX" aria-label="Close">✕</button></div>
       <div id="ear"><span id="earPill"></span><span id="wakePill"></span><span id="segPill"></span><span id="prePill"></span><span id="costPill" class="cost"></span></div>
-      <div class="pk">Mode</div><label class="tog"><input type="checkbox" id="coMode"><i></i><b>Co-host mode</b><small>Adds the CO-HOST button · Uncle follows your script</small></label><label class="tog"><input type="checkbox" id="boltMode"><i></i><b>Lightning core</b><small>Lightning inside the sphere</small></label><label class="tog"><input type="checkbox" id="swMode"><i></i><b>Swoosh sound</b><small>Plays when you finish asking</small></label><div class="pk">Look</div>
+      <div class="pk">Mode</div><label class="tog"><input type="checkbox" id="coMode"><i></i><b>Co-host mode</b><small>Adds the CO-HOST button · Uncle follows your script</small></label><label class="tog"><input type="checkbox" id="boltMode"><i></i><b>Lightning core</b><small>Lightning inside the sphere</small></label><label class="tog"><input type="checkbox" id="swMode"><i></i><b>Swoosh sound</b><small>Plays when you finish asking</small></label><div class="pk">Layout</div><div class="prow"><select id="laySel" aria-label="Layout"><option value="glide">Layout: Center, glide aside for chat</option><option value="side">Layout: Sphere left, chat right (classic)</option><option value="caption">Layout: Center with caption below</option></select></div><div class="pk">Look</div>
       <div class="prow"><select id="sphSel2" aria-label="Sphere"></select></div><div class="prow"><select id="orbSel2" aria-label="Orb"></select><select id="bgSel2" aria-label="Background"></select></div>
       <div class="pk">Script · tap a line to jump there</div>
       <div id="slist"></div>
@@ -347,7 +359,7 @@ const $=s=>document.querySelector(s);
 const st={get(k,d){try{const v=localStorage.getItem("ul_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ul_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
 const raw=(k)=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const MY=/[က-႟ꩠ-ꩿ]/;
-let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:1,chime:"off",pre:1,orb:"Arc Reactor",bg:"Matte Black",auto:1,pname:"UNCLE",comode:0,swoosh:1,sphere:"1",bolt:1},st.get("s",{}));
+let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:1,chime:"off",pre:1,orb:"Arc Reactor",bg:"Matte Black",auto:1,pname:"UNCLE",comode:0,swoosh:1,sphere:"1",bolt:1,layout:"glide"},st.get("s",{}));
 const saveS=()=>st.set("s",S);
 let AKEY=st.get("akey",""),EKEY=st.get("ekey","");
 let EPS=st.get("eps",[]);
@@ -673,7 +685,7 @@ async function earStart(){if(EAR.on)return true;if(!EKEY){toast("The ear needs y
   try{const AC=window.AudioContext||window.webkitAudioContext;EAR.ctx=new AC();try{await EAR.ctx.resume()}catch(e){}
     const sr=EAR.ctx.sampleRate;EAR.dec=Math.max(1,Math.round(sr/16000));EAR.rate=Math.round(sr/EAR.dec);EAR.buf=new Float32Array(EAR.rate*EAR_SEC);EAR.w=0;EAR.len=0;EAR.voiced=0;
     EAR.src=EAR.ctx.createMediaStreamSource(EAR.stream);EAR.proc=EAR.ctx.createScriptProcessor(4096,1,1);
-    EAR.proc.onaudioprocess=ev=>{if(uncleTalking())return;const x=ev.inputBuffer.getChannelData(0),d=EAR.dec,b=EAR.buf;let s=0;
+    EAR.proc.onaudioprocess=ev=>{if(!EAR.ctx||uncleTalking())return;const x=ev.inputBuffer.getChannelData(0),d=EAR.dec,b=EAR.buf;let s=0;
       for(let i=0;i<x.length;i++)s+=x[i]*x[i];EAR.rms=Math.sqrt(s/x.length);if(RT.live)RT.feed(x,EAR.ctx.sampleRate);if(Math.sqrt(s/x.length)>0.012){EAR.lastVoice=now();EAR.voiced+=x.length/EAR.ctx.sampleRate}
       for(let i=0;i+d<=x.length;i+=d){let a=0;for(let k=0;k<d;k++)a+=x[i+k];b[EAR.w]=a/d;EAR.w=(EAR.w+1)%b.length;if(EAR.len<b.length)EAR.len++}};
     EAR.sink=EAR.ctx.createGain();EAR.sink.gain.value=0;EAR.src.connect(EAR.proc);EAR.proc.connect(EAR.sink);EAR.sink.connect(EAR.ctx.destination)}
@@ -785,8 +797,8 @@ async function showNotes(){$("#notes").classList.remove("hidden");$("#notesPre")
   catch(e){$("#notesBody").textContent=transcript.length?"Couldn't write the notes: "+errText(e):"Nothing was said on air."}}
 
 /* ============================== STAGE UI ============================== */
-function addBubble(who,my,en,tag){const c=$("#chat");[...c.children].forEach(b=>b.classList.add("old"));while(c.children.length>6)c.firstElementChild.remove();
-  const b=document.createElement("div");b.className="b "+who;b.innerHTML=`<span class="n">${who==="j"?esc(S.name).toUpperCase():"UNCLE"}</span>${tag?`<span class="tag">${esc(tag)}</span>`:""}<div class="m"></div><div class="e"></div>`;setBubble(b,my,en);c.appendChild(b);return b}
+function addBubble(who,my,en,tag){const moved=(typeof LAY!=="undefined")&&LAY.active();const c=$("#chat");[...c.children].forEach(b=>b.classList.add("old"));while(c.children.length>6)c.firstElementChild.remove();
+  const b=document.createElement("div");b.className="b "+who;b.innerHTML=`<span class="n">${who==="j"?esc(S.name).toUpperCase():"UNCLE"}</span>${tag?`<span class="tag">${esc(tag)}</span>`:""}<div class="m"></div><div class="e"></div>`;setBubble(b,my,en);c.appendChild(b);if(moved)b.dataset.wait="1";return b}
 function setBubble(b,my,en){b.querySelector(".m").textContent=my;const e=b.querySelector(".e");e.textContent=en||"";e.style.display=en?"":"none"}
 let clockT=null;
 function goLive(){S.show=$("#showName").value.trim()||"Jamie & Friends";S.topic=$("#topic").value.trim();S.script=$("#script").value;saveS();
@@ -846,7 +858,7 @@ const FX={ctx:null,
    for(let k=0;k<=14;k++){const u=k/14,x=(1-u)*(1-u)*(from.x+jx)+2*(1-u)*u*cx+u*u*to.x,y=(1-u)*(1-u)*(from.y+jy)+2*(1-u)*u*cy+u*u*to.y;kf.push({transform:`translate(${x}px,${y}px) scale(${1.3-u*.7})`,opacity:u<.1?u*10:u>.85?(1-u)/.15:1})}
    const an=p.animate(kf,{duration:dur,delay:i*(180/n),easing:"cubic-bezier(.45,0,.25,1)",fill:"both"});an.onfinish=()=>{p.remove();if(--left===0&&done)done()}}},
  send(){const a=FX.rel($("#askBtn")),o=FX.orb();FX.swoosh();FX.burst(a,{x:o.x,y:o.y},16,560,o.h*.35,()=>{const u=$("#uncle");u.classList.remove("hit");void u.offsetWidth;u.classList.add("hit");setTimeout(()=>u.classList.remove("hit"),500)})},
- bubbleIn(b){const o=FX.orb(),r=FX.rel(b),st=$("#stage");b.style.transition="none";b.style.opacity="0";const g=b.cloneNode(true);g.classList.add("ghost");g.classList.remove("old");g.style.cssText=`left:${r.l}px;top:${r.t}px;width:${r.w}px;margin:0;opacity:1`;st.appendChild(g);
+ bubbleIn(b){if(b.dataset.wait){delete b.dataset.wait;b.style.transition="none";b.style.opacity="0";setTimeout(()=>FX.bubbleIn(b),1600);return}const o=FX.orb(),r=FX.rel(b),st=$("#stage");b.style.transition="none";b.style.opacity="0";const g=b.cloneNode(true);g.classList.add("ghost");g.classList.remove("old");g.style.cssText=`left:${r.l}px;top:${r.t}px;width:${r.w}px;margin:0;opacity:1`;st.appendChild(g);
   const dx=o.x+o.w*.25-r.l,dy=o.y-r.t-r.h/2;
   const an=g.animate([{transform:`translate(${dx}px,${dy}px) scale(.08)`,opacity:0,filter:"blur(6px) brightness(2)"},{offset:.35,opacity:1},{transform:"translate(0,0) scale(1)",opacity:1,filter:"blur(0) brightness(1)"}],{duration:620,easing:"cubic-bezier(.2,.9,.25,1.12)",fill:"both"});
   FX.burst({x:o.x+o.w*.3,y:o.y,w:20,h:20},{x:r.l+r.w*.15,y:r.t+r.h/2},8,520,40);
@@ -903,7 +915,7 @@ async function askPress(src){if($("#live").classList.contains("hidden"))return;u
   try{await ask(text,{label:"ASK",utag:"ASK",adlib:true,pre:ASK_PRE.split("{N}").join(S.name)})}finally{b.classList.remove("proc")}}
 function askCancel(){ASK.on=false;cancelAnimationFrame(ASK.raf);ASK.ui(false);RT.stop();earReset();$("#uncle").style.setProperty("--lv","0")}
 
-/* v2.5: ripples that match the sphere colours and roll out across the whole screen while listening and thinking */
+/* v2.6: ripples that match the sphere colours and roll out across the whole screen while listening and thinking */
 const RIP={last:0,k:0,
  color(){const st=String(S.sphere||"1");this.k++;
   if($("#stage").classList.contains("mesh")){const t=MESH.t/1000;
@@ -920,10 +932,21 @@ const RIP={last:0,k:0,
   if(ls){const lv=parseFloat(u.style.getPropertyValue("--lv"))||0;if(n-this.last>(lv>.15?520-lv*220:1100)){this.last=n;this.emit(Math.max(.25,lv))}}
   else if(th){if(n-this.last>850){this.last=n;this.emit(.55)}}}};
 setInterval(()=>RIP.tick(),90);
+
+/* v2.6 layout: sphere sits in the centre and glides aside when chat bubbles show */
+const LAY={lastAct:0,HOLD:9000,
+ apply(){const st=$("#stage");if(!st)return;const L=S.layout||"glide";st.classList.toggle("caption",L==="caption");if(L!=="glide")st.classList.remove("center");const sel=$("#laySel");if(sel)sel.value=L;setTimeout(()=>MESH.size&&MESH.size(),1850)},
+ active(){LAY.lastAct=now();const st=$("#stage");if(st&&st.classList.contains("center")){st.classList.remove("center");setTimeout(()=>MESH.size&&MESH.size(),1850);return true}return false},
+ tick(){const st=$("#stage");if(!st||(S.layout||"glide")!=="glide"||$("#live").classList.contains("hidden"))return;
+  const quiet=!busy&&!uncleTalking()&&!ASK.busy&&!coBusy&&!reacting&&!chiming&&!(PRE&&PRE.active&&false);
+  if(quiet&&now()-LAY.lastAct>LAY.HOLD&&!st.classList.contains("center")){st.classList.add("center");setTimeout(()=>MESH.size&&MESH.size(),1850)}
+  if(!quiet)LAY.lastAct=Math.max(LAY.lastAct,now()-LAY.HOLD+2500)}};
+setInterval(()=>LAY.tick(),400);
+$("#laySel").onchange=e=>{S.layout=e.target.value;saveS();LAY.apply();if(S.layout==="glide")LAY.lastAct=0};
 $("#coMode").onchange=e=>{S.comode=e.target.checked?1:0;saveS();applyMode();renderStrip();toast(S.comode?"Co-host mode on: Space = CO-HOST":"Co-host mode off: Space = ASK")};
 $("#swMode").onchange=e=>{S.swoosh=e.target.checked?1:0;saveS()};
 $("#boltMode").onchange=e=>{S.bolt=e.target.checked?1:0;saveS()};
-applyMode();
+applyMode();LAY.apply();
 
 $("#roastAud").onclick=()=>{if(busy){toast("Let him finish, or press Esc.");return}ask(DIRECTIONS.roastAud,{direction:true,utag:"👥 ROAST"})};
 $("#roastMe").onclick=()=>{if(busy){toast("Let him finish, or press Esc.");return}ask(DIRECTIONS.roastMe,{direction:true,utag:"👤 ROAST"})};
@@ -970,7 +993,7 @@ $("#closeNotes").onclick=()=>$("#notes").classList.add("hidden");
 fillSetup();
 if(EKEY&&!S.vid)findVoice(true);
 if('serviceWorker' in navigator){/* no SW: keep it simple */}
-/* v2.5 mesh sphere: wireframe globe with moving ripples, drawn on a canvas */
+/* v2.6 mesh sphere: wireframe globe with moving ripples, drawn on a canvas */
 const MESH={th:0,bolts:[],style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,nm:90,a0:.05,warp:1.3,dust:2.4,rim:1}},bph:0,beats:[],cfg:{nl:54,nm:78,amp:1.7,dust:.5},fl:[],acc:0,seed:3,cv:null,ctx:null,off:null,oc:null,t:0,last:0,run:false,c1:"#2f6bff",c2:"#ff3fd8",amp:1,spin:1,lv:0,talk:0,hit:0,dust:null,
  init(){const u=$("#uncle");if(!u||MESH.cv)return;const c=document.createElement("canvas");c.className="mesh";u.appendChild(c);MESH.cv=c;MESH.ctx=c.getContext("2d");MESH.off=document.createElement("canvas");MESH.oc=MESH.off.getContext("2d");
   let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647;MESH.dust=Array.from({length:900},()=>({th:r()*6.283,ph:Math.acos(2*r()-1),k:1.03+r()*.12,f:r()*6.28,z:.6+r()*1.4}));MESH.size()},
