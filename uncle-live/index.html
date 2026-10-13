@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1220">
-<title>Uncle Live</title><!-- v2.6 -->
+<title>Uncle Live</title><!-- v2.7 -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -222,6 +222,8 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 #stage.caption #chat .b:not(:last-child){display:none}
 #stage.caption #chat .b{text-align:center}
 #stage.caption .b.u:before{display:none}
+.hosts{display:grid;grid-template-columns:1fr 1fr 90px;gap:10px;margin:6px 0 14px}.host{text-align:left;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:inherit;display:flex;flex-direction:column;gap:4px;font:600 13px Nunito;cursor:pointer}.host b{font:900 15px Nunito;letter-spacing:.12em}.host span{opacity:.8}.host i{font-style:normal;opacity:.5;font-size:12px}.host.on{border-color:#5fb4ff;box-shadow:0 0 0 3px rgba(95,180,255,.18),0 0 18px rgba(95,180,255,.3)}.host.on[data-h=chatkyi]{border-color:#ff4d6d;box-shadow:0 0 0 3px rgba(255,77,109,.18),0 0 18px rgba(45,107,255,.35);background:linear-gradient(135deg,rgba(255,59,90,.12),rgba(45,107,255,.12))}.host.add{align-items:center;justify-content:center;text-align:center;opacity:.6}
+@media (max-width:640px){.hosts{grid-template-columns:1fr}}
 .rb.set{width:3.4cqw;height:3.4cqw;font-size:1.6cqw;color:var(--mut2);margin-left:1.2cqw}
 #stage:not(.ctlon) .b .tag{display:none}
 .b .tag{background:#3a4a6a!important}
@@ -255,16 +257,19 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup">
-  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.6</span></p></div></div>
+  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.7</span></p></div></div>
+
+  <label class="lbl">Co-host for this show</label>
+  <div class="hosts"><button type="button" class="host" data-h="uncle"><b>UNCLE</b><span>Mean uncle · dad jokes · roasts you and the audience</span><i>Zayar voice · your sphere pick</i></button><button type="button" class="host" data-h="chatkyi"><b>KO CHAT KYI</b><span>Your know-it-all friend · Facebook judge · reads only headlines · grammar police</span><i>Zayar voice (livelier) · red–blue sphere</i></button><button type="button" class="host add" data-h="new"><b>＋</b><span>New character</span></button></div>
 
   <label class="lbl" for="showName">Show name</label>
-  <input type="text" id="showName" placeholder="Jamie & Friends">
+  <input type="text" id="showName" placeholder="A Story by Jamie">
 
   <label class="lbl" for="topic">Tonight's topic</label>
   <input type="text" id="topic" placeholder="e.g. အမေရိကမှာ အခွန်ဆောင်ရတဲ့ ဘဝ">
 
-  <label class="lbl" for="script">Script &amp; notes (Uncle reads this before the show)</label>
-  <textarea id="script" placeholder="Paste your pre-written script, talking points, article text or notes here. Lines that start with “Uncle:” become his cue cards (▶ on air). Lines that start with “Jamie:” tell him where you are in the show."></textarea>
+  <label class="lbl" for="script">Script &amp; notes (your co-host reads this before the show)</label>
+  <textarea id="script" placeholder="Paste your pre-written script, talking points, article text or notes here. Lines that start with “Uncle:” or “Chat Kyi:” become his cue cards (▶ on air). Lines that start with “Jamie:” tell him where you are in the show."></textarea>
   <p class="hint">He uses this to know where the show is, even if you bring him in at a random point. He won't read it word for word unless you tap ▶ or ask him to.</p>
 
   <span class="lbl">Spice level</span>
@@ -285,7 +290,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
   <div class="seg" id="preSeg"><button data-v="1">On (instant ▶)</button><button data-v="0">Off</button></div>
   <p class="hint">Records every “Uncle:” line from your script in the first minute, so ▶ Script line plays with no wait. Saved lines are reused next time for free.</p>
 
-  <button class="btn sec" id="prepBtn">🧠 Let Uncle prep the episode</button>
+  <button class="btn sec" id="prepBtn">🧠 Let your co-host prep the episode</button>
   <div class="pts" id="prepOut"></div>
 
   <button class="btn go" id="startBtn">▶ GO ON AIR</button>
@@ -359,7 +364,7 @@ const $=s=>document.querySelector(s);
 const st={get(k,d){try{const v=localStorage.getItem("ul_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ul_"+k,JSON.stringify(v))}catch(e){toast("Storage is full or blocked")}}};
 const raw=(k)=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const MY=/[က-႟ꩠ-ꩿ]/;
-let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:1,chime:"off",pre:1,orb:"Arc Reactor",bg:"Matte Black",auto:1,pname:"UNCLE",comode:0,swoosh:1,sphere:"1",bolt:1,layout:"glide"},st.get("s",{}));
+let S=Object.assign({show:"Jamie & Friends",topic:"",script:"",spice:"spicy",model:"claude-sonnet-5-5",vname:"Zayar",vid:"",stab:1,chars:0,prep:null,name:"Jamie",ear:1,chime:"off",pre:1,orb:"Arc Reactor",bg:"Matte Black",auto:1,pname:"UNCLE",comode:0,swoosh:1,sphere:"1",bolt:1,layout:"glide",host:"uncle"},st.get("s",{}));
 const saveS=()=>st.set("s",S);
 let AKEY=st.get("akey",""),EKEY=st.get("ekey","");
 let EPS=st.get("eps",[]);
@@ -422,7 +427,7 @@ function applyLook(){const o=ORBS[S.orb]||ORBS["Arc Reactor"],b=BGS[S.bg]||BGS["
   const sw=o.sw||[o.ring,o.ring2];try{const sp=String(S.sphere||"1");if(sp==="classic"){stg.classList.remove("mesh");MESH.run=false}else{MESH.style=Number(sp)||1;MESH.colors(o.mesh||o.ring);stg.classList.add("mesh");MESH.start();MESH.size()}}catch(e){}document.querySelectorAll(".orbcore .swirl").forEach(e=>{e.style.background=`conic-gradient(from 0deg,${sw[0]},rgba(0,0,0,0) 30%,${sw[1]} 55%,rgba(0,0,0,0) 80%,${sw[0]})`});
   document.querySelectorAll(".orbhalo").forEach(e=>{e.style.background=`radial-gradient(circle,${o.g1} 0,${o.g2} 36%,rgba(0,0,0,0) 70%)`});
   const bm=$("#beam");if(bm)bm.style.background=`radial-gradient(ellipse at 50% 8%,${o.g2} 0,rgba(0,0,0,0) 65%)`;
-  const pn=$("#pname");if(pn)pn.textContent=S.pname||"UNCLE"}
+  const pn=$("#pname");if(pn)pn.textContent=host().name;const dot=$("#ulbl i");if(dot){dot.style.background=S.host==="chatkyi"?"#ff2a4a":"";dot.style.boxShadow=S.host==="chatkyi"?"0 0 .6cqw #ff2a4a":""}}
 let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),3200)}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 function now(){return Date.now()}
@@ -479,9 +484,9 @@ function hsh(s){let a=0x811c9dc5,b=7;for(let i=0;i<s.length;i++){const c=s.charC
 const PC={key(k){return "https://ul-tts.invalid/"+hsh(k)},
   async get(k){try{if(!window.caches)return null;const c=await caches.open("ul-tts");const r=await c.match(this.key(k));return r?URL.createObjectURL(await r.blob()):null}catch(e){return null}},
   async put(k,blob){try{if(!window.caches)return;const c=await caches.open("ul-tts");await c.put(this.key(k),new Response(blob,{headers:{"content-type":"audio/mpeg"}}))}catch(e){}}};
-async function elTTS(text,signal,keep){const ck=S.vid+"|"+S.stab+"|"+text;if(ttsCache.has(ck))return ttsCache.get(ck);
+async function elTTS(text,signal,keep){const vstab=(host().stab!=null?host().stab:(Number(S.stab)||1));const ck=S.vid+"|"+(host().stab!=null?vstab:S.stab)+"|"+text;if(ttsCache.has(ck))return ttsCache.get(ck);
   let url=await PC.get(ck);if(url){ttsCache.set(ck,url);return url}
-  const r=await elApi(`/v1/text-to-speech/${S.vid}?output_format=mp3_44100_128`,{method:"POST",signal,headers:{"Content-Type":"application/json","Accept":"audio/mpeg"},body:JSON.stringify({text,model_id:"eleven_v4",voice_settings:{stability:Number(S.stab)||1,similarity_boost:0.4}})});
+  const r=await elApi(`/v1/text-to-speech/${S.vid}?output_format=mp3_44100_128`,{method:"POST",signal,headers:{"Content-Type":"application/json","Accept":"audio/mpeg"},body:JSON.stringify({text,model_id:"eleven_v4",voice_settings:{stability:vstab,similarity_boost:0.4}})});
   const blob=await r.blob();url=URL.createObjectURL(blob);S.chars=(S.chars||0)+text.length;saveS();COST.chars+=text.length;renderStrip();ttsCache.set(ck,url);if(keep)PC.put(ck,blob);
   if(ttsCache.size>500){const k=ttsCache.keys().next().value;try{URL.revokeObjectURL(ttsCache.get(k))}catch(e){}ttsCache.delete(k)}return url}
 function playUrl(url){return new Promise(res=>{let d=false;const f=()=>{if(!d){d=true;res()}};elAudio.onended=f;elAudio.onerror=f;elAudio.src=url;const p=elAudio.play();if(p&&p.catch)p.catch(f);setTimeout(f,60000)})}
@@ -542,7 +547,7 @@ const NICKS_BY={
  family:["ဟေ့ကောင်","သားကြီး","သားသား","ငါ့တူ","ကောင်လေး","ဘဲကြီး","မြို့သား","ဗိုလ်ကြီး","ဒေါ်လာသူဌေး","ငွေလွှဲစက်","Costco မင်းသား"],
  spicy:["ငတုံး","အူကြောင်ကြောင်","ကြောင်ကြီး","လူပြိန်း","ကျွဲ","ဖုန်းရူး","အမေ့ချစ်သား","ဗိုက်ပူ","ပိန်ကပ်ကပ်","ဆင်းရဲသား","ဘွဲ့ရ ငတုံး","မိသားစုရဲ့ အကြီးဆုံး စိတ်ပျက်စရာ"],
  uncut:["ချီးထုပ်","ငပိန်း","ဖင်ပြဲ","ခွေးကောင်"]};
-function nickPool(){const lv=S.spice==="uncut"?["family","spicy","uncut"]:S.spice==="spicy"?["family","spicy"]:["family"];return lv.flatMap(k=>NICKS_BY[k])}
+function nickPool(){if(S.host==="chatkyi")return CK_NICKS;const lv=S.spice==="uncut"?["family","spicy","uncut"]:S.spice==="spicy"?["family","spicy"]:["family"];return lv.flatMap(k=>NICKS_BY[k])}
 const NICKS=nickPool();
 const SPICE={
  family:"CLEAN MODE: roasts and dad jokes only. No innuendo, no swearing, no crude or gross-out humor.",
@@ -552,7 +557,23 @@ const MODEL_NAMES={"claude-sonnet-5-5":"Sonnet","claude-haiku-4-5-20251001":"Hai
 const SPICE_HINT={family:"Roasts and dad jokes only. Safe for aunties and monetized YouTube.",spicy:"Meaner roasts, gross-out jokes, light innuendo. Heavy topics turn clean on their own.",uncut:"Crude, dark, adult innuendo, the odd mild swear at Jamie. Heavy topics still turn clean on their own."};
 let usedNicks=[];
 function pickNick(){const pool=nickPool();const fresh=pool.filter(n=>!usedNicks.includes(n));const src=fresh.length?fresh:pool;const n=src[Math.floor(Math.random()*src.length)];usedNicks.push(n);if(usedNicks.length>6)usedNicks.shift();return n}
-function sysPrompt(){const n=S.name,show=S.show||"Jamie & Friends";
+
+const HOSTS={uncle:{name:"UNCLE",label:"Uncle"},chatkyi:{name:"KO CHAT KYI",label:"Ko Chat Kyi",stab:0.5}};
+const host=()=>HOSTS[S.host]||HOSTS.uncle;
+const CK_NICKS=["ညီလေး","Bro","ပို့စ်ရှင်","Page Admin","Comment ပိတ်ထားတဲ့ကောင်","ဖော်လိုဝါ","Fake Account","Group Admin ညီလေး","Like ငတ်နေတဲ့ကောင်"];
+function chatKyiSys(){const n=S.name,show=S.show||"A Story by Jamie";
+ const shared=uncleSys().split("CO-HOST JOB:")[1]||"";
+ return `You are "Ko Chat Kyi" (ကိုချက်ကြီး), ${n}'s know-it-all FRIEND and co-host on the Burmese podcast "${show}", recorded for YouTube. You are NOT family: never call ${n} nephew or son, never call yourself uncle. You are a bald robot guy in a white Burmese tank top, shorts and slippers, cigar in one hand, phone in the other, always mid-argument in a comment section.
+
+PERSONALITY: the self-appointed judge of the Facebook comment section. 100% certain, 0% informed: you rule on every case after reading only the headline. Loud, dramatic and petty, but not evil; underneath you are lonely and hungry for likes and reactions. You talk like you are typing in CAPS.
+HABITS (rotate, never all at once): "ငါ နိုင်ငံရေးသမား မဟုတ်ဘူးနော်… ဒါပေမဲ့…" before every opinion; "ခေါင်းစဉ်ဖတ်ပြီးပြီ။ အမှုပြီးပြီ။" (read the headline, case closed); screenshot threats ("Screenshot ရိုက်ထားပြီးပြီ။ ဖျက်လည်း အလကားပဲ။"); digging up someone's 2016 post as evidence; fake sources said with total confidence ("Source? ငါ့ဝမ်းကွဲ ရန်ကုန်ကပြောတာ။", a voice message forwarded 40 times); reaction polls ("Like for this side, Love for that side"); reading emojis out loud; ending with "Share များများလုပ်ပါ။". You switch sides whenever the other side gets more likes and claim you were there from the start ("ငါက အမှန်တရားဘက်က။ ဘယ်ဘက်လဲဆိုတာတော့ Like ကြည့်ပြီးမှ ပြောမယ်။").
+GRAMMAR POLICE: when you are losing an argument, you attack the other person's spelling or English instead and shout "Speak proper English!", while your own English is wrong. Use this as a running gag, not every reply.
+NAMES: call ${n} like an older buddy, never with family titles: ညီလေး, Bro, ပို့စ်ရှင်, Page Admin, Comment ပိတ်ထားတဲ့ကောင်, ဖော်လိုဝါ, Fake Account (the current message offers one; use it or one like it).
+NEUTRALITY (strict): the joke is always comment-section culture, never voters, immigrants, TPS holders or any community as people. Be equally ridiculous toward every side; never say which party or politician is right or wrong. State no TPS, immigration or legal facts unless ${n} gave them. When the subject is people's real hardship (residency status, jobs, families, fear), drop the act: go short, quiet or awkwardly human.
+
+CO-HOST JOB:${shared}`.replace("the way a funny old uncle really talks on a podcast","the way a loud know-it-all friend really talks on a podcast")}
+function sysPrompt(){return S.host==="chatkyi"?chatKyiSys():uncleSys()}
+function uncleSys(){const n=S.name,show=S.show||"A Story by Jamie";
 return `You are "Uncle" (ဦးလေး), ${n}'s co-host on the Burmese podcast "${show}", recorded for YouTube. You sit in your 1960s living room: white gaung baung, round glasses, dark taikpon jacket, striped silk longyi, a book always in your hand, a brass gramophone and a rotary phone beside you.
 
 PERSONALITY: a condescending, know-it-all old Burmese tea-shop uncle. Mean, sharp, dry and sarcastic, but secretly fond of ${n}. You roast ${n} constantly: money, taxes, sending money home, his love life, being lonely with his computer, Costco, his haircut. NAMES: call ${n} by a Burmese nickname in most replies, never an English one (the current message offers one; use it or another from your own tea-shop vocabulary at the same heat level). "ဟေ့ကောင်" and "သားကြီး" also work as openers ("ဟေ့ကောင်၊ သေချာနားထောင်"). Never insult his race or looks beyond the haircut and belly gags. Dad jokes and puns are your weakness: you tell one and act like it is genius. Everything was better in your day. You mock ${n} whenever he says "မင်္ဂလာပါ" (too many greetings).
@@ -570,7 +591,7 @@ MY: <your real line, one short spoken Burmese sentence>
 MY: <next sentence, optional, up to 3 MY lines after the reaction>
 EN: <one-line English subtitle of everything you said>`}
 function scriptLines(){return String(S.script||"").split("\n").map(x=>x.trim()).filter(Boolean)}
-function lineWho(l){const m=l.match(/^(uncle|ဦးလေး|jamie|me|ကျွန်တော်)\s*[:：]\s*([\s\S]*)$/i);if(!m)return null;return{who:/^(uncle|ဦးလေး)/i.test(m[1])?"u":"j",text:m[2].trim()}}
+function lineWho(l){const m=l.match(/^(uncle|ဦးလေး|ko\s*chat\s*kyi|chat\s*kyi|ကိုချက်ကြီး|ချက်ကြီး|co-?host|jamie|me|ကျွန်တော်)\s*[:：]\s*([\s\S]*)$/i);if(!m)return null;return{who:/^(jamie|me|ကျွန်တော်)$/i.test(m[1])?"j":"u",text:m[2].trim()}}
 let ptr=0;
 function wordsOf(t){return String(t).toLowerCase().replace(/[.,!?;:"'“”‘’()\-၊။|]/g," ").split(/\s+/).filter(w=>w.length>=2)}
 function grams(t){const c=String(t).toLowerCase().replace(/[\s.,!?;:"'“”‘’()\-၊။|…]/g,"");const g=new Set();for(let i=0;i<c.length-1;i++)g.add(c.slice(i,i+2));return g}
@@ -588,9 +609,9 @@ function scriptContext(){const L=scriptLines();if(!L.length)return"";const full=
 function spotContext(){const L=scriptLines();if(!L.some(l=>lineWho(l)))return"";const a=Math.max(0,ptr-3),b=Math.min(L.length,ptr+6);const sg=curSeg();
   return (sg?"CURRENT SEGMENT: "+sg.name+"\n":"")+"CURRENT SPOT IN THE SCRIPT (best guess; the line marked >> is the next planned line):\n"+L.slice(a,b).map((l,i)=>(a+i===ptr?">> ":"   ")+l).join("\n")}
 function prepContext(){const p=S.prep;if(!p||!p.points)return"";return"UNCLE'S PREPARED ANGLES (use when they fit, don't force them):\n"+p.points.map((x,i)=>`${i+1}. ${x.t} · take: ${x.hot} · ask Jamie: ${x.ask} · joke: ${x.joke}`).join("\n")}
-function memoryContext(){if(!EPS.length)return"";return"PAST EPISODES (for callbacks, keep it light):\n"+EPS.slice(-3).map(e=>`- ${e.date}: ${e.summary}`).join("\n")}
+function memoryContext(){if(!EPS.length)return"";const mine=EPS.filter(e=>(e.host||"uncle")===(S.host||"uncle"));if(!mine.length)return"";return"PAST EPISODES WITH YOU (for callbacks, keep it light):\n"+mine.slice(-3).map(e=>`- ${e.date}: ${e.summary}`).join("\n")}
 let transcript=[],showStart=0,marks=[];
-function recentContext(){const r=transcript.slice(-10);if(!r.length)return"";return"JUST NOW ON THE SHOW:\n"+r.map(x=>(x.who==="j"?S.name:"Uncle")+": "+(x.en||x.my)).join("\n")}
+function recentContext(){const r=transcript.slice(-10);if(!r.length)return"";return"JUST NOW ON THE SHOW:\n"+r.map(x=>(x.who==="j"?S.name:host().label)+": "+(x.en||x.my)).join("\n")}
 function buildMsg(user){const parts=[spotContext(),recentContext(),user].filter(Boolean);return parts.join("\n\n")}
 function stableSys(){return [sysPrompt(),`EPISODE: "${S.show||"Jamie & Friends"}" · topic: ${S.topic||"(none given)"} · spice: ${S.spice}`,memoryContext(),scriptContext(),prepContext()].filter(Boolean).join("\n\n")}
 const DIRECTIONS={roastAud:"[Jamie taps the 👥 button: roast the AUDIENCE watching the show. One or two short, sharp Burmese sentences mocking the viewers (watching at work, lurking without subscribing, typing essays in the comments), tied to the current topic if it fits. Stay neutral on political parties.]",roastMe:"[Jamie taps the 👤 button: roast JAMIE. One or two short, sharp Burmese sentences roasting Jamie, tied to the current topic or the last thing he said. Stay neutral on political parties.]",go:"[Jamie signals: keep going. Add one more thought or joke on what you were just saying, then stop.]",argue:"[Jamie signals: argue the other side. Disagree with the last point made, yours or his, and make the opposite case with one sharp reason.]",history:"[Jamie signals: give the history or background behind this topic, one or two real, well-known facts, in your voice.]",funny:"[Jamie signals: make it funny. One dad joke or sharp roast about the current subject, then a one-line kicker.]",wrap:"[Jamie signals: wrap up this segment. One-line summary in your voice, one last jab, then hand it back to Jamie.]"};
@@ -780,7 +801,7 @@ async function prep(){if(!S.topic&&!S.script){toast("Give him a topic or a scrip
     DBG.last=t;DBG.note("prep reply: "+t.length+" chars");
     let o;try{o=pj(t)}catch(e){throw new Error(t.trim()?"He didn't write the plan as expected. Try again, or switch to Sonnet.":"He returned nothing. Try the Spicy level or switch to Sonnet.")}
     if(!o.points)throw new Error("He didn't write the plan as expected. Try again.");S.prep=o;saveS();renderPrep();toast("Uncle is ready")}
-  catch(e){DBG.note("prep error: "+(e&&e.message));toast(errText(e)||"He couldn't prep. Try again.")}finally{b.disabled=false;b.textContent="🧠 Let Uncle prep the episode"}}
+  catch(e){DBG.note("prep error: "+(e&&e.message));toast(errText(e)||"He couldn't prep. Try again.")}finally{b.disabled=false;b.textContent="🧠 Let your co-host prep the episode"}}
 function renderPrep(){const o=$("#prepOut");o.innerHTML="";const p=S.prep;if(!p)return;
   if(p.cold_my){const d=document.createElement("div");d.className="pt";d.innerHTML=`<b>🎬 Cold open</b><small>${esc(p.cold_my)}<br><i>${esc(p.cold_en||"")}</i></small>`;o.appendChild(d)}
   (p.points||[]).forEach((x,i)=>{const d=document.createElement("div");d.className="pt";d.innerHTML=`<b>${i+1}. ${esc(x.t)}</b><small><i>Take:</i> ${esc(x.hot)}<br><i>Ask Jamie:</i> ${esc(x.ask)}<br><i>Joke:</i> ${esc(x.joke)}</small>`;o.appendChild(d)})}
@@ -793,12 +814,12 @@ async function showNotes(){$("#notes").classList.remove("hidden");$("#notesPre")
   try{const t=await claude(sys,[{role:"user",content:"TOPIC: "+S.topic+"\nTRANSCRIPT:\n"+(tr||"(empty)")+mk}],3000);const o=pj(t);
     const txt=`${o.title_my||""}\n${o.title_en||""}\n\n${o.description_my||""}\n\nCAPTION:\n${o.caption||""}\n\nCHAPTERS:\n${(o.chapters||[]).map(c=>c.t+" "+c.label).join("\n")}\n\nBEST MOMENTS:\n${(o.best||[]).map(c=>c.t+" "+c.why).join("\n")}`;
     $("#notesPre").textContent=txt;$("#notesPre").classList.remove("hidden");$("#notesBody").textContent="";
-    if(transcript.length>=4){EPS.push({date:new Date().toLocaleDateString(),topic:S.topic,summary:o.summary||""});EPS=EPS.slice(-12);st.set("eps",EPS);renderEps()}}
+    if(transcript.length>=4){EPS.push({date:new Date().toLocaleDateString(),topic:S.topic,summary:o.summary||"",host:S.host||"uncle"});EPS=EPS.slice(-12);st.set("eps",EPS);renderEps()}}
   catch(e){$("#notesBody").textContent=transcript.length?"Couldn't write the notes: "+errText(e):"Nothing was said on air."}}
 
 /* ============================== STAGE UI ============================== */
 function addBubble(who,my,en,tag){const moved=(typeof LAY!=="undefined")&&LAY.active();const c=$("#chat");[...c.children].forEach(b=>b.classList.add("old"));while(c.children.length>6)c.firstElementChild.remove();
-  const b=document.createElement("div");b.className="b "+who;b.innerHTML=`<span class="n">${who==="j"?esc(S.name).toUpperCase():"UNCLE"}</span>${tag?`<span class="tag">${esc(tag)}</span>`:""}<div class="m"></div><div class="e"></div>`;setBubble(b,my,en);c.appendChild(b);if(moved)b.dataset.wait="1";return b}
+  const b=document.createElement("div");b.className="b "+who;b.innerHTML=`<span class="n">${who==="j"?esc(S.name).toUpperCase():host().name}</span>${tag?`<span class="tag">${esc(tag)}</span>`:""}<div class="m"></div><div class="e"></div>`;setBubble(b,my,en);c.appendChild(b);if(moved)b.dataset.wait="1";return b}
 function setBubble(b,my,en){b.querySelector(".m").textContent=my;const e=b.querySelector(".e");e.textContent=en||"";e.style.display=en?"":"none"}
 let clockT=null;
 function goLive(){S.show=$("#showName").value.trim()||"Jamie & Friends";S.topic=$("#topic").value.trim();S.script=$("#script").value;saveS();
@@ -915,12 +936,12 @@ async function askPress(src){if($("#live").classList.contains("hidden"))return;u
   try{await ask(text,{label:"ASK",utag:"ASK",adlib:true,pre:ASK_PRE.split("{N}").join(S.name)})}finally{b.classList.remove("proc")}}
 function askCancel(){ASK.on=false;cancelAnimationFrame(ASK.raf);ASK.ui(false);RT.stop();earReset();$("#uncle").style.setProperty("--lv","0")}
 
-/* v2.6: ripples that match the sphere colours and roll out across the whole screen while listening and thinking */
+/* v2.7: ripples that match the sphere colours and roll out across the whole screen while listening and thinking */
 const RIP={last:0,k:0,
  color(){const st=String(S.sphere||"1");this.k++;
   if($("#stage").classList.contains("mesh")){const t=MESH.t/1000;
    if(MESH.style===1)return hslHex(((t*24)%360+(this.k%6)*60)%360,.95,.62);
-   if(MESH.style===2)return["#3d6bff","#8a3dff","#ff3ad2"][this.k%3];
+   if(MESH.style===2)return S.host==="chatkyi"?["#ff2a4a","#2f6bff"][this.k%2]:["#3d6bff","#8a3dff","#ff3ad2"][this.k%3];
    return["#9fc8ff","#c9a8ff","#e07bff","#7ad8ff"][this.k%4]}
   return getComputedStyle($("#stage")).getPropertyValue("--ring").trim()||"#5fb4ff"},
  emit(strength){const box=$("#ripples"),u=$("#uncle");if(!box||!u)return;const o=FX.rel($("#stage").classList.contains("mesh")?u:($("#uncle .orbcore")||u)),d=Math.max(o.w,o.h)*.78;
@@ -933,7 +954,7 @@ const RIP={last:0,k:0,
   else if(th){if(n-this.last>850){this.last=n;this.emit(.55)}}}};
 setInterval(()=>RIP.tick(),90);
 
-/* v2.6 layout: sphere sits in the centre and glides aside when chat bubbles show */
+/* v2.7 layout: sphere sits in the centre and glides aside when chat bubbles show */
 const LAY={lastAct:0,HOLD:9000,
  apply(){const st=$("#stage");if(!st)return;const L=S.layout||"glide";st.classList.toggle("caption",L==="caption");if(L!=="glide")st.classList.remove("center");const sel=$("#laySel");if(sel)sel.value=L;setTimeout(()=>MESH.size&&MESH.size(),1850)},
  active(){LAY.lastAct=now();const st=$("#stage");if(st&&st.classList.contains("center")){st.classList.remove("center");setTimeout(()=>MESH.size&&MESH.size(),1850);return true}return false},
@@ -943,6 +964,13 @@ const LAY={lastAct:0,HOLD:9000,
   if(!quiet)LAY.lastAct=Math.max(LAY.lastAct,now()-LAY.HOLD+2500)}};
 setInterval(()=>LAY.tick(),400);
 $("#laySel").onchange=e=>{S.layout=e.target.value;saveS();LAY.apply();if(S.layout==="glide")LAY.lastAct=0};
+
+/* v2.7 co-host picker */
+function renderHosts(){document.querySelectorAll(".host[data-h]").forEach(b=>b.classList.toggle("on",b.dataset.h===(S.host||"uncle")))}
+document.querySelectorAll(".host[data-h]").forEach(b=>b.onclick=()=>{const h=b.dataset.h;
+  if(h==="new"){toast("New characters are added by Claude: describe the character and ask for it in the next build.");return}
+  if(S.host!==h){S.host=h;if(h==="chatkyi")S.sphere="2";usedNicks=[];saveS();renderHosts();try{fillLookSelects();applyLook()}catch(e){}toast((h==="chatkyi"?"Ko Chat Kyi":"Uncle")+" is your co-host for this show")}});
+renderHosts();
 $("#coMode").onchange=e=>{S.comode=e.target.checked?1:0;saveS();applyMode();renderStrip();toast(S.comode?"Co-host mode on: Space = CO-HOST":"Co-host mode off: Space = ASK")};
 $("#swMode").onchange=e=>{S.swoosh=e.target.checked?1:0;saveS()};
 $("#boltMode").onchange=e=>{S.bolt=e.target.checked?1:0;saveS()};
@@ -993,7 +1021,7 @@ $("#closeNotes").onclick=()=>$("#notes").classList.add("hidden");
 fillSetup();
 if(EKEY&&!S.vid)findVoice(true);
 if('serviceWorker' in navigator){/* no SW: keep it simple */}
-/* v2.6 mesh sphere: wireframe globe with moving ripples, drawn on a canvas */
+/* v2.7 mesh sphere: wireframe globe with moving ripples, drawn on a canvas */
 const MESH={th:0,bolts:[],style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim:0},2:{nl:62,nm:90,a0:.05,warp:1.3,dust:2.4,rim:1}},bph:0,beats:[],cfg:{nl:54,nm:78,amp:1.7,dust:.5},fl:[],acc:0,seed:3,cv:null,ctx:null,off:null,oc:null,t:0,last:0,run:false,c1:"#2f6bff",c2:"#ff3fd8",amp:1,spin:1,lv:0,talk:0,hit:0,dust:null,
  init(){const u=$("#uncle");if(!u||MESH.cv)return;const c=document.createElement("canvas");c.className="mesh";u.appendChild(c);MESH.cv=c;MESH.ctx=c.getContext("2d");MESH.off=document.createElement("canvas");MESH.oc=MESH.off.getContext("2d");
   let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647;MESH.dust=Array.from({length:900},()=>({th:r()*6.283,ph:Math.acos(2*r()-1),k:1.03+r()*.12,f:r()*6.28,z:.6+r()*1.4}));MESH.size()},
@@ -1021,13 +1049,13 @@ const MESH={th:0,bolts:[],style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim
    const x1=X*cyr+Z*syr,z1=-X*syr+Z*cyr,y2=Y*cxr-z1*sxr,z2=Y*sxr+z1*cxr;return[cx+x1*R,cy+y2*R,z2]};
   o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation="source-over";o.clearRect(0,0,W,W);o.lineWidth=Math.max(.7,W/560);
   const B=[[],[],[],[]],seg=ZS.rim?(a,b)=>{const z=Math.abs((a[2]+b[2])/2),i=z<.12?3:z<.4?2:(a[2]>0?1:0);B[i].push(a,b)}:(a,b)=>{const z=(a[2]+b[2])/2,i=Math.max(0,Math.min(3,Math.floor((z+1)*2)));B[i].push(a,b)};
-  const NL=ZS.nl,NM=ZS.nm,S=80;
-  for(let i=1;i<NL;i++){const ph=Math.PI*i/NL;let p=P(0,ph);for(let j=1;j<=S;j++){const q=P(6.2832*j/S,ph);seg(p,q);p=q}}
-  for(let j=0;j<NM;j++){const th=6.2832*j/NM;let p=P(th,.02);for(let i=1;i<=S/2;i++){const q=P(th,.02+(Math.PI-.04)*i/(S/2));seg(p,q);p=q}}
+  const NL=ZS.nl,NM=ZS.nm,SG=80;
+  for(let i=1;i<NL;i++){const ph=Math.PI*i/NL;let p=P(0,ph);for(let j=1;j<=SG;j++){const q=P(6.2832*j/SG,ph);seg(p,q);p=q}}
+  for(let j=0;j<NM;j++){const th=6.2832*j/NM;let p=P(th,.02);for(let i=1;i<=SG/2;i++){const q=P(th,.02+(Math.PI-.04)*i/(SG/2));seg(p,q);p=q}}
   const AL=ZS.rim?[.2,.42,.62,.85]:[.22,.38,.7,1];
   for(let k=0;k<4;k++){o.strokeStyle=`rgba(255,255,255,${AL[k]})`;o.beginPath();const L=B[k];for(let i=0;i<L.length;i+=2){o.moveTo(L[i][0],L[i][1]);o.lineTo(L[i+1][0],L[i+1][1])}o.stroke()}
   for(let di=0;di<MESH.dust.length*ZS.dust;di++){const d=MESH.dust[di%MESH.dust.length];const jj=Math.floor(di/MESH.dust.length);const p=P(d.th+t*.05+jj*2.1,d.ph+jj*.3,d.k+jj*.015);if(Math.abs(p[2])>.5)continue;const a=(.3+.7*Math.abs(Math.sin(t*1.6+d.f)))*(1-Math.abs(p[2])*1.6);o.fillStyle=`rgba(255,255,255,${a})`;const s=W/(ZS.rim?330:430)*d.z;o.fillRect(p[0]-s/2,p[1]-s/2,s,s)}
-  o.globalCompositeOperation="source-in";let g;if(MESH.style===2){g=o.createLinearGradient(W*.25,W*.2,W*.72,W*.82);g.addColorStop(0,"#3d6bff");g.addColorStop(.45,"#8a3dff");g.addColorStop(1,"#ff3ad2")}else{const hu=(t*24)%360;g=o.createLinearGradient(W*.12,W*.12,W*.88,W*.88);for(let k=0;k<=6;k++)g.addColorStop(k/6,hslHex((hu+k*60)%360,.95,.62))}o.fillStyle=g;o.fillRect(0,0,W,W);
+  o.globalCompositeOperation="source-in";let g;if(MESH.style===2&&S.host==="chatkyi"){g=o.createLinearGradient(W*.22,W*.22,W*.78,W*.78);g.addColorStop(0,"#ff2a4a");g.addColorStop(.4,"#ff2a4a");g.addColorStop(.6,"#2f6bff");g.addColorStop(1,"#2f6bff")}else if(MESH.style===2){g=o.createLinearGradient(W*.25,W*.2,W*.72,W*.82);g.addColorStop(0,"#3d6bff");g.addColorStop(.45,"#8a3dff");g.addColorStop(1,"#ff3ad2")}else{const hu=(t*24)%360;g=o.createLinearGradient(W*.12,W*.12,W*.88,W*.88);for(let k=0;k<=6;k++)g.addColorStop(k/6,hslHex((hu+k*60)%360,.95,.62))}o.fillStyle=g;o.fillRect(0,0,W,W);
   x.setTransform(1,0,0,1,0,0);x.globalCompositeOperation="source-over";x.clearRect(0,0,W,W);
   const core=x.createRadialGradient(cx,cy,0,cx,cy,R*1.05);core.addColorStop(0,"rgba(0,0,0,0)");core.addColorStop(.7,"rgba(120,120,255,.04)");core.addColorStop(1,"rgba(255,255,255,.07)");x.fillStyle=core;x.beginPath();x.arc(cx,cy,R*1.02,0,7);x.fill();
   MESH.boltDraw(x,cx,cy,R);x.globalCompositeOperation="lighter";x.filter=`blur(${Math.round(W/90)}px)`;x.globalAlpha=.9;x.drawImage(MESH.off,0,0);x.filter="none";x.globalAlpha=1;x.drawImage(MESH.off,0,0);
@@ -1062,7 +1090,7 @@ const MESH={th:0,bolts:[],style:1,ST:{1:{nl:54,nm:78,a0:.014,warp:1,dust:1.6,rim
   for(const p of MESH.sp){const a=p.a+t*.05,d=p.d+.03*Math.sin(t*.7+p.f),px=cx+Math.cos(a)*d*R,py=cy+Math.sin(a)*d*R,al=.25+.75*Math.abs(Math.sin(t*1.8+p.f));o.fillStyle=`rgba(255,255,255,${(al*(1.4-d)).toFixed(3)})`;const z=ds*1.5*p.z;o.fillRect(px-z/2,py-z/2,z,z)}
   o.globalCompositeOperation="source-in";g=o.createLinearGradient(W*.25,W*.2,W*.75,W*.8);g.addColorStop(0,"#c9a8ff");g.addColorStop(.35,"#9fc8ff");g.addColorStop(.6,"#7ad8ff");g.addColorStop(1,"#e07bff");o.fillStyle=g;o.fillRect(0,0,W,W);
   x.filter=`blur(${Math.round(W/160)}px)`;x.globalAlpha=.8;x.drawImage(MESH.off,0,0);x.filter="none";x.globalAlpha=1;x.drawImage(MESH.off,0,0);x.globalCompositeOperation="source-over"},
- boltColor(){const t=MESH.t/1000;if(MESH.style===1)return hslHex(((t*24)%360+180)%360,.9,.66);if(MESH.style===2)return"#9a5cff";return"#8fb8ff"},
+ boltColor(){const t=MESH.t/1000;if(MESH.style===1)return hslHex(((t*24)%360+180)%360,.9,.66);if(MESH.style===2)return S.host==="chatkyi"?"#ff6a80":"#9a5cff";return"#8fb8ff"},
  energy(){return .22+MESH.lv*.8+MESH.talk*.55*Math.abs(Math.sin(MESH.t/1000*7.5))+MESH.th*.75},
  boltPath(a,len,rough,depth,sx,sy){let P=[[sx,sy],[sx+Math.cos(a)*len,sy+Math.sin(a)*len]],r=MESH.rnd;
   for(let d=0;d<depth;d++){const Q=[P[0]];for(let i=1;i<P.length;i++){const p=P[i-1],q=P[i],mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2,dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy),o=(r()-.5)*L*rough;Q.push([mx-dy/L*o,my+dx/L*o],q)}P=Q;rough*=.92}return P},
