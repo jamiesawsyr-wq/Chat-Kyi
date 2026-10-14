@@ -257,7 +257,7 @@ summary{cursor:pointer;font-weight:800;padding:12px 0;color:var(--gold)}
 
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup">
-  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.7</span></p></div></div>
+  <div class="brand"><div class="av"><div class="orbx" id="avOrb"><div class="orbhalo"></div><div class="orbcore"><div class="swirl"></div><div class="grain"></div></div></div></div><div><h1>UNCLE LIVE</h1><p>Your Burmese co-host. Paste tonight's topic and script, let him prep, then go on air. <span style="opacity:.6">v2.7.1</span></p></div></div>
 
   <label class="lbl">Co-host for this show</label>
   <div class="hosts"><button type="button" class="host" data-h="uncle"><b>UNCLE</b><span>Mean uncle · dad jokes · roasts you and the audience</span><i>Zayar voice · your sphere pick</i></button><button type="button" class="host" data-h="chatkyi"><b>KO CHAT KYI</b><span>Your know-it-all friend · Facebook judge · reads only headlines · grammar police</span><i>Zayar voice (livelier) · red–blue sphere</i></button><button type="button" class="host add" data-h="new"><b>＋</b><span>New character</span></button></div>
@@ -543,6 +543,9 @@ async function listenStart(){if(listening||busy)return;
 function listenStop(){if(!listening||!rec)return;if(rec.state!=="recording"){listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden");return}try{rec.stop()}catch(e){listening=false;$("#mic").classList.remove("on");$("#micHint").classList.add("hidden")}}
 
 /* ============================== UNCLE'S BRAIN ============================== */
+const HOSTS={uncle:{name:"UNCLE",label:"Uncle"},chatkyi:{name:"KO CHAT KYI",label:"Ko Chat Kyi",stab:0.5}};
+const host=()=>HOSTS[S.host]||HOSTS.uncle;
+const CK_NICKS=["ညီလေး","Bro","ပို့စ်ရှင်","Page Admin","Comment ပိတ်ထားတဲ့ကောင်","ဖော်လိုဝါ","Fake Account","Group Admin ညီလေး","Like ငတ်နေတဲ့ကောင်"];
 const NICKS_BY={
  family:["ဟေ့ကောင်","သားကြီး","သားသား","ငါ့တူ","ကောင်လေး","ဘဲကြီး","မြို့သား","ဗိုလ်ကြီး","ဒေါ်လာသူဌေး","ငွေလွှဲစက်","Costco မင်းသား"],
  spicy:["ငတုံး","အူကြောင်ကြောင်","ကြောင်ကြီး","လူပြိန်း","ကျွဲ","ဖုန်းရူး","အမေ့ချစ်သား","ဗိုက်ပူ","ပိန်ကပ်ကပ်","ဆင်းရဲသား","ဘွဲ့ရ ငတုံး","မိသားစုရဲ့ အကြီးဆုံး စိတ်ပျက်စရာ"],
@@ -558,9 +561,6 @@ const SPICE_HINT={family:"Roasts and dad jokes only. Safe for aunties and moneti
 let usedNicks=[];
 function pickNick(){const pool=nickPool();const fresh=pool.filter(n=>!usedNicks.includes(n));const src=fresh.length?fresh:pool;const n=src[Math.floor(Math.random()*src.length)];usedNicks.push(n);if(usedNicks.length>6)usedNicks.shift();return n}
 
-const HOSTS={uncle:{name:"UNCLE",label:"Uncle"},chatkyi:{name:"KO CHAT KYI",label:"Ko Chat Kyi",stab:0.5}};
-const host=()=>HOSTS[S.host]||HOSTS.uncle;
-const CK_NICKS=["ညီလေး","Bro","ပို့စ်ရှင်","Page Admin","Comment ပိတ်ထားတဲ့ကောင်","ဖော်လိုဝါ","Fake Account","Group Admin ညီလေး","Like ငတ်နေတဲ့ကောင်"];
 function chatKyiSys(){const n=S.name,show=S.show||"A Story by Jamie";
  const shared=uncleSys().split("CO-HOST JOB:")[1]||"";
  return `You are "Ko Chat Kyi" (ကိုချက်ကြီး), ${n}'s know-it-all FRIEND and co-host on the Burmese podcast "${show}", recorded for YouTube. You are NOT family: never call ${n} nephew or son, never call yourself uncle. You are a bald robot guy in a white Burmese tank top, shorts and slippers, cigar in one hand, phone in the other, always mid-argument in a comment section.
